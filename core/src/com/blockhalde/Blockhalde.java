@@ -49,7 +49,9 @@ public class Blockhalde extends ApplicationAdapter {
 	public void render() {
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-	
+		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+		
 		shader.begin();
 		
 		// Normal matrix is inverse transposed modelview matrix
@@ -57,7 +59,7 @@ public class Blockhalde extends ApplicationAdapter {
 		
 		shader.setUniformMatrix("u_view", cam.view);
 		shader.setUniformMatrix("u_projection", cam.projection);
-		shader.setUniformMatrix("u_normalMatrix", cam.projection);
+		shader.setUniformMatrix("u_normalMatrix", normalMatrix);
 		
 		chunk.getMesh().render(shader, GL20.GL_TRIANGLES);
 		

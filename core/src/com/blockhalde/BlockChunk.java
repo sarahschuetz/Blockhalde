@@ -38,12 +38,14 @@ public class BlockChunk {
 	 */
 	private short[] indices = new short[CHUNK_INDEX_COUNT];
 	private int indexCount = 0;
+	
+	private int nextIdx;
 	/**
 	 */
 	private Mesh mesh = new Mesh(
 		false,
-		verts.length,
-		indices.length,
+		CHUNK_VERTEX_COUNT,
+		CHUNK_INDEX_COUNT,
 		new VertexAttributes(
 			new VertexAttribute(Usage.Position, 3, "a_position"),
 			new VertexAttribute(Usage.Normal, 3, "a_normal"),
@@ -103,89 +105,151 @@ public class BlockChunk {
 		indexCount = 0;
 		
 		Vector3 center = new Vector3();
-		
+		Vector3 bottomLeft = new Vector3();
+		Vector3 bottomRight = new Vector3();
+		Vector3 topRight = new Vector3();
+		Vector3 topLeft = new Vector3();
+		Vector3 normal = new Vector3();
 		
 		// X coordinate of the leftmost blocks so that the mesh is symmetrical
 		float firstX = (-CHUNK_WIDTH / 2) * BLOCK_SIZE + BLOCK_SIZE_HALF;
 		float firstY = (-CHUNK_HEIGHT / 2) * BLOCK_SIZE + BLOCK_SIZE_HALF;
 		float firstZ = (-CHUNK_DEPTH / 2) * BLOCK_SIZE + BLOCK_SIZE_HALF;
 		
-		for(int x = 0; x < CHUNK_WIDTH; ++x) {
-			for(int y = 0; y < CHUNK_HEIGHT; ++y) {
-				for(int z = 0; z < CHUNK_DEPTH; ++z) {
+		nextIdx = 0;
+		
+		for(int z = 0; z < CHUNK_DEPTH; ++z) {
+			for(int x = 0; x < CHUNK_WIDTH; ++x) {
+				for(int y = 0; y < CHUNK_HEIGHT; ++y) {
+				
 					center.set(firstX + x * BLOCK_SIZE,
 							   firstY + y * BLOCK_SIZE,
 							   firstZ + z * BLOCK_SIZE);
 					
-					// Front face, front left bottom vertex
-					int frontLeftBottom = indexCount;
-					// Position
-					verts[vertCount++] = center.x - BLOCK_SIZE_HALF;
-					verts[vertCount++] = center.y - BLOCK_SIZE_HALF;
-					verts[vertCount++] = center.z + BLOCK_SIZE_HALF;
-					// Normal
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 1f;
-					// UVs
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 0f;
+					// Front plane
+					bottomLeft.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					bottomRight.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					topRight.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					topLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					normal.set(0, 0, 1);
+					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
-					// Front face, front right bottom vertex
-					int frontRightBottom = indexCount + 1;
-					// Position
-					verts[vertCount++] = center.x + BLOCK_SIZE_HALF;
-					verts[vertCount++] = center.y - BLOCK_SIZE_HALF;
-					verts[vertCount++] = center.z + BLOCK_SIZE_HALF;
-					// Normal
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 1f;
-					// UVs
-					verts[vertCount++] = 1f;
-					verts[vertCount++] = 0f;
+					// Back plane
+					bottomLeft.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					bottomRight.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					topRight.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					topLeft.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					normal.set(0, 0, -1);
+					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
-					// Front face, top right top vertex
-					int frontRightTop = indexCount + 2;
-					// Position
-					verts[vertCount++] = center.x + BLOCK_SIZE_HALF;
-					verts[vertCount++] = center.y + BLOCK_SIZE_HALF;
-					verts[vertCount++] = center.z + BLOCK_SIZE_HALF;
-					// Normal
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 1f;
-					// UVs
-					verts[vertCount++] = 1f;
-					verts[vertCount++] = 1f;
+					// Top plane
+					bottomLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					bottomRight.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					topRight.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					topLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					normal.set(0, 1, 0);
+					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
-					// Front face, top left top vertex
-					int frontLeftTop = indexCount + 3;
-					// Position
-					verts[vertCount++] = center.x - BLOCK_SIZE_HALF;
-					verts[vertCount++] = center.y + BLOCK_SIZE_HALF;
-					verts[vertCount++] = center.z + BLOCK_SIZE_HALF;
-					// Normal
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 1f;
-					// UVs
-					verts[vertCount++] = 0f;
-					verts[vertCount++] = 1f;
+					// Bottom plane
+					bottomLeft.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					bottomRight.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					topRight.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					topLeft.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					normal.set(0, -1, 0);
+					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
-					indices[indexCount++] = (short) frontLeftBottom;
-					indices[indexCount++] = (short) frontRightBottom;
-					indices[indexCount++] = (short) frontRightTop;
+					// Left plane
+					bottomLeft.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					bottomRight.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					topRight.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					topLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					normal.set(-1, 0, 0);
+					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
-					indices[indexCount++] = (short) frontLeftBottom;
-					indices[indexCount++] = (short) frontRightTop;
-					indices[indexCount++] = (short) frontLeftTop;
+					// Right plane
+					bottomLeft.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					bottomRight.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					topRight.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
+					topLeft.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
+					normal.set(1, 0, 0);
+					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
 				}
 			}
 		}
 		
 		mesh.setVertices(verts, 0, vertCount);
 		mesh.setIndices(indices, 0, indexCount);
+	}
+
+	public void addCubePlane(Vector3 center,
+			                 Vector3 bottomLeftOffset,
+			                 Vector3 bottomRightOffset,
+			                 Vector3 topRightOffset,
+			                 Vector3 topLeftOffset,
+			                 Vector3 commonNormal) {
+		// Front face, front left bottom vertex
+		int frontLeftBottom = nextIdx++;
+		// Position
+		verts[vertCount++] = center.x + bottomLeftOffset.x;
+		verts[vertCount++] = center.y + bottomLeftOffset.y;
+		verts[vertCount++] = center.z + bottomLeftOffset.z;
+		// Normal
+		verts[vertCount++] = commonNormal.x;
+		verts[vertCount++] = commonNormal.y;
+		verts[vertCount++] = commonNormal.z;
+		// UVs
+		verts[vertCount++] = 0f;
+		verts[vertCount++] = 0f;
+		
+		// Front face, front right bottom vertex
+		int frontRightBottom = nextIdx++;
+		// Position
+		verts[vertCount++] = center.x + bottomRightOffset.x;
+		verts[vertCount++] = center.y + bottomRightOffset.y;
+		verts[vertCount++] = center.z + bottomRightOffset.z;
+		// Normal
+		verts[vertCount++] = commonNormal.x;
+		verts[vertCount++] = commonNormal.y;
+		verts[vertCount++] = commonNormal.z;
+		// UVs
+		verts[vertCount++] = 1f;
+		verts[vertCount++] = 0f;
+		
+		// Front face, top right top vertex
+		int frontRightTop = nextIdx++;
+		// Position
+		verts[vertCount++] = center.x + topRightOffset.x;
+		verts[vertCount++] = center.y + topRightOffset.y;
+		verts[vertCount++] = center.z + topRightOffset.z;
+		// Normal
+		verts[vertCount++] = commonNormal.x;
+		verts[vertCount++] = commonNormal.y;
+		verts[vertCount++] = commonNormal.z;
+		// UVs
+		verts[vertCount++] = 1f;
+		verts[vertCount++] = 1f;
+		
+		// Front face, top left top vertex
+		int frontLeftTop = nextIdx++;
+		// Position
+		verts[vertCount++] = center.x + topLeftOffset.x;
+		verts[vertCount++] = center.y + topLeftOffset.y;
+		verts[vertCount++] = center.z + topLeftOffset.z;
+		// Normal
+		verts[vertCount++] = commonNormal.x;
+		verts[vertCount++] = commonNormal.y;
+		verts[vertCount++] = commonNormal.z;
+		// UVs
+		verts[vertCount++] = 0f;
+		verts[vertCount++] = 1f;
+		
+		indices[indexCount++] = (short) frontLeftBottom;
+		indices[indexCount++] = (short) frontRightBottom;
+		indices[indexCount++] = (short) frontRightTop;
+		
+		indices[indexCount++] = (short) frontLeftBottom;
+		indices[indexCount++] = (short) frontRightTop;
+		indices[indexCount++] = (short) frontLeftTop;
 	}
 	
 	public Mesh getMesh() {
