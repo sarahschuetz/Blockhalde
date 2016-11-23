@@ -31,7 +31,7 @@ public class Blockhalde extends ApplicationAdapter {
 		cam.far = 300f;
 		cam.update();
 		
-		chunk.setBlockTypeAt(BlockType.WATER, 10, 100, 10);
+		//chunk.setBlockTypeAt(BlockType.WATER, 10, 100, 10);
 		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/blocks.vs.glsl"),
 				                   Gdx.files.internal("shaders/blocks.fs.glsl"));
@@ -43,14 +43,15 @@ public class Blockhalde extends ApplicationAdapter {
 		
 		inputController = new CameraInputController(cam);
 		Gdx.input.setInputProcessor(inputController);
+		
+		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
+		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 	}
 
 	@Override
 	public void render() {
-		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
-		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		
 		shader.begin();
 		

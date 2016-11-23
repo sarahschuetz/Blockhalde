@@ -1,5 +1,7 @@
 package com.blockhalde;
 
+import java.util.Arrays;
+
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -14,7 +16,7 @@ public class BlockChunk {
 	
 	public static final int CHUNK_WIDTH = 16;
 	public static final int CHUNK_DEPTH = 16;
-	public static final int CHUNK_HEIGHT = 256;
+	public static final int CHUNK_HEIGHT = 16;
 	public static final int BLOCK_COUNT = CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT;
 	/**
 	 * For each block each side has 4 unique vertices
@@ -77,6 +79,11 @@ public class BlockChunk {
 		blockTypes[offset] = type;
 		meshDirty = true;
 	}
+	
+	public boolean isOpaqueAt(int x, int y, int z) {
+		byte type = getBlockTypeAt(x, y, z);
+		return type != BlockType.AIR && type != BlockType.WATER;
+	}
 
 	public int coordsToFlatIndex(int x, int y, int z) {
 		if(x < 0 || x >= CHUNK_WIDTH || y < 0 || y >= CHUNK_HEIGHT || z < 0 || z >= CHUNK_DEPTH) {
@@ -117,10 +124,10 @@ public class BlockChunk {
 		float firstZ = (-CHUNK_DEPTH / 2) * BLOCK_SIZE + BLOCK_SIZE_HALF;
 		
 		nextIdx = 0;
-		
-		for(int z = 0; z < CHUNK_DEPTH; ++z) {
-			for(int x = 0; x < CHUNK_WIDTH; ++x) {
-				for(int y = 0; y < CHUNK_HEIGHT; ++y) {
+
+		for(int x = 0; x < CHUNK_WIDTH; ++x) {
+			for(int y = 0; y < CHUNK_HEIGHT; ++y) {
+				for(int z = 0; z < CHUNK_DEPTH; ++z) {
 				
 					center.set(firstX + x * BLOCK_SIZE,
 							   firstY + y * BLOCK_SIZE,
@@ -133,6 +140,7 @@ public class BlockChunk {
 					topLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
 					normal.set(0, 0, 1);
 					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
+					
 					
 					// Back plane
 					bottomLeft.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
@@ -176,6 +184,8 @@ public class BlockChunk {
 				}
 			}
 		}
+		
+		System.out.println(Arrays.toString(verts));
 		
 		mesh.setVertices(verts, 0, vertCount);
 		mesh.setIndices(indices, 0, indexCount);
