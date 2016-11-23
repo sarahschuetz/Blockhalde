@@ -7,5 +7,5 @@ varying vec3 v_normal;
 varying vec2 v_texCoords;
 
 void main() {
-    gl_FragColor = vec4(v_texCoords, 1.0, 1.0);
+    gl_FragColor = vec4(v_texCoords.x, v_texCoords.y, 0.0, 1.0);
 }

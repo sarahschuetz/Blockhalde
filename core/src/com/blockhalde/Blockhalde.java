@@ -62,7 +62,9 @@ public class Blockhalde extends ApplicationAdapter {
 		shader.setUniformMatrix("u_projection", cam.projection);
 		shader.setUniformMatrix("u_normalMatrix", normalMatrix);
 		
-		chunk.getMesh().render(shader, GL20.GL_TRIANGLES);
+		for(Mesh mesh: chunk.getMeshes()) {
+			mesh.render(shader, GL20.GL_TRIANGLES);
+		}
 		
 		shader.end();
 	}

@@ -1,11 +1,17 @@
 package com.blockhalde;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
+import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class BlockChunk {
@@ -16,7 +22,7 @@ public class BlockChunk {
 	
 	public static final int CHUNK_WIDTH = 16;
 	public static final int CHUNK_DEPTH = 16;
-	public static final int CHUNK_HEIGHT = 16;
+	public static final int CHUNK_HEIGHT = 256;
 	public static final int BLOCK_COUNT = CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT;
 	/**
 	 * For each block each side has 4 unique vertices
@@ -44,16 +50,17 @@ public class BlockChunk {
 	private int nextIdx;
 	/**
 	 */
-	private Mesh mesh = new Mesh(
-		false,
-		CHUNK_VERTEX_COUNT,
-		CHUNK_INDEX_COUNT,
-		new VertexAttributes(
-			new VertexAttribute(Usage.Position, 3, "a_position"),
-			new VertexAttribute(Usage.Normal, 3, "a_normal"),
-			new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords")
-		)
-	);
+	private List<Mesh> meshes = new ArrayList<Mesh>();
+//	private Mesh mesh = new Mesh(
+//		false,
+//		CHUNK_VERTEX_COUNT,
+//		CHUNK_INDEX_COUNT,
+//		new VertexAttributes(
+//			new VertexAttribute(Usage.Position, 3, "a_position"),
+//			new VertexAttribute(Usage.Normal, 3, "a_normal"),
+//			new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoords")
+//		)
+//	);
 	private boolean meshDirty = true;
 	
 	public byte getBlockTypeAt(int x, int y, int z) {
@@ -108,6 +115,8 @@ public class BlockChunk {
 	}
 	
 	private void updateMesh() {
+		meshes.clear();
+		
 		vertCount = 0;
 		indexCount = 0;
 		
@@ -118,20 +127,34 @@ public class BlockChunk {
 		Vector3 topLeft = new Vector3();
 		Vector3 normal = new Vector3();
 		
+		VertexInfo corner000 = new VertexInfo();
+		VertexInfo corner010 = new VertexInfo();
+		VertexInfo corner100 = new VertexInfo();
+		VertexInfo corner110 = new VertexInfo();
+		VertexInfo corner001 = new VertexInfo();
+		VertexInfo corner011 = new VertexInfo();
+		VertexInfo corner101 = new VertexInfo();
+		VertexInfo corner111 = new VertexInfo();
+		
 		// X coordinate of the leftmost blocks so that the mesh is symmetrical
 		float firstX = (-CHUNK_WIDTH / 2) * BLOCK_SIZE + BLOCK_SIZE_HALF;
 		float firstY = (-CHUNK_HEIGHT / 2) * BLOCK_SIZE + BLOCK_SIZE_HALF;
 		float firstZ = (-CHUNK_DEPTH / 2) * BLOCK_SIZE + BLOCK_SIZE_HALF;
 		
 		nextIdx = 0;
+		
+		MeshBuilder builder = new MeshBuilder();
+		builder.begin(Usage.Position | Usage.Normal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
 
 		for(int x = 0; x < CHUNK_WIDTH; ++x) {
 			for(int y = 0; y < CHUNK_HEIGHT; ++y) {
+				
 				for(int z = 0; z < CHUNK_DEPTH; ++z) {
 				
 					center.set(firstX + x * BLOCK_SIZE,
 							   firstY + y * BLOCK_SIZE,
 							   firstZ + z * BLOCK_SIZE);
+					
 					
 					// Front plane
 					bottomLeft.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
@@ -139,7 +162,7 @@ public class BlockChunk {
 					topRight.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
 					topLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
 					normal.set(0, 0, 1);
-					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
+					addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
 					
 					// Back plane
@@ -148,7 +171,7 @@ public class BlockChunk {
 					topRight.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
 					topLeft.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
 					normal.set(0, 0, -1);
-					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
+					addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
 					// Top plane
 					bottomLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
@@ -156,7 +179,7 @@ public class BlockChunk {
 					topRight.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
 					topLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
 					normal.set(0, 1, 0);
-					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
+					addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
 					// Bottom plane
 					bottomLeft.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
@@ -164,7 +187,7 @@ public class BlockChunk {
 					topRight.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
 					topLeft.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
 					normal.set(0, -1, 0);
-					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
+					addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
 					// Left plane
 					bottomLeft.set(-BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
@@ -172,7 +195,7 @@ public class BlockChunk {
 					topRight.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
 					topLeft.set(-BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
 					normal.set(-1, 0, 0);
-					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
+					addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
 					
 					// Right plane
 					bottomLeft.set(BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
@@ -180,94 +203,57 @@ public class BlockChunk {
 					topRight.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, -BLOCK_SIZE_HALF);
 					topLeft.set(BLOCK_SIZE_HALF, BLOCK_SIZE_HALF, BLOCK_SIZE_HALF);
 					normal.set(1, 0, 0);
-					addCubePlane(center, bottomLeft, bottomRight, topRight, topLeft, normal);
+					addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+				}
+				
+				if(builder.getNumVertices() > 30000) {
+					Mesh partMesh = builder.end();
+					meshes.add(partMesh);
+					
+					builder.begin(Usage.Position | Usage.Normal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
 				}
 			}
 		}
 		
-		System.out.println(Arrays.toString(verts));
+		if(builder.getNumVertices() > 0) {
+			Mesh partMesh = builder.end();
+			meshes.add(partMesh);
+		}
 		
-		mesh.setVertices(verts, 0, vertCount);
-		mesh.setIndices(indices, 0, indexCount);
+		meshDirty = false;
 	}
 
-	public void addCubePlane(Vector3 center,
+	public void addCubePlane(MeshBuilder builder,
+			                 Vector3 center,
 			                 Vector3 bottomLeftOffset,
 			                 Vector3 bottomRightOffset,
 			                 Vector3 topRightOffset,
 			                 Vector3 topLeftOffset,
 			                 Vector3 commonNormal) {
-		// Front face, front left bottom vertex
-		int frontLeftBottom = nextIdx++;
-		// Position
-		verts[vertCount++] = center.x + bottomLeftOffset.x;
-		verts[vertCount++] = center.y + bottomLeftOffset.y;
-		verts[vertCount++] = center.z + bottomLeftOffset.z;
-		// Normal
-		verts[vertCount++] = commonNormal.x;
-		verts[vertCount++] = commonNormal.y;
-		verts[vertCount++] = commonNormal.z;
-		// UVs
-		verts[vertCount++] = 0f;
-		verts[vertCount++] = 0f;
 		
-		// Front face, front right bottom vertex
-		int frontRightBottom = nextIdx++;
-		// Position
-		verts[vertCount++] = center.x + bottomRightOffset.x;
-		verts[vertCount++] = center.y + bottomRightOffset.y;
-		verts[vertCount++] = center.z + bottomRightOffset.z;
-		// Normal
-		verts[vertCount++] = commonNormal.x;
-		verts[vertCount++] = commonNormal.y;
-		verts[vertCount++] = commonNormal.z;
-		// UVs
-		verts[vertCount++] = 1f;
-		verts[vertCount++] = 0f;
 		
-		// Front face, top right top vertex
-		int frontRightTop = nextIdx++;
-		// Position
-		verts[vertCount++] = center.x + topRightOffset.x;
-		verts[vertCount++] = center.y + topRightOffset.y;
-		verts[vertCount++] = center.z + topRightOffset.z;
-		// Normal
-		verts[vertCount++] = commonNormal.x;
-		verts[vertCount++] = commonNormal.y;
-		verts[vertCount++] = commonNormal.z;
-		// UVs
-		verts[vertCount++] = 1f;
-		verts[vertCount++] = 1f;
+		Vector3 position = new Vector3(center.x + bottomLeftOffset.x, center.y + bottomLeftOffset.y, center.z + bottomLeftOffset.z);
+		VertexInfo frontLeftBottom = new VertexInfo().setPos(position).setNor(commonNormal).setUV(new Vector2(0, 0));
 		
-		// Front face, top left top vertex
-		int frontLeftTop = nextIdx++;
-		// Position
-		verts[vertCount++] = center.x + topLeftOffset.x;
-		verts[vertCount++] = center.y + topLeftOffset.y;
-		verts[vertCount++] = center.z + topLeftOffset.z;
-		// Normal
-		verts[vertCount++] = commonNormal.x;
-		verts[vertCount++] = commonNormal.y;
-		verts[vertCount++] = commonNormal.z;
-		// UVs
-		verts[vertCount++] = 0f;
-		verts[vertCount++] = 1f;
+		position.set(center.x + bottomRightOffset.x, center.y + bottomRightOffset.y, center.z + bottomRightOffset.z);
+		VertexInfo frontRightBottom = new VertexInfo().setPos(position).setNor(commonNormal).setUV(new Vector2(1, 0));
+
+		position.set(center.x + topRightOffset.x, center.y + topRightOffset.y, center.z + topRightOffset.z);
+		VertexInfo frontRightTop = new VertexInfo().setPos(position).setNor(commonNormal).setUV(new Vector2(1, 1));
 		
-		indices[indexCount++] = (short) frontLeftBottom;
-		indices[indexCount++] = (short) frontRightBottom;
-		indices[indexCount++] = (short) frontRightTop;
+		position.set(center.x + topLeftOffset.x, center.y + topLeftOffset.y, center.z + topLeftOffset.z);
+		VertexInfo frontLeftTop = new VertexInfo().setPos(position).setNor(commonNormal).setUV(new Vector2(0, 1));
 		
-		indices[indexCount++] = (short) frontLeftBottom;
-		indices[indexCount++] = (short) frontRightTop;
-		indices[indexCount++] = (short) frontLeftTop;
+		builder.triangle(frontLeftBottom, frontRightBottom, frontRightTop);
+		builder.triangle(frontLeftBottom, frontRightTop, frontLeftTop);
 	}
 	
-	public Mesh getMesh() {
+	public List<Mesh> getMeshes() {
 		if(meshDirty) {
 			updateMesh();
 		}
 		
-		return mesh;
+		return meshes;
 	}
 
 }
