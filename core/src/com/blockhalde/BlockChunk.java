@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
+import com.terrain.BlockType;
 
 public class BlockChunk {
 
@@ -80,7 +81,7 @@ public class BlockChunk {
 	
 	public boolean isOpaqueAt(int x, int y, int z) {
 		byte type = getBlockTypeAt(x, y, z);
-		return type != BlockType.AIR && type != BlockType.WATER;
+		return type != BlockType.AIR.getBlockId() && type != BlockType.WATER.getBlockId();
 	}
 
 	public int coordsToFlatIndex(int x, int y, int z) {
