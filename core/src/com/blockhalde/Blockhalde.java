@@ -17,12 +17,14 @@ public class Blockhalde extends ApplicationAdapter {
 
 	private PerspectiveCamera cam;
 	private BlockChunk chunk;
+	private BlockChunkMeshBuilder chunkMeshBuilder;
 	private ShaderProgram shader;
 	private CameraInputController inputController;
 
 	@Override
 	public void create() {
 		chunk = new BlockChunk();
+		chunkMeshBuilder = new BlockChunkMeshBuilder(chunk);
 		
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cam.position.set(0f, 0f, 50f);
@@ -62,7 +64,7 @@ public class Blockhalde extends ApplicationAdapter {
 		shader.setUniformMatrix("u_projection", cam.projection);
 		shader.setUniformMatrix("u_normalMatrix", normalMatrix);
 		
-		for(Mesh mesh: chunk.getMeshes()) {
+		for(Mesh mesh: chunkMeshBuilder.getMeshes()) {
 			mesh.render(shader, GL20.GL_TRIANGLES);
 		}
 		
