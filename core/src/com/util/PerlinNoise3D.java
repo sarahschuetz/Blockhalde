@@ -42,7 +42,7 @@ public class PerlinNoise3D {
 	 * 
 	 * @return double between 0.0 and 1.0
 	 */
-	public double perlin(double x, double y, double z) {
+	public double calcPerlinAt(double x, double y, double z) {
 
 		if (repeat > 0) { // If we have any repeat on, change the coordinates to their "local" repetitions
 			x = x % repeat;
@@ -108,7 +108,7 @@ public class PerlinNoise3D {
      * 6t^5 - 15t^4 + 10t^3
 	 * 
 	 */
-	public static double fade(double t) {
+	private static double fade(double t) {
 	
 		return t * t * t * (t * (t * 6 - 15) + 10);  
 	}
@@ -116,10 +116,10 @@ public class PerlinNoise3D {
 	/**
 	 * 
 	 * Simply used to increment the numbers and make sure that the noise still repeats.
-	 * If you didn’t care about the ability to repeat num + 1 would have the same effect.
+	 * If you didn't care about the ability to repeat num + 1 would have the same effect.
 	 * 
 	 */
-	public int inc(int num) {
+	private int inc(int num) {
 	    
 		num++;
 	    
@@ -142,7 +142,7 @@ public class PerlinNoise3D {
 	 * @param z represents part z of the location vector (that will be used for the dot product)
 	 * @return random vector from the following 12 vectors (1,1,0), (-1,1,0), (1,-1,0), (-1,-1,0), (1,0,1), (-1,0,1), (1,0,-1), (-1,0,-1), (0,1,1), (0,-1,1), (0,1,-1), (0,-1,-1)
 	 */
-	public static double grad(int hash, double x, double y, double z)
+	private static double grad(int hash, double x, double y, double z)
 	{
 	    switch(hash & 0xF)
 	    {
@@ -169,7 +169,7 @@ public class PerlinNoise3D {
 	/**
 	 *  Linear Interpolate
 	 */
-	public static double lerp(double a, double b, double x) {
+	private static double lerp(double a, double b, double x) {
 	    return a + x * (b - a);
 	}
 }
