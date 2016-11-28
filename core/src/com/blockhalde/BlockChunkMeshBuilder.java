@@ -10,18 +10,19 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.terrain.Chunk;
 
 public class BlockChunkMeshBuilder {
 
-	private BlockChunk chunk;
+	private Chunk chunk;
 	private List<Mesh> meshes = new ArrayList<Mesh>();
-	private long lastMeshBuildTime = Long.MIN_VALUE;
+	private boolean meshDirty = true;
 	
-	public BlockChunkMeshBuilder(BlockChunk chunk) {
+	public BlockChunkMeshBuilder(Chunk chunk) {
 		this.chunk = chunk;
 	}
 	
-	private void updateMesh() {
+	public void updateMesh() {
 		meshes.clear();
 		
 		Vector3 center = new Vector3();
@@ -119,8 +120,6 @@ public class BlockChunkMeshBuilder {
 			Mesh partMesh = builder.end();
 			meshes.add(partMesh);
 		}
-		
-		lastMeshBuildTime = System.nanoTime();
 	}
 
 	public void addCubePlane(MeshBuilder builder,
@@ -148,10 +147,10 @@ public class BlockChunkMeshBuilder {
 	}
 	
 	public List<Mesh> getMeshes() {
-		if(chunk.getLastModifiedTime() > lastMeshBuildTime) {
+		if(meshDirty){
 			updateMesh();
+			meshDirty = false;
 		}
-		
 		return meshes;
 	}
 
