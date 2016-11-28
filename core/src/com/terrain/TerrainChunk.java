@@ -4,13 +4,13 @@ import com.util.noise.PerlinNoise3D;
 
 public class TerrainChunk implements Chunk {
 	
-	private final short[][][] blocks = new short[WIDTH][HEIGHT][DEPTH];
+	private final short[][][] blocks = new short[X_MAX][Y_MAX][Z_MAX];
 	private final PerlinNoise3D perlinNoise = new PerlinNoise3D();
 	
 	public TerrainChunk() {
-		for(int x = 0; x < WIDTH; x++) {
-			for(int y = 0; y < HEIGHT; y++) {
-				for(int z = 0; z < DEPTH; z++) {
+		for(int x = 0; x < X_MAX; x++) {
+			for(int y = 0; y < Y_MAX; y++) {
+				for(int z = 0; z < Z_MAX; z++) {
 					double noise = perlinNoise.calcPerlinAt(x, y, z);
 					
 					if(noise < 0.3) {
@@ -25,17 +25,17 @@ public class TerrainChunk implements Chunk {
 
 	@Override
 	public int getWidth() {
-		return WIDTH;
+		return X_MAX;
 	}
 
 	@Override
 	public int getHeight() {
-		return HEIGHT;
+		return Y_MAX;
 	}
 
 	@Override
 	public int getDepth() {
-		return DEPTH;
+		return Z_MAX;
 	}
 
 	@Override

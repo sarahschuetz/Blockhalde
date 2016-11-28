@@ -2,9 +2,9 @@ package com.terrain;
 
 public interface Chunk {
 	
-	static final int WIDTH = 16;
-	static final int HEIGHT = 16;
-	static final int DEPTH = 256;
+	static final int X_MAX = 16;
+	static final int Y_MAX = 256;
+	static final int Z_MAX = 16;
 	
 	int getWidth();
 	int getHeight();

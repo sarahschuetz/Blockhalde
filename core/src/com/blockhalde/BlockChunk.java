@@ -1,15 +1,16 @@
 package com.blockhalde;
 
 import com.terrain.BlockType;
+import com.terrain.Chunk;
 
-public class BlockChunk {
+public class BlockChunk implements Chunk {
 
 	private static final int CHUNK_WIDTH = 16;
 	private static final int CHUNK_DEPTH = 16;
 	private static final int CHUNK_HEIGHT = 256;
 	private static final int BLOCK_COUNT = CHUNK_WIDTH * CHUNK_DEPTH * CHUNK_HEIGHT;
 	
-	private byte[] blockTypes = new byte[BLOCK_COUNT];
+	private short[] blockTypes = new short[BLOCK_COUNT];
 	
 	private long lastModifiedTime = System.nanoTime();
 	
@@ -59,24 +60,24 @@ public class BlockChunk {
 		lastModifiedTime = System.nanoTime();
 	}
 	
-	public byte getBlockTypeAt(int x, int y, int z) {
+	public short getBlockAt(int x, int y, int z) {
 		int offset = coordsToFlatIndex(x, y, z);
 		return blockTypes[offset];
 	}
 	
-	public byte getBlockTypeAt(int offset) {
+	public short getBlockAt(int offset) {
 		return blockTypes[offset];
 	}
 	
-	public void setBlockTypeAt(BlockType type, int x, int y, int z) {
-		setBlockTypeAt(type.getBlockId(), coordsToFlatIndex(x, y, z));
+	public void setBlockAt(BlockType type, int x, int y, int z) {
+		setBlockAt(type.getBlockId(), coordsToFlatIndex(x, y, z));
 	}
 	
-	public void setBlockTypeAt(byte type, int x, int y, int z) {
-		setBlockTypeAt(type, coordsToFlatIndex(x, y, z));
+	public void setBlockAt(short type, int x, int y, int z) {
+		setBlockAt(type, coordsToFlatIndex(x, y, z));
 	}
 	
-	public void setBlockTypeAt(byte type, int offset)
+	public void setBlockAt(short type, int offset)
 	{
 		if(offset < 0 || offset >= BLOCK_COUNT) {
 			throw new IndexOutOfBoundsException("Flat offset is out of bounds: " + offset);
@@ -87,7 +88,7 @@ public class BlockChunk {
 	}
 	
 	public boolean isOpaqueAt(int x, int y, int z) {
-		byte type = getBlockTypeAt(x, y, z);
+		short type = getBlockAt(x, y, z);
 		return type != BlockType.AIR.getBlockId() && type != BlockType.WATER.getBlockId();
 	}
 

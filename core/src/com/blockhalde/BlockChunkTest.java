@@ -18,13 +18,13 @@ public class BlockChunkTest {
 
 	@Test
 	public void testGetBlockTypeAt() {
-		chunk.setBlockTypeAt(BlockType.DIRT , 12, 200, 14);
+		chunk.setBlockAt(BlockType.DIRT , 12, 200, 14);
 		
-		assertEquals(BlockType.DIRT.getBlockId(), chunk.getBlockTypeAt(12, 200, 14));
+		assertEquals(BlockType.DIRT.getBlockId(), chunk.getBlockAt(12, 200, 14));
 		
-		chunk.setBlockTypeAt(BlockType.WATER, 1, 9, 0);
+		chunk.setBlockAt(BlockType.WATER, 1, 9, 0);
 		
-		assertEquals(BlockType.WATER.getBlockId(), chunk.getBlockTypeAt(1, 9, 0));
+		assertEquals(BlockType.WATER.getBlockId(), chunk.getBlockAt(1, 9, 0));
 	}
 
 	@Test
