@@ -18,6 +18,11 @@ public class BlockChunkMeshBuilder {
 	private Chunk chunk;
 	private List<Mesh> meshes = new ArrayList<Mesh>();
 	private boolean meshDirty = true;
+	
+	VertexInfo leftBottom = new VertexInfo();
+	VertexInfo leftTop = new VertexInfo();
+	VertexInfo rightBottom = new VertexInfo();
+	VertexInfo rightTop = new VertexInfo();
 
 	public BlockChunkMeshBuilder(Chunk chunk) {
 		this.chunk = chunk;
@@ -56,53 +61,68 @@ public class BlockChunkMeshBuilder {
 					if (chunk.getBlockAt(x, y, z) != BlockType.AIR.getBlockId()) {
 						center.set(firstX + x * blockSize, firstY + y * blockSize, firstZ + z * blockSize);
 
-						// Front plane
-						bottomLeft.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-						bottomRight.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-						topRight.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
-						topLeft.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
-						normal.set(0, 0, 1);
-						addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						if ((z + 1) == chunk.getDepth()
+								|| chunk.getBlockAt(x, y, z + 1) == BlockType.AIR.getBlockId()) {
+							// Front plane
+							bottomLeft.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							bottomRight.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							topRight.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							topLeft.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							normal.set(0, 0, 1);
+							addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						}
 
-						// Back plane
-						bottomLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-						bottomRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-						topRight.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-						topLeft.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-						normal.set(0, 0, -1);
-						addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						if (z == 0 || chunk.getBlockAt(x, y, z - 1) == BlockType.AIR.getBlockId()) {
+							// Back plane
+							bottomLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							bottomRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							topRight.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							topLeft.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							normal.set(0, 0, -1);
+							addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						}
 
-						// Top plane
-						bottomLeft.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
-						bottomRight.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
-						topRight.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-						topLeft.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-						normal.set(0, 1, 0);
-						addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						if ((y + 1) == chunk.getHeight()
+								|| chunk.getBlockAt(x, y + 1, z) == BlockType.AIR.getBlockId()) {
+							// Top plane
+							bottomLeft.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							bottomRight.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							topRight.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							topLeft.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							normal.set(0, 1, 0);
+							addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						}
 
-						// Bottom plane
-						bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-						bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-						topRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-						topLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-						normal.set(0, -1, 0);
-						addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						if (y == 0 || chunk.getBlockAt(x, y - 1, z) == BlockType.AIR.getBlockId()) {
+							// Bottom plane
+							bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							topRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							topLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							normal.set(0, -1, 0);
+							addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						}
 
-						// Left plane
-						bottomLeft.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-						bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-						topRight.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
-						topLeft.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-						normal.set(-1, 0, 0);
-						addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						if ((x + 1) == chunk.getWidth()
+								|| chunk.getBlockAt(x + 1, y, z) == BlockType.AIR.getBlockId()) {
+							// Right plane
+							bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							bottomRight.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							topRight.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							topLeft.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							normal.set(1, 0, 0);
+							addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						}
 
-						// Right plane
-						bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-						bottomRight.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-						topRight.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-						topLeft.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
-						normal.set(1, 0, 0);
-						addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						if (x == 0 || chunk.getBlockAt(x - 1, y, z) == BlockType.AIR.getBlockId()) {
+							// Left plane
+							bottomLeft.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							topRight.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							topLeft.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							normal.set(-1, 0, 0);
+							addCubePlane(builder, center, bottomLeft, bottomRight, topRight, topLeft, normal);
+						}
 					}
 				}
 
@@ -126,23 +146,27 @@ public class BlockChunkMeshBuilder {
 
 		Vector3 position = new Vector3(center.x + bottomLeftOffset.x, center.y + bottomLeftOffset.y,
 				center.z + bottomLeftOffset.z);
-		VertexInfo frontLeftBottom = new VertexInfo().setPos(position).setNor(commonNormal).setUV(new Vector2(0, 0));
+		leftBottom.setPos(position).setNor(commonNormal).setUV(new Vector2(0, 0));
 
 		position.set(center.x + bottomRightOffset.x, center.y + bottomRightOffset.y, center.z + bottomRightOffset.z);
-		VertexInfo frontRightBottom = new VertexInfo().setPos(position).setNor(commonNormal).setUV(new Vector2(1, 0));
+		rightBottom.setPos(position).setNor(commonNormal).setUV(new Vector2(1, 0));
 
 		position.set(center.x + topRightOffset.x, center.y + topRightOffset.y, center.z + topRightOffset.z);
-		VertexInfo frontRightTop = new VertexInfo().setPos(position).setNor(commonNormal).setUV(new Vector2(1, 1));
+		rightTop.setPos(position).setNor(commonNormal).setUV(new Vector2(1, 1));
 
 		position.set(center.x + topLeftOffset.x, center.y + topLeftOffset.y, center.z + topLeftOffset.z);
-		VertexInfo frontLeftTop = new VertexInfo().setPos(position).setNor(commonNormal).setUV(new Vector2(0, 1));
+		leftTop.setPos(position).setNor(commonNormal).setUV(new Vector2(0, 1));
 
-		builder.rect(frontLeftBottom, frontRightBottom, frontRightTop, frontLeftTop);
+		builder.rect(leftBottom, rightBottom, rightTop, leftTop);
 	}
 
 	public List<Mesh> getMeshes() {
 		if (meshDirty) {
+			long time = 0;
+			time = System.currentTimeMillis();
 			updateMesh();
+			time = System.currentTimeMillis() - time;
+			System.out.println(time);
 			meshDirty = false;
 		}
 		return meshes;
