@@ -9,18 +9,19 @@ import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.blockhalde.gui.RendererGUI;
+import com.terrain.TerrainChunk;
 
 public class Blockhalde extends ApplicationAdapter {
 
 	private PerspectiveCamera cam;
-	private BlockChunk chunk;
+	private TerrainChunk chunk;
 	private BlockChunkMeshBuilder chunkMeshBuilder;
 	private ShaderProgram shader;
 	private CameraInputController inputController;
 
 	@Override
 	public void create() {
-		chunk = new BlockChunk();
+		chunk = new TerrainChunk();
 		chunkMeshBuilder = new BlockChunkMeshBuilder(chunk);
 		
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
