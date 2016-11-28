@@ -6,6 +6,7 @@ attribute vec2 a_texCoord0;
 varying vec3 v_position;
 varying vec3 v_normal;
 varying vec2 v_texCoords;
+varying vec3 v_eyeVec;
 
 uniform mat4 u_view;
 uniform mat4 u_projection;
@@ -17,6 +18,9 @@ void main() {
     v_position = (vp * vec4(a_position, 1.0)).xyz;
     v_normal = (u_normalMatrix * vec4(a_normal, 0.0)).xyz;
     v_texCoords = a_texCoord0;
-
+    
+	vec4 eyePosition = u_view * vec4(a_position,1);
+    v_eyeVec = -eyePosition.xyz;
+    
     gl_Position = vp * vec4(a_position, 1.0);
 }
