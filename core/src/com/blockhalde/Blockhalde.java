@@ -3,15 +3,12 @@ package com.blockhalde;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.blockhalde.gui.RendererGUI;
 
 public class Blockhalde extends ApplicationAdapter {
 
@@ -50,10 +47,18 @@ public class Blockhalde extends ApplicationAdapter {
 		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 	}
+	
+	public void resize(){
+		cam.viewportWidth =  Gdx.graphics.getWidth();
+		cam.viewportHeight = Gdx.graphics.getHeight();
+		RendererGUI.instance().resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+	}
 
 	@Override
 	public void render() {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
+		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 		
 		shader.begin();
 		
@@ -62,12 +67,16 @@ public class Blockhalde extends ApplicationAdapter {
 		
 		shader.setUniformMatrix("u_view", cam.view);
 		shader.setUniformMatrix("u_projection", cam.projection);
-		shader.setUniformMatrix("u_normalMatrix", normalMatrix);
+		//shader.setUniformMatrix("u_normalMatrix", normalMatrix);
 		
 		for(Mesh mesh: chunkMeshBuilder.getMeshes()) {
 			mesh.render(shader, GL20.GL_TRIANGLES);
 		}
 		
 		shader.end();
+	 	
+		RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
+											"\ncam pos " + cam.position.toString());
+		RendererGUI.instance().render();
 	}
 }
