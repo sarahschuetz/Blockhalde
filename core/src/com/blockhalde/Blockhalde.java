@@ -55,10 +55,11 @@ public class Blockhalde extends ApplicationAdapter {
 		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
 	}
 	
-	public void resize(){
-		cam.viewportWidth =  Gdx.graphics.getWidth();
-		cam.viewportHeight = Gdx.graphics.getHeight();
-		RendererGUI.instance().resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+	@Override
+	public void resize(int width, int height){
+		cam.viewportWidth =  width;
+		cam.viewportHeight = height;
+		RendererGUI.instance().resize(width, height);
 	}
 
 	@Override
