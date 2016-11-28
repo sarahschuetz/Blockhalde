@@ -1,4 +1,6 @@
-package com.util;
+package com.util.noise;
+
+import java.util.Random;
 
 public class PerlinNoise3D {
 	
@@ -8,7 +10,7 @@ public class PerlinNoise3D {
 	 * Hash lookup table as defined by Ken Perlin. This is a randomly arranged
 	 * array of all numbers from 0-255 inclusive.
 	 */
-	private static final int[] PERMUTATION_TABLE = { 151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7,
+	private static final int[] permutation_table = { 151, 160, 137, 91, 90, 15, 131, 13, 201, 95, 96, 53, 194, 233, 7,
 			225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62,
 			94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33, 88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175,
 			74, 165, 71, 134, 139, 48, 27, 166, 77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92,
@@ -21,21 +23,51 @@ public class PerlinNoise3D {
 			84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141,
 			128, 195, 78, 66, 215, 61, 156, 180 };
 
-	private static final int[] p; // Doubled permutation to avoid overflow
-
-	static {
-		p = new int[512];
+	private final int[] p = new int[512]; // Doubled permutation to avoid overflow
+	
+	double offsetX;
+	double offsetY;
+	double offsetZ;
+	
+	public PerlinNoise3D() {
+		this.repeat = -1;
+		
 		for (int x = 0; x < 512; x++) {
-			p[x] = PERMUTATION_TABLE[x % 256];
+			p[x] = permutation_table[x % 256];
 		}
 	}
 	
-	public PerlinNoise3D() {
-		this(-1);
+	public PerlinNoise3D(long seed) {
+		this(seed, -1);
 	}
 	
-	public PerlinNoise3D(int repeat) {
+	public PerlinNoise3D(long seed, int repeat) {
 		this.repeat = repeat;
+		
+		Random random = new Random(seed);
+		
+		// nextDouble() returns the next pseudorandom double value between 0.0 and 1.0
+		// * 256 -> numbers between 0 and 255
+		offsetX = random.nextDouble() * 256;
+	    offsetY = random.nextDouble() * 256;
+	    offsetZ = random.nextDouble() * 256;
+
+	    // fill first 256 values of p[] with pseudorandom numbers
+	    for(int i = 0; i < 256; i++) {
+	    	
+	    	// Returns a pseudorandom int value between 0 and the specified value (exclusive)
+	    	p[i] = random.nextInt(256);
+	    }
+
+	    // TODO: find out what this is for!
+        for(int i = 0; i < 256; i++) {
+            int pos = random.nextInt(256 - i) + i;
+            int old = p[i];
+
+            p[i] = p[pos];
+            p[pos] = old;
+            p[i + 256] = p[i];
+        }
 	}
 
 	/**
@@ -43,6 +75,11 @@ public class PerlinNoise3D {
 	 * @return double between 0.0 and 1.0
 	 */
 	public double calcPerlinAt(double x, double y, double z) {
+		
+		// add random offset
+		x += offsetX;
+        y += offsetY;
+        z += offsetZ;
 
 		if (repeat > 0) { // If we have any repeat on, change the coordinates to their "local" repetitions
 			x = x % repeat;
@@ -70,14 +107,14 @@ public class PerlinNoise3D {
 	    // The result of this hash function is a value between 0 and 255 (inclusive) because of our p[] array.
 	    int aaa, aba, aab, abb, baa, bba, bab, bbb;
 	    
-	    aaa = p[p[p[    xi ]+    yi ]+    zi ];
-	    aba = p[p[p[    xi ]+inc(yi)]+    zi ];
-	    aab = p[p[p[    xi ]+    yi ]+inc(zi)];
-	    abb = p[p[p[    xi ]+inc(yi)]+inc(zi)];
-	    baa = p[p[p[inc(xi)]+    yi ]+    zi ];
-	    bba = p[p[p[inc(xi)]+inc(yi)]+    zi ];
-	    bab = p[p[p[inc(xi)]+    yi ]+inc(zi)];
-	    bbb = p[p[p[inc(xi)]+inc(yi)]+inc(zi)];
+	    aaa = p[p[p[    xi ] +    yi ] +    zi ];
+	    aba = p[p[p[    xi ] + inc(yi)] +    zi ];
+	    aab = p[p[p[    xi ] +    yi ] + inc(zi)];
+	    abb = p[p[p[    xi ] + inc(yi)] + inc(zi)];
+	    baa = p[p[p[inc(xi)] +    yi ] +    zi ];
+	    bba = p[p[p[inc(xi)] + inc(yi)] +    zi ];
+	    bab = p[p[p[inc(xi)] +    yi ] + inc(zi)];
+	    bbb = p[p[p[inc(xi)] + inc(yi)] + inc(zi)];
 	    
 		
 		// The gradient function calculates the dot product between a pseudorandom

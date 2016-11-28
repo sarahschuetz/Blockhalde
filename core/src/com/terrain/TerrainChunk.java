@@ -1,6 +1,6 @@
 package com.terrain;
 
-import com.util.PerlinNoise3D;
+import com.util.noise.PerlinNoise3D;
 
 public class TerrainChunk implements Chunk {
 	
