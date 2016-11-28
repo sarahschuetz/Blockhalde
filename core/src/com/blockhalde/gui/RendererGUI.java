@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.blockhalde.gui.Grid.Side;
 
 public class RendererGUI {
 	private static RendererGUI instance;
@@ -25,6 +26,7 @@ public class RendererGUI {
 		stage = new Stage(viewport);
 		debugText = new Text();
 		stage.addActor(debugText);
+		//stage.addActor(new Grid(50).stickToSide(Side.BOTTOM, Side.CENTERX));
 	}
 	
     public void setDebugText(String text){
