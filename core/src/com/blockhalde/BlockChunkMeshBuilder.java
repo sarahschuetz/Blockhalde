@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.terrain.BlockType;
-import com.terrain.Chunk;
+import com.terrain.block.BlockType;
+import com.terrain.chunk.Chunk;
 
 public class BlockChunkMeshBuilder {
 

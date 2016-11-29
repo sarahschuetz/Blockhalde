@@ -1,4 +1,4 @@
-package com.terrain;
+package com.terrain.chunk;
 
 public class ChunkPosition{
 

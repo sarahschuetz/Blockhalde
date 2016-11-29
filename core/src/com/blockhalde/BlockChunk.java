@@ -1,8 +1,8 @@
 package com.blockhalde;
 
-import com.terrain.BlockType;
-import com.terrain.Chunk;
-import com.terrain.ChunkPosition;
+import com.terrain.block.BlockType;
+import com.terrain.chunk.Chunk;
+import com.terrain.chunk.ChunkPosition;
 
 public class BlockChunk implements Chunk {
 

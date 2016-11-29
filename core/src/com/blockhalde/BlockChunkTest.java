@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.terrain.BlockType;
+import com.terrain.block.BlockType;
 
 public class BlockChunkTest {
 

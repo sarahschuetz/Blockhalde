@@ -1,7 +1,6 @@
-package com.terrain;
+package com.terrain.chunk;
 
 public interface Chunk {
-	
 	static final int X_MAX = 16;
 	static final int Y_MAX = 256;
 	static final int Z_MAX = 16;
@@ -12,5 +11,4 @@ public interface Chunk {
 	
 	short getBlockAt(int x, int y, int z);
 	ChunkPosition getChunkPosition();
-
 }

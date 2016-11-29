@@ -10,9 +10,9 @@ import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.blockhalde.gui.RendererGUI;
-import com.terrain.Chunk;
-import com.terrain.TerrainChunk;
-import com.terrain.World;
+import com.terrain.chunk.Chunk;
+import com.terrain.chunk.TerrainChunk;
+import com.terrain.world.World;
 
 import java.util.ArrayList;
 import java.util.List;

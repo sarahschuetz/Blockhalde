@@ -1,5 +1,7 @@
-package com.terrain;
+package com.terrain.chunk;
 
+import com.terrain.block.BlockType;
+import com.terrain.world.World;
 import com.util.noise.PerlinNoise3D;
 
 public class TerrainChunk implements Chunk {
