@@ -59,7 +59,7 @@ public class BlockChunkMeshBuilder {
 				for (int z = 0; z < chunkDepth; ++z) {
 
 					if (chunk.getBlockAt(x, y, z) != BlockType.AIR.getBlockId()) {
-						center.set(firstX + x * blockSize, firstY + y * blockSize, firstZ + z * blockSize);
+						center.set(chunk.getChunkPosition().getXPosition() + firstX + x * blockSize, firstY + y * blockSize, chunk.getChunkPosition().getZPosition() + firstZ + z * blockSize);
 
 						if ((z + 1) == chunk.getDepth()
 								|| chunk.getBlockAt(x, y, z + 1) == BlockType.AIR.getBlockId()) {

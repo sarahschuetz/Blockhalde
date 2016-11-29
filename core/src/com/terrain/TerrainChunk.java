@@ -6,8 +6,13 @@ public class TerrainChunk implements Chunk {
 	
 	private final short[][][] blocks = new short[X_MAX][Y_MAX][Z_MAX];
 	private final PerlinNoise3D perlinNoise = new PerlinNoise3D("Heinzibert".hashCode());
+	private ChunkPosition chunkPosition;
+	private World world;
 	
-	public TerrainChunk() {
+	public TerrainChunk(ChunkPosition chunkPosition, World world) {
+		this.chunkPosition = chunkPosition;
+		this.world = world;
+
 		for(int x = 0; x < X_MAX; x++) {
 			for(int y = 0; y < Y_MAX; y++) {
 				for(int z = 0; z < Z_MAX; z++) {
@@ -21,6 +26,10 @@ public class TerrainChunk implements Chunk {
 				}
 			}
 		}
+	}
+
+	public void setBlock(int x, int y, int z, BlockType blockType){
+		blocks[x][y][z] = blockType.getBlockId();
 	}
 
 	@Override
@@ -41,5 +50,10 @@ public class TerrainChunk implements Chunk {
 	@Override
 	public short getBlockAt(int x, int y, int z) {
 		return blocks[x][y][z];
+	}
+
+	@Override
+	public ChunkPosition getChunkPosition() {
+		return chunkPosition;
 	}
 }

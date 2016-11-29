@@ -2,6 +2,7 @@ package com.blockhalde;
 
 import com.terrain.BlockType;
 import com.terrain.Chunk;
+import com.terrain.ChunkPosition;
 
 public class BlockChunk implements Chunk {
 
@@ -112,5 +113,10 @@ public class BlockChunk implements Chunk {
 	public int flatIndexToZ(int offset) {
 		offset -= offset / (CHUNK_WIDTH+CHUNK_HEIGHT) * (CHUNK_WIDTH+CHUNK_HEIGHT);
 		return offset / CHUNK_WIDTH;
+	}
+
+	@Override
+	public ChunkPosition getChunkPosition() {
+		return null;
 	}
 }
