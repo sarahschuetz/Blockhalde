@@ -51,11 +51,16 @@ public class TerrainChunk implements Chunk {
 
 	@Override
 	public short getBlockAt(int x, int y, int z) {
-		return blocks[x][y][z];
+		return x<=Chunk.X_MAX && y <= Chunk.Y_MAX && z <= Chunk.Z_MAX ? blocks[x][y][z] : BlockType.AIR.getBlockId();
 	}
 
 	@Override
 	public ChunkPosition getChunkPosition() {
 		return chunkPosition;
+	}
+
+	@Override
+	public ChunkPosition getRelativeChunkPosition() {
+		return new ChunkPosition(chunkPosition.getXPosition()/Chunk.X_MAX, chunkPosition.getZPosition()/Chunk.Z_MAX);
 	}
 }

@@ -11,4 +11,5 @@ public interface Chunk {
 	
 	short getBlockAt(int x, int y, int z);
 	ChunkPosition getChunkPosition();
+	ChunkPosition getRelativeChunkPosition();
 }

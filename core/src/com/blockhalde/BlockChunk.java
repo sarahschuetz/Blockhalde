@@ -119,4 +119,9 @@ public class BlockChunk implements Chunk {
 	public ChunkPosition getChunkPosition() {
 		return null;
 	}
+
+	@Override
+	public ChunkPosition getRelativeChunkPosition() {
+		return null;
+	}
 }

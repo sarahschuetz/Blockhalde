@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.blockhalde.gui.RendererGUI;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.TerrainChunk;
@@ -35,22 +36,16 @@ public class Blockhalde extends ApplicationAdapter {
 	public void create() {
 		world = new World();
 
-		//experimental multi chunk rendering
-		for(int x = 0; x < 3; x++){
-			for(int z = 0; z < 3; z++){
-				Chunk chunk = world.getChunk(x*Chunk.X_MAX,z*Chunk.Z_MAX);
-				if(chunk!=null){
-					BlockChunkMeshBuilder blockChunkMeshBuilder = new BlockChunkMeshBuilder(world.getChunk(x*Chunk.X_MAX,z* Chunk.Z_MAX));
-					for(int i = 0; i < blockChunkMeshBuilder.getMeshes().size(); i++){
-						meshes.add(blockChunkMeshBuilder.getMeshes().get(i));
-					}
+		for(int i = 0; i < world.getVisibleChunks().size(); i++){
+			Chunk chunk = world.getVisibleChunks().get(i);
+			if(chunk!=null){
+				BlockChunkMeshBuilder blockChunkMeshBuilder = new BlockChunkMeshBuilder(chunk);
+				for(int j = 0; j < blockChunkMeshBuilder.getMeshes().size(); j++){
+					meshes.add(blockChunkMeshBuilder.getMeshes().get(j));
 				}
 			}
 		}
 
-		//enable to get the former 1 chunk drawing
-		//chunkMeshBuilder = new BlockChunkMeshBuilder(world.getChunk(0,0));
-		
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cam.position.set(0f, 0f, 50f);
 		cam.lookAt(0, 0, 0);
@@ -104,14 +99,10 @@ public class Blockhalde extends ApplicationAdapter {
 		shader.setUniformi("u_texture", 0);
 		shader.setUniformMatrix("u_normalMatrix", normalMatrix);
 
-		//for(Mesh mesh: chunkMeshBuilder.getMeshes()) {
-		//	mesh.render(shader, GL20.GL_TRIANGLES);
-		//}
 
 		for(int i = 0; i < meshes.size(); i++){
 			meshes.get(i).render(shader, GL20.GL_TRIANGLES);
 		}
-
 
 		shader.end();
 	 	
