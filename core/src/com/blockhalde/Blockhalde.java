@@ -116,7 +116,8 @@ public class Blockhalde extends ApplicationAdapter {
 		shader.end();
 	 	
 		RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
-											"\ncam pos " + cam.position.toString());
+				"\ncam pos " + cam.position.toString() + 
+				"\nM: toggle menu, Q + E: iterate items");
 		RendererGUI.instance().render();
 	}
 }
