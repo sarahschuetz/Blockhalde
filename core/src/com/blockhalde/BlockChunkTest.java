@@ -33,22 +33,4 @@ public class BlockChunkTest {
 		assertEquals(BlockType.WATER.getBlockId(), chunk.getBlockAt(1, 9, 0));
 	}
 
-	@Test
-	public void testOffsetToX() {
-		int flat = chunk.coordsToFlatIndex(15, 230, 11);
-		assertEquals(15, chunk.flatIndexToX(flat));
-	}
-
-	@Test
-	public void testOffsetToY() {
-		int flat = chunk.coordsToFlatIndex(15, 230, 11);
-		assertEquals(230, chunk.flatIndexToY(flat));
-	}
-
-	@Test
-	public void testOffsetToZ() {
-		int flat = chunk.coordsToFlatIndex(15, 230, 11);
-		assertEquals(11, chunk.flatIndexToZ(flat));
-	}
-
 }
