@@ -1,8 +1,5 @@
 package com.blockhalde;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -15,23 +12,13 @@ import com.terrain.chunk.Chunk;
 
 public class BlockChunkMeshBuilder {
 
-	private Chunk chunk;
-	private List<Mesh> meshes = new ArrayList<Mesh>();
-	private boolean meshDirty = true;
-	
 	VertexInfo leftBottom = new VertexInfo();
 	VertexInfo leftTop = new VertexInfo();
 	VertexInfo rightBottom = new VertexInfo();
 	VertexInfo rightTop = new VertexInfo();
 
-	public BlockChunkMeshBuilder(Chunk chunk) {
-		this.chunk = chunk;
-	}
-
-	public void updateMesh() {
-		meshes.clear();
-
-		Vector3 center = new Vector3();
+	public void updateMesh(Chunk chunk, Mesh mesh, int subchunkIdx) {
+		Vector3 center = new Vector3(); 
 		Vector3 bottomLeft = new Vector3();
 		Vector3 bottomRight = new Vector3();
 		Vector3 topRight = new Vector3();
@@ -53,9 +40,9 @@ public class BlockChunkMeshBuilder {
 		MeshBuilder builder = new MeshBuilder();
 		builder.begin(Usage.Position | Usage.Normal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
 
+		long startTime = System.currentTimeMillis();
 		for (int x = 0; x < chunkWidth; ++x) {
 			for (int y = 0; y < chunkHeight; ++y) {
-
 				for (int z = 0; z < chunkDepth; ++z) {
 
 					if (chunk.getBlockAt(x, y, z) != BlockType.AIR.getBlockId()) {
@@ -127,18 +114,16 @@ public class BlockChunkMeshBuilder {
 				}
 
 				if (builder.getNumVertices() > 30000) {
-					Mesh partMesh = builder.end();
-					meshes.add(partMesh);
-
-					builder.begin(Usage.Position | Usage.Normal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
+					throw new RuntimeException("Too many vertices");
 				}
 			}
 		}
+		
+		long buildFinishTime = System.currentTimeMillis();
 
-		if (builder.getNumVertices() > 0) {
-			Mesh partMesh = builder.end();
-			meshes.add(partMesh);
-		}
+		builder.end(mesh);
+		
+		long uploadFinishTime = System.currentTimeMillis();
 	}
 
 	public void addCubePlane(MeshBuilder builder, Vector3 center, Vector3 bottomLeftOffset, Vector3 bottomRightOffset,
@@ -146,30 +131,17 @@ public class BlockChunkMeshBuilder {
 
 		Vector3 position = new Vector3(center.x + bottomLeftOffset.x, center.y + bottomLeftOffset.y,
 				center.z + bottomLeftOffset.z);
-		leftBottom.setPos(position).setNor(commonNormal).setUV(new Vector2(0, 0));
+		leftBottom.setPos(position).setNor(commonNormal).setUV(0, 0);
 
 		position.set(center.x + bottomRightOffset.x, center.y + bottomRightOffset.y, center.z + bottomRightOffset.z);
-		rightBottom.setPos(position).setNor(commonNormal).setUV(new Vector2(1, 0));
+		rightBottom.setPos(position).setNor(commonNormal).setUV(1, 0);
 
 		position.set(center.x + topRightOffset.x, center.y + topRightOffset.y, center.z + topRightOffset.z);
-		rightTop.setPos(position).setNor(commonNormal).setUV(new Vector2(1, 1));
+		rightTop.setPos(position).setNor(commonNormal).setUV(1, 1);
 
 		position.set(center.x + topLeftOffset.x, center.y + topLeftOffset.y, center.z + topLeftOffset.z);
-		leftTop.setPos(position).setNor(commonNormal).setUV(new Vector2(0, 1));
+		leftTop.setPos(position).setNor(commonNormal).setUV(0, 1);
 
 		builder.rect(leftBottom, rightBottom, rightTop, leftTop);
 	}
-
-	public List<Mesh> getMeshes() {
-		if (meshDirty) {
-			long time = 0;
-			time = System.currentTimeMillis();
-			updateMesh();
-			time = System.currentTimeMillis() - time;
-			System.out.println(time);
-			meshDirty = false;
-		}
-		return meshes;
-	}
-
 }

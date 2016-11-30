@@ -98,21 +98,21 @@ public class BlockChunk implements Chunk {
 			throw new IndexOutOfBoundsException("Index set: (" + x + "," + y + "," + z + ") is out of bounds");
 		}
 		
-		int offset = x + z * CHUNK_WIDTH + y * (CHUNK_WIDTH + CHUNK_HEIGHT);
+		int offset = z * (CHUNK_WIDTH * CHUNK_DEPTH) + y * CHUNK_WIDTH + x;
 		return offset;
 	}
 	
 	public int flatIndexToX(int offset) {
-		return offset % (CHUNK_WIDTH + CHUNK_HEIGHT) % CHUNK_WIDTH;
+		return offset % CHUNK_WIDTH;
 	}
 	
 	public int flatIndexToY(int offset) {
-		return offset / (CHUNK_WIDTH+CHUNK_HEIGHT);
+		offset -= flatIndexToZ(offset) * (CHUNK_WIDTH+CHUNK_HEIGHT);
+		return offset / CHUNK_WIDTH;
 	}
 	
 	public int flatIndexToZ(int offset) {
-		offset -= offset / (CHUNK_WIDTH+CHUNK_HEIGHT) * (CHUNK_WIDTH+CHUNK_HEIGHT);
-		return offset / CHUNK_WIDTH;
+		return offset / (CHUNK_WIDTH * CHUNK_DEPTH);
 	}
 
 	@Override

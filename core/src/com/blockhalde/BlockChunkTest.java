@@ -15,6 +15,12 @@ public class BlockChunkTest {
 	public void setUp() throws Exception {
 		chunk = new BlockChunk();
 	}
+	
+	@Test
+	public void testGetLastBlock() {
+		chunk.setBlockAt(BlockType.DIRT , 15, 255, 15);
+		assertEquals(BlockType.DIRT.getBlockId(), chunk.getBlockAt(15, 255, 15));
+	}
 
 	@Test
 	public void testGetBlockTypeAt() {
