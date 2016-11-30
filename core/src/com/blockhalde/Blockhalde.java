@@ -28,9 +28,8 @@ public class Blockhalde extends ApplicationAdapter {
 	private InputProcessor inputProcessor;
 	
 	private Texture texture;
-
-
 	private World world;
+	
 	private List<Mesh> meshes = new ArrayList<Mesh>();
 
 	@Override

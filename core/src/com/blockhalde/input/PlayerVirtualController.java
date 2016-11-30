@@ -4,30 +4,51 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
+import com.blockhalde.gui.RendererGUI;
 
 public class PlayerVirtualController implements VirtualController {
 	private Camera camera;
 	private int startX = 0;
 	private int startY = 0;
-	private double movementX = 0;
-	private double movementY = 0;
-	private boolean isJumping = false;
-	private boolean isDigging = false;
 	private Vector3 tmpV1 = new Vector3();
 	private Vector3 target = new Vector3();
 	private float rotateAngle = 360f;
 	
+	private double movementX = 0;
+	private double movementY = 0;
+	private boolean isJumping = false;
+	private boolean isDigging = false;
+	
 	public PlayerVirtualController(Camera camera) {
 		this.camera = camera;
+	}
+
+	public double getMovementX() {
+		return movementX;
+	}
+
+	public double getMovementY() {
+		return movementY;
+	}
+
+	public boolean isJumping() {
+		return isJumping;
+	}
+
+	public boolean isDigging() {
+		return isDigging;
 	}
 	
 	@Override
 	public void keyDown(int keycode) {
-		if (keycode == Keybindings.FORWARD)       movementX += 1;
-		else if (keycode == Keybindings.LEFT)     movementY += 1;
-		else if (keycode == Keybindings.BACKWARD) movementX += -1;
-		else if (keycode == Keybindings.RIGHT)    movementY += -1;
-		else if (keycode == Keybindings.JUMP)     isJumping = true;
+		if (keycode == Keybindings.FORWARD)           movementX += 1;
+		else if (keycode == Keybindings.LEFT)         movementY += 1;
+		else if (keycode == Keybindings.BACKWARD)     movementX += -1;
+		else if (keycode == Keybindings.RIGHT)        movementY += -1;
+		else if (keycode == Keybindings.JUMP)         isJumping = true;
+		else if (keycode == Keybindings.INV_TOGGLE)   RendererGUI.instance().toggleMenu();
+		else if (keycode == Keybindings.INV_FORWARD)  RendererGUI.instance().scrollItems(1);
+		else if (keycode == Keybindings.INV_BACKWARD) RendererGUI.instance().scrollItems(-1);
 	}
 	
 	@Override
@@ -66,7 +87,6 @@ public class PlayerVirtualController implements VirtualController {
 
 	@Override
 	public void scrolled(int amount) {
-		// Cycle through items?
+		RendererGUI.instance().scrollItems(amount);
 	}
-	
 }

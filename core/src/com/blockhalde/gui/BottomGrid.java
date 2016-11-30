@@ -3,7 +3,6 @@ package com.blockhalde.gui;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -55,9 +54,6 @@ public class BottomGrid extends Grid {
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		
-		processHelperInput();
-		
 		layout.setText(font, items[selectedItemColumn][selectedItemRow]);
 		font.draw(batch, items[selectedItemColumn][selectedItemRow], width/2 - layout.width/2, offsetY + gridSize * rows + layout.height + BORDER_SIZE + gapSize + BOTTOM_GRID_OFFSET);
 
@@ -154,15 +150,4 @@ public class BottomGrid extends Grid {
 		items[6][0] = "Imaginary Bricks";
 		
 	}
-	
-	private void processHelperInput() {
-		if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-			increaseSelectedItem();
-		}
-		
-		if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-			decreaseSelectedItem();
-		}
-	}
-
 }
