@@ -9,11 +9,13 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
-import com.blockhalde.BlockMeshCache.CachedSubchunk;
 import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.input.PhysicalInputProcessor;
 import com.blockhalde.input.PlayerVirtualController;
 import com.blockhalde.input.VirtualController;
+import com.render.ChunkMeshBuilder;
+import com.render.ChunkMeshCache;
+import com.render.ChunkMeshCache.CachedSubchunk;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.TerrainChunk;
 import com.terrain.world.World;
@@ -25,19 +27,19 @@ public class Blockhalde extends ApplicationAdapter {
 
 	private PerspectiveCamera cam;
 	private VirtualController camVC;
-	private BlockChunkMeshBuilder chunkMeshBuilder;
+	private ChunkMeshBuilder chunkMeshBuilder;
 	private ShaderProgram shader;
 	private InputProcessor inputProcessor;
 	
 	private Texture texture;
 	private World world;
 	
-	private BlockMeshCache meshCache;
+	private ChunkMeshCache meshCache;
 
 	@Override
 	public void create() {
 		world = new World();
-		meshCache = new BlockMeshCache(world);
+		meshCache = new ChunkMeshCache(world);
 		
 		long start = System.currentTimeMillis();
 		meshCache.update();

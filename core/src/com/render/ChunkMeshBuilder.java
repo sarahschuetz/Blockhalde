@@ -1,16 +1,15 @@
-package com.blockhalde;
+package com.render;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 
-public class BlockChunkMeshBuilder {
+public class ChunkMeshBuilder {
 
 	VertexInfo leftBottom = new VertexInfo();
 	VertexInfo leftTop = new VertexInfo();
@@ -38,8 +37,7 @@ public class BlockChunkMeshBuilder {
 
 		MeshBuilder builder = new MeshBuilder();
 		builder.begin(Usage.Position | Usage.Normal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
-
-		long startTime = System.currentTimeMillis();
+		
 		for (int x = 0; x < chunkWidth; ++x) {
 			for (int y = subchunkIdx*16; y < (subchunkIdx+1)*16; ++y) {
 				for (int z = 0; z < chunkDepth; ++z) {
@@ -117,12 +115,8 @@ public class BlockChunkMeshBuilder {
 				}
 			}
 		}
-		
-		long buildFinishTime = System.currentTimeMillis();
 
 		builder.end(mesh);
-		
-		long uploadFinishTime = System.currentTimeMillis();
 	}
 
 	public void addCubePlane(MeshBuilder builder, Vector3 center, Vector3 bottomLeftOffset, Vector3 bottomRightOffset,

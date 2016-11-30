@@ -1,7 +1,7 @@
 package com.terrain.world;
 
 import com.badlogic.gdx.math.Vector3;
-import com.blockhalde.BlockChunk;
+import com.render.BlockChunk;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;

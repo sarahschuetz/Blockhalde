@@ -1,13 +1,13 @@
-package com.blockhalde;
+package com.render;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.render.BlockChunk;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.ChunkPosition;
-import com.blockhalde.BlockChunk;
 
 public class BlockChunkTest {
 

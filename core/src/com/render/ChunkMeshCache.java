@@ -1,4 +1,4 @@
-package com.blockhalde;
+package com.render;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
 import com.terrain.world.World;
 
-public class BlockMeshCache {
+public class ChunkMeshCache {
 
 	private World world;
 	
@@ -22,11 +22,11 @@ public class BlockMeshCache {
 	}
 	
 	private List<CachedSubchunk> cachedSubs = new ArrayList<CachedSubchunk>(24);
-	private BlockChunkMeshBuilder builder;
+	private ChunkMeshBuilder builder;
 	
-	public BlockMeshCache(World world) {
+	public ChunkMeshCache(World world) {
 		this.world = world;
-		builder = new BlockChunkMeshBuilder();
+		builder = new ChunkMeshBuilder();
 	}
 	
 	public void update() {

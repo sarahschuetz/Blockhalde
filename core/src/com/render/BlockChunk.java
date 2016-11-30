@@ -1,4 +1,4 @@
-package com.blockhalde;
+package com.render;
 
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
