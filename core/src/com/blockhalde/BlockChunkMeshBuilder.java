@@ -33,9 +33,9 @@ public class BlockChunkMeshBuilder {
 		int chunkDepth = chunk.getDepth();
 
 		// X coordinate of the leftmost blocks so that the mesh is symmetrical
-		float firstX = (-chunkWidth / 2.0f) * blockSize + blockSizeHalved;
-		float firstY = (-chunkHeight / 2.0f) * blockSize + blockSizeHalved;
-		float firstZ = (-chunkDepth / 2.0f) * blockSize + blockSizeHalved;
+		float firstX = blockSizeHalved + chunk.getChunkPosition().getXPosition();
+		float firstY = blockSizeHalved;
+		float firstZ = blockSizeHalved + chunk.getChunkPosition().getZPosition();
 
 		MeshBuilder builder = new MeshBuilder();
 		builder.begin(Usage.Position | Usage.Normal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
