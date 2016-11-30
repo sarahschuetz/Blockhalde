@@ -2,15 +2,17 @@ package com.blockhalde;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.blockhalde.gui.RendererGUI;
+import com.blockhalde.input.PhysicalInputProcessor;
+import com.blockhalde.input.PlayerVirtualController;
+import com.blockhalde.input.VirtualController;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.TerrainChunk;
 import com.terrain.world.World;
@@ -21,15 +23,15 @@ import java.util.List;
 public class Blockhalde extends ApplicationAdapter {
 
 	private PerspectiveCamera cam;
+	private VirtualController camVC;
 	private TerrainChunk chunk;
 	private BlockChunkMeshBuilder chunkMeshBuilder;
 	private ShaderProgram shader;
-	private CameraInputController inputController;
+	private InputProcessor inputProcessor;
 	
 	private Texture texture;
-
-
 	private World world;
+	
 	private List<Mesh> meshes = new ArrayList<Mesh>();
 
 	@Override
@@ -65,8 +67,11 @@ public class Blockhalde extends ApplicationAdapter {
 			System.out.println(shader.getLog());
 		}
 		
-		inputController = new CameraInputController(cam);
-		Gdx.input.setInputProcessor(inputController);
+		//inputProcessor = new CameraInputController(cam);
+		camVC = new PlayerVirtualController(cam);
+		inputProcessor = new PhysicalInputProcessor(camVC);
+		Gdx.input.setInputProcessor(inputProcessor);
+		Gdx.input.setCursorCatched(true);
 		
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
@@ -110,5 +115,7 @@ public class Blockhalde extends ApplicationAdapter {
 				"\ncam pos " + cam.position.toString() + 
 				"\nM: toggle menu, Q + E: iterate items");
 		RendererGUI.instance().render();
+
+		camVC.update();
 	}
 }
