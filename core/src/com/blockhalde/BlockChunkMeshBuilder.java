@@ -29,7 +29,6 @@ public class BlockChunkMeshBuilder {
 		float blockSizeHalved = blockSize * 0.5f;
 
 		int chunkWidth = chunk.getWidth();
-		int chunkHeight = 16;
 		int chunkDepth = chunk.getDepth();
 
 		// X coordinate of the leftmost blocks so that the mesh is symmetrical

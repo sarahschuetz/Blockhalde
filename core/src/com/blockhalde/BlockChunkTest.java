@@ -6,6 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.terrain.block.BlockType;
+import com.terrain.chunk.ChunkPosition;
+import com.blockhalde.BlockChunk;
 
 public class BlockChunkTest {
 
@@ -13,22 +15,22 @@ public class BlockChunkTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		chunk = new BlockChunk();
+		chunk = new BlockChunk(new ChunkPosition(0, 0), null);
 	}
 	
 	@Test
 	public void testGetLastBlock() {
-		chunk.setBlockAt(BlockType.DIRT , 15, 255, 15);
+		chunk.setBlockAt(15, 255, 15, BlockType.DIRT);
 		assertEquals(BlockType.DIRT.getBlockId(), chunk.getBlockAt(15, 255, 15));
 	}
 
 	@Test
 	public void testGetBlockTypeAt() {
-		chunk.setBlockAt(BlockType.DIRT , 12, 200, 14);
+		chunk.setBlockAt(12, 200, 14, BlockType.DIRT);
 		
 		assertEquals(BlockType.DIRT.getBlockId(), chunk.getBlockAt(12, 200, 14));
 		
-		chunk.setBlockAt(BlockType.WATER, 1, 9, 0);
+		chunk.setBlockAt(1, 9, 0, BlockType.WATER);
 		
 		assertEquals(BlockType.WATER.getBlockId(), chunk.getBlockAt(1, 9, 0));
 	}

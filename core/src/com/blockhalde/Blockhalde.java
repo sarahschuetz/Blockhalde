@@ -25,7 +25,6 @@ public class Blockhalde extends ApplicationAdapter {
 
 	private PerspectiveCamera cam;
 	private VirtualController camVC;
-	private TerrainChunk chunk;
 	private BlockChunkMeshBuilder chunkMeshBuilder;
 	private ShaderProgram shader;
 	private InputProcessor inputProcessor;
@@ -39,7 +38,11 @@ public class Blockhalde extends ApplicationAdapter {
 	public void create() {
 		world = new World();
 		meshCache = new BlockMeshCache(world);
+		
+		long start = System.currentTimeMillis();
 		meshCache.update();
+		
+		System.out.println("Initial generation time: " + (System.currentTimeMillis() - start));
 
 //		for(int i = 0; i < world.getVisibleChunks().size(); i++){
 //			Chunk chunk = world.getVisibleChunks().get(i);
