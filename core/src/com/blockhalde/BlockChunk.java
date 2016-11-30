@@ -124,4 +124,10 @@ public class BlockChunk implements Chunk {
 	public ChunkPosition getRelativeChunkPosition() {
 		return null;
 	}
+
+	@Override
+	public void setBlockAt(int x, int y, int z, BlockType type) {
+		// TODO Auto-generated method stub
+		
+	}
 }
