@@ -163,7 +163,7 @@ public class ChunkMeshBuilder {
 		rightTop.setPos(position).setNor(normal).setUV(uvTopRight.x, uvTopRight.y);
 
 		position.set(center.x + topLeftOffset.x, center.y + topLeftOffset.y, center.z + topLeftOffset.z);
-		leftTop.setPos(position).setNor(normal).setUV(uvBottomLeft.x, uvTopRight.x);
+		leftTop.setPos(position).setNor(normal).setUV(uvBottomLeft.x, uvTopRight.y);
 
 		builder.rect(leftBottom, rightBottom, rightTop, leftTop);
 	}
