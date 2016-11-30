@@ -15,10 +15,10 @@ public class Grid extends Actor {
 
 	protected String[][] items;
 
-	private ShapeRenderer shapeRenderer;
+	protected ShapeRenderer shapeRenderer;
 
-	private int rows;
-	private int columns;
+	protected int rows;
+	protected int columns;
 	protected int gridSize = 4;
 	protected int offsetX = 0;
 	protected int offsetY = 0;
@@ -88,7 +88,12 @@ public class Grid extends Actor {
 	public Grid setCoordinates(int x, int y) {
 		offsetX = x;
 		offsetY = y;
-
+		return this;
+	}
+	
+	public Grid addCoordinates(int x, int y) {
+		offsetX += x;
+		offsetY += y;
 		return this;
 	}
 
