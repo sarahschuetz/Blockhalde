@@ -7,28 +7,28 @@ import com.badlogic.gdx.math.Vector3;
 import com.blockhalde.gui.RendererGUI;
 
 public class PlayerVirtualController implements VirtualController {
+	private static final float ROTATION_SPEED = 180f;
+
 	private Camera camera;
-	private int startX = 0;
-	private int startY = 0;
-	private Vector3 tmpV1 = new Vector3();
-	private Vector3 target = new Vector3();
-	private float rotateAngle = 360f;
-	
-	private double movementX = 0;
-	private double movementY = 0;
+
+	private int centerX = Gdx.graphics.getWidth()/2;
+	private int centerY = Gdx.graphics.getHeight()/2;
+
+	private float movementFwd = 0;
+	private float movementSide = 0;
 	private boolean isJumping = false;
 	private boolean isDigging = false;
-	
+
 	public PlayerVirtualController(Camera camera) {
 		this.camera = camera;
 	}
 
-	public double getMovementX() {
-		return movementX;
+	public float getMovementFwd() {
+		return movementFwd;
 	}
 
-	public double getMovementY() {
-		return movementY;
+	public float getMovementSide() {
+		return movementSide;
 	}
 
 	public boolean isJumping() {
@@ -38,55 +38,69 @@ public class PlayerVirtualController implements VirtualController {
 	public boolean isDigging() {
 		return isDigging;
 	}
-	
+
 	@Override
 	public void keyDown(int keycode) {
-		if (keycode == Keybindings.FORWARD)           movementX += 1;
-		else if (keycode == Keybindings.LEFT)         movementY += 1;
-		else if (keycode == Keybindings.BACKWARD)     movementX += -1;
-		else if (keycode == Keybindings.RIGHT)        movementY += -1;
+		if (keycode == Keybindings.FORWARD)           movementFwd += 1;
+		else if (keycode == Keybindings.LEFT)         movementSide += 1;
+		else if (keycode == Keybindings.BACKWARD)     movementFwd += -1;
+		else if (keycode == Keybindings.RIGHT)        movementSide += -1;
 		else if (keycode == Keybindings.JUMP)         isJumping = true;
 		else if (keycode == Keybindings.INV_TOGGLE)   RendererGUI.instance().toggleMenu();
 		else if (keycode == Keybindings.INV_FORWARD)  RendererGUI.instance().scrollItems(1);
 		else if (keycode == Keybindings.INV_BACKWARD) RendererGUI.instance().scrollItems(-1);
 	}
-	
+
 	@Override
 	public void keyUp(int keycode) {
-		if (keycode == Keybindings.FORWARD)       movementX -= 1;
-		else if (keycode == Keybindings.LEFT)     movementY -= 1;
-		else if (keycode == Keybindings.BACKWARD) movementX -= -1;
-		else if (keycode == Keybindings.RIGHT)    movementY -= -1;
+		if (keycode == Keybindings.FORWARD)       movementFwd -= 1;
+		else if (keycode == Keybindings.LEFT)     movementSide -= 1;
+		else if (keycode == Keybindings.BACKWARD) movementFwd -= -1;
+		else if (keycode == Keybindings.RIGHT)    movementSide -= -1;
 	}
-	
+
 	@Override
 	public void touchDown(int screenX, int screenY, int button) {
 		if (button == Buttons.LEFT) isDigging = true;
 	}
-	
+
 	@Override
 	public void touchUp(int screenX, int screenY, int button) {
 		if (button == Buttons.LEFT) isDigging = false;
 	}
-	
+
 	@Override
 	public void mouseMoved(int screenX, int screenY) {
-		final float deltaX = (float)(startX - screenX) / Gdx.graphics.getWidth();
-		final float deltaY = (float)(startY - screenY) / Gdx.graphics.getHeight();
-		startX = screenX;
-		startY = screenY;
-		process(deltaX, deltaY);
-	}
-	
-	private void process(float deltaX, float deltaY) {
-		tmpV1.set(camera.direction).crs(camera.up).y = 0f;
-		camera.rotateAround(target, tmpV1.nor(), deltaY * rotateAngle);
-		camera.rotateAround(target, Vector3.Y, deltaX * -rotateAngle);
+		final int width = Gdx.graphics.getWidth();
+		final int height = Gdx.graphics.getHeight();
+		resize(width, height);
+
+		final float deltaX = (float)(centerX - screenX) / width;
+		final float deltaY = (float)(centerY - screenY) / height;
+		Gdx.input.setCursorPosition(centerX, centerY);
+
+		camera.rotate(Vector3.Y, deltaX * ROTATION_SPEED);
+		if ((camera.direction.y > -0.965 && deltaY < 0) || (camera.direction.y < 0.965 && deltaY > 0))
+			camera.rotate(camera.direction.cpy().crs(Vector3.Y), deltaY * ROTATION_SPEED);
+		
 		camera.update();
 	}
 
 	@Override
 	public void scrolled(int amount) {
 		RendererGUI.instance().scrollItems(amount);
+	}
+
+	@Override
+	public void update() {
+		camera.translate(camera.direction.x * movementFwd, camera.direction.y * movementFwd, camera.direction.z * movementFwd);
+		Vector3 side = camera.direction.cpy().rotate(90f, 0, 1, 0);
+		camera.translate(side.x * movementSide, 0, side.z * movementSide);
+		camera.update();
+	}
+
+	private void resize(int width, int height) {
+		centerX = width / 2;
+		centerY = height / 2;
 	}
 }
