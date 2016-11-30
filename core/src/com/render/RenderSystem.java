@@ -19,6 +19,7 @@ public class RenderSystem extends EntitySystem {
 	
 	public RenderSystem(World world) {
 		meshCache = new ChunkMeshCache(world);
+		texture = new Texture(Gdx.files.internal("textures/pack.png"));
 	}
 
 	@Override
@@ -55,8 +56,6 @@ public class RenderSystem extends EntitySystem {
 		long start = System.currentTimeMillis();
 		meshCache.update();
 		System.out.println("Initial generation time: " + (System.currentTimeMillis() - start));
-		
-		texture = new Texture("textures/dirt.gif");
 		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/blocks.vs.glsl"),
 				                   Gdx.files.internal("shaders/blocks.fs.glsl"));
