@@ -32,6 +32,9 @@ public class ChunkMeshCache {
 	public void update() {
 		cachedSubs.clear();
 		
+		// TODO keep list contents and only remove entries that are far away from the player
+		// TODO update chunks that were modified, add new list entries for chunks that are not there yet
+		
 		for(Chunk visibleChunk: world.getVisibleChunks()) {
 			for(int y = 0; y < 16; ++y) {
 				CachedSubchunk subchunk = new CachedSubchunk();
