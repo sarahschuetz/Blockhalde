@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.blockhalde.BlockMeshCache.CachedSubchunk;
 import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.input.PhysicalInputProcessor;
 import com.blockhalde.input.PlayerVirtualController;
@@ -32,21 +33,23 @@ public class Blockhalde extends ApplicationAdapter {
 	private Texture texture;
 	private World world;
 	
-	private List<Mesh> meshes = new ArrayList<Mesh>();
+	private BlockMeshCache meshCache;
 
 	@Override
 	public void create() {
 		world = new World();
+		meshCache = new BlockMeshCache(world);
+		meshCache.update();
 
-		for(int i = 0; i < world.getVisibleChunks().size(); i++){
-			Chunk chunk = world.getVisibleChunks().get(i);
-			if(chunk!=null){
-				BlockChunkMeshBuilder blockChunkMeshBuilder = new BlockChunkMeshBuilder(chunk);
-				for(int j = 0; j < blockChunkMeshBuilder.getMeshes().size(); j++){
-					meshes.add(blockChunkMeshBuilder.getMeshes().get(j));
-				}
-			}
-		}
+//		for(int i = 0; i < world.getVisibleChunks().size(); i++){
+//			Chunk chunk = world.getVisibleChunks().get(i);
+//			if(chunk!=null){
+//				BlockChunkMeshBuilder blockChunkMeshBuilder = new BlockChunkMeshBuilder(chunk);
+//				for(int j = 0; j < blockChunkMeshBuilder.getMeshes().size(); j++){
+//					meshes.add(blockChunkMeshBuilder.getMeshes().get(j));
+//				}
+//			}
+//		}
 
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cam.position.set(0f, 0f, 50f);
@@ -104,11 +107,10 @@ public class Blockhalde extends ApplicationAdapter {
 		shader.setUniformi("u_texture", 0);
 		shader.setUniformMatrix("u_normalMatrix", normalMatrix);
 
-
-		for(int i = 0; i < meshes.size(); i++){
-			meshes.get(i).render(shader, GL20.GL_TRIANGLES);
+		for(CachedSubchunk cache: meshCache.getCachedSubs()) {
+			cache.mesh.render(shader, GL20.GL_TRIANGLES);
 		}
-
+		
 		shader.end();
 	 	
 		RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 

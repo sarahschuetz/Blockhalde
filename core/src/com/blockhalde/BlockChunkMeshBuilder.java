@@ -29,7 +29,7 @@ public class BlockChunkMeshBuilder {
 		float blockSizeHalved = blockSize * 0.5f;
 
 		int chunkWidth = chunk.getWidth();
-		int chunkHeight = chunk.getHeight();
+		int chunkHeight = 16;
 		int chunkDepth = chunk.getDepth();
 
 		// X coordinate of the leftmost blocks so that the mesh is symmetrical
@@ -42,7 +42,7 @@ public class BlockChunkMeshBuilder {
 
 		long startTime = System.currentTimeMillis();
 		for (int x = 0; x < chunkWidth; ++x) {
-			for (int y = 0; y < chunkHeight; ++y) {
+			for (int y = subchunkIdx*16; y < (subchunkIdx+1)*16; ++y) {
 				for (int z = 0; z < chunkDepth; ++z) {
 
 					if (chunk.getBlockAt(x, y, z) != BlockType.AIR.getBlockId()) {

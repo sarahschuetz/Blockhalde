@@ -3,6 +3,7 @@ package com.blockhalde;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
+import com.terrain.world.World;
 
 public class BlockChunk implements Chunk {
 
@@ -15,6 +16,14 @@ public class BlockChunk implements Chunk {
 	
 	private long lastModifiedTime = System.nanoTime();
 	
+	private World world;
+	private ChunkPosition pos;
+	
+	public BlockChunk(ChunkPosition pos, World world) {
+		this.world = world;
+		this.pos = pos;
+	}
+
 	/**
 	 * Gets the block count in X direction. Assuming a block size of 1, this
 	 * is equivalent to the physical width of the chunk.
@@ -70,12 +79,9 @@ public class BlockChunk implements Chunk {
 		return blockTypes[offset];
 	}
 	
-	public void setBlockAt(BlockType type, int x, int y, int z) {
+	@Override
+	public void setBlockAt(int x, int y, int z, BlockType type) {
 		setBlockAt(type.getBlockId(), coordsToFlatIndex(x, y, z));
-	}
-	
-	public void setBlockAt(short type, int x, int y, int z) {
-		setBlockAt(type, coordsToFlatIndex(x, y, z));
 	}
 	
 	public void setBlockAt(short type, int offset)
@@ -104,17 +110,11 @@ public class BlockChunk implements Chunk {
 	
 	@Override
 	public ChunkPosition getChunkPosition() {
-		return null;
+		return pos;
 	}
 
 	@Override
 	public ChunkPosition getRelativeChunkPosition() {
-		return null;
-	}
-
-	@Override
-	public void setBlockAt(int x, int y, int z, BlockType type) {
-		// TODO Auto-generated method stub
-		
+		return new ChunkPosition(pos.getXPosition() / Chunk.X_MAX, pos.getZPosition() / Chunk.Z_MAX);
 	}
 }
