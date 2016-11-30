@@ -3,6 +3,7 @@ package com.render;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -30,13 +31,13 @@ public class RenderSystem extends EntitySystem {
 		
 		shader.begin();
 		
-		CameraSystem c = engine.getSystem(CameraSystem.class);
+		Camera cam = engine.getSystem(CameraSystem.class).getCam();
 		
 		// Normal matrix is inverse transposed modelview matrix
-		Matrix4 normalMatrix = c.cam.view.cpy().inv().tra();
+		Matrix4 normalMatrix = cam.view.cpy().inv().tra();
 		
-		shader.setUniformMatrix("u_view", c.cam.view);
-		shader.setUniformMatrix("u_projection", c.cam.projection);
+		shader.setUniformMatrix("u_view", cam.view);
+		shader.setUniformMatrix("u_projection", cam.projection);
 
 		texture.bind();
 		shader.setUniformi("u_texture", 0);
@@ -67,8 +68,6 @@ public class RenderSystem extends EntitySystem {
 		
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
-		
-		super.addedToEngine(engine);
 	}
 	
 }

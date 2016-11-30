@@ -4,13 +4,10 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.blockhalde.input.PlayerVirtualController;
-import com.blockhalde.input.VirtualController;
 
 public class CameraSystem extends EntitySystem {
 	
-	public PerspectiveCamera cam;
-	public VirtualController camVC;
+	private PerspectiveCamera cam;
 
 	@Override
 	public void addedToEngine(Engine engine) {
@@ -20,17 +17,16 @@ public class CameraSystem extends EntitySystem {
 		cam.near = 1f;
 		cam.far = 300f;
 		cam.update();
-		camVC = new PlayerVirtualController(cam);
-	}
-
-	@Override
-	public void update(float deltaTime) {
-		camVC.update();
 	}
 	
 	public void resize(int width, int height){
 		cam.viewportWidth =  width;
 		cam.viewportHeight = height;
+		cam.update();
+	}
+
+	public PerspectiveCamera getCam() {
+		return cam;
 	}
 
 }
