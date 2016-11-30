@@ -1,4 +1,4 @@
-package com.terrain;
+package com.terrain.block;
 
 /**
  * Defines all block types which are specified in a byte

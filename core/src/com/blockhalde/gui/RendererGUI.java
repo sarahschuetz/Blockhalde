@@ -1,6 +1,7 @@
 package com.blockhalde.gui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -12,6 +13,7 @@ public class RendererGUI {
 	
 	Stage stage;
 	Text debugText;
+	BottomGrid bottomGrid;
 	
 	public static RendererGUI instance(){
 		if(instance == null){
@@ -24,7 +26,9 @@ public class RendererGUI {
 		Viewport viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera());
 		stage = new Stage(viewport);
 		debugText = new Text();
+		bottomGrid = BottomGrid.getInstance();
 		stage.addActor(debugText);
+		stage.addActor(bottomGrid);
 	}
 	
     public void setDebugText(String text){
@@ -40,5 +44,18 @@ public class RendererGUI {
 		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
 		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 	    stage.draw();
+	    
+	    toggleMenu();
+	}
+	
+	private void toggleMenu() {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+			if (bottomGrid.isVisible()) {
+				bottomGrid.setVisible(false);
+			} else {
+				bottomGrid.setVisible(true);
+			}
+			
+		}
 	}
 }
