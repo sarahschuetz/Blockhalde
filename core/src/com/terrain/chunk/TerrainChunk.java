@@ -23,7 +23,22 @@ public class TerrainChunk implements Chunk {
 					if(noise < 0.67) {
 						blocks[x][y][z] = BlockType.AIR.getBlockId();
 					} else {
-						blocks[x][y][z] = BlockType.DIRT.getBlockId();
+						BlockType type;
+						
+						// NOTE TO THE TERRAIN TEAM
+						
+						// THIS IS JUST FOR DEMONSTRATION PURPOSES (FUN)
+						// YOU CAN DELETE THIS
+						
+						if(y > 20) {
+							type = BlockType.GRASS;
+						} else if(y > 10) {
+							type = BlockType.DIRT;
+						} else {
+							type = BlockType.STONE;
+						}
+						
+						blocks[x][y][z] = type.getBlockId();
 					}
 				}
 			}
