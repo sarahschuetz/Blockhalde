@@ -31,7 +31,7 @@ public class TerrainChunk implements Chunk {
 	}
 
 	public void setBlock(int x, int y, int z, BlockType blockType){
-		blocks[x][y][z] = blockType.getBlockId();
+		
 	}
 
 	@Override
@@ -51,7 +51,12 @@ public class TerrainChunk implements Chunk {
 
 	@Override
 	public short getBlockAt(int x, int y, int z) {
-		return x<=Chunk.X_MAX && y <= Chunk.Y_MAX && z <= Chunk.Z_MAX ? blocks[x][y][z] : BlockType.AIR.getBlockId();
+		return x <= Chunk.X_MAX && y <= Chunk.Y_MAX && z <= Chunk.Z_MAX ? blocks[x][y][z] : BlockType.AIR.getBlockId();
+	}
+	
+	@Override
+	public void setBlockAt(int x, int y, int z, BlockType type) {
+		blocks[x][y][z] = type.getBlockId();
 	}
 
 	@Override
@@ -61,6 +66,7 @@ public class TerrainChunk implements Chunk {
 
 	@Override
 	public ChunkPosition getRelativeChunkPosition() {
-		return new ChunkPosition(chunkPosition.getXPosition()/Chunk.X_MAX, chunkPosition.getZPosition()/Chunk.Z_MAX);
+		return new ChunkPosition(chunkPosition.getXPosition() / Chunk.X_MAX, chunkPosition.getZPosition() / Chunk.Z_MAX);
 	}
+
 }

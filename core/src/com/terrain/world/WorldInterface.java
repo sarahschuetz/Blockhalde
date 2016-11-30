@@ -20,6 +20,4 @@ public interface WorldInterface {
      */
 	List<Chunk> getVisibleChunks();
 	// TODO: get relative chunk
-	// TODO: Get all chunks
-	// TODO: Dimensions (How many chunks), Center
 }
