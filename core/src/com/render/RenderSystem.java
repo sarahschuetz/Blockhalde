@@ -24,9 +24,9 @@ public class RenderSystem extends EntitySystem {
 
 	@Override
 	public void update(float deltaTime) {
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		
 		shader.begin();
 		
@@ -65,14 +65,10 @@ public class RenderSystem extends EntitySystem {
 			System.out.println(shader.getLog());
 		}
 		
+		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
+		
 		super.addedToEngine(engine);
 	}
-
-	@Override
-	public void removedFromEngine(Engine engine) {
-		// TODO Auto-generated method stub
-		super.removedFromEngine(engine);
-	}
-	
 	
 }
