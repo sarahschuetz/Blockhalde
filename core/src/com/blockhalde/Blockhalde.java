@@ -33,51 +33,35 @@ public class Blockhalde extends ApplicationAdapter {
 	
 	private World world;
 	private Engine engine;
+	private CameraSystem cameraSystem;
 
 	@Override
 	public void create() {
 		engine = new Engine();
 		world = new World();
 		
-		engine.addSystem(new CameraSystem());
+		cameraSystem = new CameraSystem();
+		engine.addSystem(cameraSystem);
 		engine.addSystem(new RenderSystem(world));
-
-//		for(int i = 0; i < world.getVisibleChunks().size(); i++){
-//			Chunk chunk = world.getVisibleChunks().get(i);
-//			if(chunk!=null){
-//				BlockChunkMeshBuilder blockChunkMeshBuilder = new BlockChunkMeshBuilder(chunk);
-//				for(int j = 0; j < blockChunkMeshBuilder.getMeshes().size(); j++){
-//					meshes.add(blockChunkMeshBuilder.getMeshes().get(j));
-//				}
-//			}
-//		}
 		
-		//chunk.setBlockTypeAt(BlockType.WATER, 10, 100, 10);
-		
-		//inputProcessor = new PhysicalInputProcessor(camVC);
+		inputProcessor = new PhysicalInputProcessor(cameraSystem.camVC);
 		Gdx.input.setInputProcessor(inputProcessor);
 		Gdx.input.setCursorCatched(true);
-		
-		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
-		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
 	}
 	
 	@Override
 	public void resize(int width, int height){
-		//cam.viewportWidth =  width;
-		//cam.viewportHeight = height;
+		cameraSystem.resize(width, height);
 		RendererGUI.instance().resize(width, height);
 	}
 
 	@Override
 	public void render() {
 	 	
-		/*RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
-				"\ncam pos " + cam.position.toString() + 
+		RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
+				"\ncam pos " + cameraSystem.cam.position.toString() + 
 				"\nM: toggle menu, Q + E: iterate items");
-		RendererGUI.instance().render();*/
+		RendererGUI.instance().render();
 
 		engine.update(Gdx.graphics.getRawDeltaTime());
 	}

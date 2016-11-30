@@ -10,7 +10,7 @@ import com.blockhalde.input.VirtualController;
 public class CameraSystem extends EntitySystem {
 	
 	public PerspectiveCamera cam;
-	private VirtualController camVC;
+	public VirtualController camVC;
 
 	@Override
 	public void addedToEngine(Engine engine) {
@@ -26,6 +26,11 @@ public class CameraSystem extends EntitySystem {
 	@Override
 	public void update(float deltaTime) {
 		camVC.update();
+	}
+	
+	public void resize(int width, int height){
+		cam.viewportWidth =  width;
+		cam.viewportHeight = height;
 	}
 
 }
