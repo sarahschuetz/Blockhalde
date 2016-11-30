@@ -2,6 +2,7 @@ package com.blockhalde;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -9,6 +10,8 @@ import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import com.blockhalde.gui.RendererGUI;
+import com.blockhalde.input.PhysicalInputProcessor;
+import com.blockhalde.input.PlayerVirtualController;
 
 public class Blockhalde extends ApplicationAdapter {
 
@@ -16,7 +19,7 @@ public class Blockhalde extends ApplicationAdapter {
 	private BlockChunk chunk;
 	private BlockChunkMeshBuilder chunkMeshBuilder;
 	private ShaderProgram shader;
-	private CameraInputController inputController;
+	private InputProcessor inputProcessor;
 
 	@Override
 	public void create() {
@@ -40,8 +43,9 @@ public class Blockhalde extends ApplicationAdapter {
 			System.out.println(shader.getLog());
 		}
 		
-		inputController = new CameraInputController(cam);
-		Gdx.input.setInputProcessor(inputController);
+		//inputProcessor = new CameraInputController(cam);
+		inputProcessor = new PhysicalInputProcessor(new PlayerVirtualController(cam));
+		Gdx.input.setInputProcessor(inputProcessor);
 		
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
