@@ -6,7 +6,7 @@ import java.util.List;
 import com.badlogic.gdx.InputProcessor;
 
 public class PhysicalInputProcessor implements InputProcessor {
-	private List<VirtualController> controllers = new ArrayList<>();
+	private List<VirtualController> controllers = new ArrayList<VirtualController>();
 	
 	public PhysicalInputProcessor(VirtualController... controllers) {
 		for (VirtualController virtualController : controllers) {
