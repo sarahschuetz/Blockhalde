@@ -15,10 +15,10 @@ public class ChunkMeshCache {
 
 	private World world;
 	
-	class CachedSubchunk {
-		ChunkPosition chunkPos;
-		int subchunkIdx;
-		Mesh mesh;
+	public class CachedSubchunk {
+		public ChunkPosition chunkPos;
+		public int subchunkIdx;
+		public Mesh mesh;
 	}
 	
 	private List<CachedSubchunk> cachedSubs = new ArrayList<CachedSubchunk>(24);
