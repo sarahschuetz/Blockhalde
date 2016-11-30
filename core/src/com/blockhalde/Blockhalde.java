@@ -1,5 +1,6 @@
 package com.blockhalde;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -13,9 +14,11 @@ import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.input.PhysicalInputProcessor;
 import com.blockhalde.input.PlayerVirtualController;
 import com.blockhalde.input.VirtualController;
+import com.render.CameraSystem;
 import com.render.ChunkMeshBuilder;
 import com.render.ChunkMeshCache;
 import com.render.ChunkMeshCache.CachedSubchunk;
+import com.render.RenderSystem;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.TerrainChunk;
 import com.terrain.world.World;
@@ -24,27 +27,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Blockhalde extends ApplicationAdapter {
-
-	private PerspectiveCamera cam;
-	private VirtualController camVC;
-	private ChunkMeshBuilder chunkMeshBuilder;
-	private ShaderProgram shader;
+	
+	//private ChunkMeshBuilder chunkMeshBuilder;
 	private InputProcessor inputProcessor;
 	
-	private Texture texture;
 	private World world;
-	
-	private ChunkMeshCache meshCache;
+	private Engine engine;
 
 	@Override
 	public void create() {
+		engine = new Engine();
 		world = new World();
-		meshCache = new ChunkMeshCache(world);
 		
-		long start = System.currentTimeMillis();
-		meshCache.update();
-		
-		System.out.println("Initial generation time: " + (System.currentTimeMillis() - start));
+		engine.addSystem(new CameraSystem());
+		engine.addSystem(new RenderSystem(world));
 
 //		for(int i = 0; i < world.getVisibleChunks().size(); i++){
 //			Chunk chunk = world.getVisibleChunks().get(i);
@@ -55,29 +51,10 @@ public class Blockhalde extends ApplicationAdapter {
 //				}
 //			}
 //		}
-
-		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		cam.position.set(0f, 0f, 50f);
-		cam.lookAt(0, 0, 0);
-		cam.near = 1f;
-		cam.far = 300f;
-		cam.update();
 		
 		//chunk.setBlockTypeAt(BlockType.WATER, 10, 100, 10);
 		
-		texture = new Texture("textures/dirt.gif");
-		
-		shader = new ShaderProgram(Gdx.files.internal("shaders/blocks.vs.glsl"),
-				                   Gdx.files.internal("shaders/blocks.fs.glsl"));
-		
-		if(!shader.isCompiled()) {
-			System.out.println("Something went wrong during shader compilation, have a look at the log:");
-			System.out.println(shader.getLog());
-		}
-		
-		//inputProcessor = new CameraInputController(cam);
-		camVC = new PlayerVirtualController(cam);
-		inputProcessor = new PhysicalInputProcessor(camVC);
+		//inputProcessor = new PhysicalInputProcessor(camVC);
 		Gdx.input.setInputProcessor(inputProcessor);
 		Gdx.input.setCursorCatched(true);
 		
@@ -89,40 +66,19 @@ public class Blockhalde extends ApplicationAdapter {
 	
 	@Override
 	public void resize(int width, int height){
-		cam.viewportWidth =  width;
-		cam.viewportHeight = height;
+		//cam.viewportWidth =  width;
+		//cam.viewportHeight = height;
 		RendererGUI.instance().resize(width, height);
 	}
 
 	@Override
 	public void render() {
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
-		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-		
-		shader.begin();
-		
-		// Normal matrix is inverse transposed modelview matrix
-		Matrix4 normalMatrix = cam.view.cpy().inv().tra();
-		
-		shader.setUniformMatrix("u_view", cam.view);
-		shader.setUniformMatrix("u_projection", cam.projection);
-
-		texture.bind();
-		shader.setUniformi("u_texture", 0);
-		shader.setUniformMatrix("u_normalMatrix", normalMatrix);
-
-		for(CachedSubchunk cache: meshCache.getCachedSubs()) {
-			cache.mesh.render(shader, GL20.GL_TRIANGLES);
-		}
-		
-		shader.end();
 	 	
-		RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
+		/*RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
 				"\ncam pos " + cam.position.toString() + 
 				"\nM: toggle menu, Q + E: iterate items");
-		RendererGUI.instance().render();
+		RendererGUI.instance().render();*/
 
-		camVC.update();
+		engine.update(Gdx.graphics.getRawDeltaTime());
 	}
 }
