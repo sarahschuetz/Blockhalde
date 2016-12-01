@@ -5,8 +5,8 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.input.InputSystem;
-import com.render.CameraSystem;
-import com.render.RenderSystem;
+import com.blockhalde.render.CameraSystem;
+import com.blockhalde.render.RenderSystem;
 import com.terrain.world.World;
 
 public class Blockhalde extends ApplicationAdapter {

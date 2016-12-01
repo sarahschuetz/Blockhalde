@@ -1,4 +1,4 @@
-package com.render;
+package com.blockhalde.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -62,8 +62,12 @@ public class ChunkMeshBuilder {
 						center.set(chunk.getChunkPosition().getXPosition() + firstX + x * blockSize, firstY + y * blockSize, chunk.getChunkPosition().getZPosition() + firstZ + z * blockSize);
 
 						AtlasRegion region = atlas.findRegion(blockType.getSideTextureName());
-						uvBottomLeft.set(region.getU(), region.getV());
-						uvTopRight.set(region.getU2(), region.getV2());
+						
+						// Counterintuively, (u,v) seems to be the bottom right and (u2,u2)
+						// the top left in an AtlasRegion
+						// That sure sounds like something that should be documented in libgdx
+						uvBottomLeft.set(region.getU(), region.getV2());
+						uvTopRight.set(region.getU2(), region.getV());
 						
 						if ((z + 1) == chunk.getDepth()
 								|| chunk.getBlockAt(x, y, z + 1) == BlockType.AIR.getBlockId()) {

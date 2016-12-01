@@ -1,11 +1,8 @@
-package com.render;
+package com.terrain.chunk;
 
 import com.terrain.block.BlockType;
-import com.terrain.chunk.Chunk;
-import com.terrain.chunk.ChunkPosition;
-import com.terrain.world.World;
 
-public class BlockChunk implements Chunk {
+public class FlatArrayChunk implements Chunk {
 
 	private static final int CHUNK_WIDTH = 16;
 	private static final int CHUNK_DEPTH = 16;
@@ -16,11 +13,9 @@ public class BlockChunk implements Chunk {
 	
 	private long lastModifiedTime = System.nanoTime();
 	
-	private World world;
 	private ChunkPosition pos;
 	
-	public BlockChunk(ChunkPosition pos, World world) {
-		this.world = world;
+	public FlatArrayChunk(ChunkPosition pos) {
 		this.pos = pos;
 	}
 

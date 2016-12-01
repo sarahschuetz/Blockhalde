@@ -58,6 +58,7 @@ public class PlayerVirtualController implements VirtualController {
 		else if (keycode == Keybindings.INV_TOGGLE)   RendererGUI.instance().toggleMenu();
 		else if (keycode == Keybindings.INV_FORWARD)  RendererGUI.instance().scrollItems(1);
 		else if (keycode == Keybindings.INV_BACKWARD) RendererGUI.instance().scrollItems(-1);
+		else if (keycode == Keybindings.QUIT)		  Gdx.app.exit();
 	}
 
 	@Override
