@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.render.CameraSystem;
+import com.blockhalde.render.CameraSystem;
 
 public class InputSystem extends EntitySystem {
 	

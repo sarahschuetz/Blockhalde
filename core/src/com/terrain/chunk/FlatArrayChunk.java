@@ -1,10 +1,8 @@
-package com.render;
+package com.terrain.chunk;
 
 import com.terrain.block.BlockType;
-import com.terrain.chunk.Chunk;
-import com.terrain.chunk.ChunkPosition;
 
-public class BlockChunk implements Chunk {
+public class FlatArrayChunk implements Chunk {
 
 	private static final int CHUNK_WIDTH = 16;
 	private static final int CHUNK_DEPTH = 16;
@@ -17,7 +15,7 @@ public class BlockChunk implements Chunk {
 	
 	private ChunkPosition pos;
 	
-	public BlockChunk(ChunkPosition pos) {
+	public FlatArrayChunk(ChunkPosition pos) {
 		this.pos = pos;
 	}
 

@@ -1,4 +1,4 @@
-package com.render;
+package com.blockhalde.render;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;

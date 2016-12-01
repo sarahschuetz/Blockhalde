@@ -1,4 +1,4 @@
-package com.render;
+package com.blockhalde.render;
 
 import com.badlogic.gdx.graphics.Mesh;
 import com.terrain.chunk.ChunkPosition;

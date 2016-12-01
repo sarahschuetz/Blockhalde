@@ -1,21 +1,21 @@
-package com.render;
+package test.util;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.render.BlockChunk;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.ChunkPosition;
+import com.terrain.chunk.FlatArrayChunk;
 
-public class BlockChunkTest {
+public class FlatArrayChunkTest {
 
-	private BlockChunk chunk;
+	private FlatArrayChunk chunk;
 	
 	@Before
 	public void setUp() throws Exception {
-		chunk = new BlockChunk(new ChunkPosition(0, 0));
+		chunk = new FlatArrayChunk(new ChunkPosition(0, 0));
 	}
 	
 	@Test
