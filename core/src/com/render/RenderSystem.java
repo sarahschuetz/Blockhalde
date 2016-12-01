@@ -31,7 +31,7 @@ public class RenderSystem extends EntitySystem {
 		long start = System.currentTimeMillis();
 		meshCache = new ChunkMeshCache(world);
 		meshCache.update();
-		System.out.println("Initial mesh generation time: " + (System.currentTimeMillis() - start) + "ms");
+		//System.out.println("Initial mesh generation time: " + (System.currentTimeMillis() - start) + "ms");
 		
 		shader = new ShaderProgram(Gdx.files.internal("shaders/blocks.vs.glsl"),
 				                   Gdx.files.internal("shaders/blocks.fs.glsl"));
@@ -55,7 +55,7 @@ public class RenderSystem extends EntitySystem {
 		
 		long start = System.currentTimeMillis();
 		meshCache.update();
-		System.out.println("Mesh update time: " + (System.currentTimeMillis() - start) + "ms");
+		//System.out.println("Mesh update time: " + (System.currentTimeMillis() - start) + "ms");
 		
 		shader.begin();
 		
