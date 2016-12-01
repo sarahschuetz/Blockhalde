@@ -9,20 +9,20 @@ import com.render.CameraSystem;
 public class InputSystem extends EntitySystem {
 	
 	private InputProcessor inputProcessor;
-	private VirtualController camVC;
+	private VirtualController cameraController;
 
 	@Override
 	public void addedToEngine(Engine engine) {
 		CameraSystem c = engine.getSystem(CameraSystem.class);
-		camVC = new PlayerVirtualController(c.getCam());
-		inputProcessor = new PhysicalInputProcessor(camVC);
+		cameraController = new PlayerVirtualController(c.getCam());
+		inputProcessor = new PhysicalInputProcessor(cameraController);
 		Gdx.input.setInputProcessor(inputProcessor);
-		Gdx.input.setCursorCatched(true);
+//		Gdx.input.setCursorCatched(true);
 	}
 
 	@Override
 	public void update(float deltaTime) {
-		camVC.update();
+		cameraController.update(deltaTime);
 	}
 
 }

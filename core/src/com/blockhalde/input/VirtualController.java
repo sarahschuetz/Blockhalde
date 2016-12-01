@@ -7,5 +7,5 @@ public interface VirtualController {
 	public void touchUp(int screenX, int screenY, int button);
 	public void mouseMoved(int screenX, int screenY); 
 	public void scrolled(int amount);
-	public void update();
+	public void update(float deltaTime);
 }
