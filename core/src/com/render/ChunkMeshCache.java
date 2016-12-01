@@ -2,7 +2,6 @@ package com.render;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.badlogic.gdx.graphics.Mesh;
@@ -81,9 +80,8 @@ public class ChunkMeshCache {
 					cacheEntry = cachedSubs.get(cacheInsertionIdx--);
 					cacheEntry.chunkPos = visibleChunk.getChunkPosition();
 					cacheEntry.subchunkIdx = y;
+					update(cacheEntry, visibleChunk);
 				}
-				
-				update(cacheEntry, visibleChunk);
 			}
 		}
 	}
@@ -127,9 +125,17 @@ public class ChunkMeshCache {
 	}
 	
 	public void update() {
+		long start = System.currentTimeMillis();
 		sortCache();
+		long afterSort = System.currentTimeMillis();
 		uploadUncachedMeshes();
+		long afterUploadingUncached = System.currentTimeMillis();
 		updateOutOfDateMeshes();
+		long end = System.currentTimeMillis();
+		
+		//System.out.println("Sorting:               " + (afterSort-start) + "ms");
+		//System.out.println("Uploading uncached:    " + (afterUploadingUncached-afterSort) + "ms");
+		//System.out.println("Uploading invalidated: " + (end-afterUploadingUncached) + "ms");
 	}
 	
 	public List<CachedSubchunk> getCachedSubchunks() {
