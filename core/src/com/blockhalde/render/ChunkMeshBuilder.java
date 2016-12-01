@@ -1,4 +1,4 @@
-package com.render;
+package com.blockhalde.render;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
