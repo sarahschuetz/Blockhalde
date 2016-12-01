@@ -11,4 +11,5 @@ public class Keybindings {
 	public static int INV_TOGGLE = Keys.M;
 	public static int INV_FORWARD = Keys.E;
 	public static int INV_BACKWARD = Keys.Q;
+	public static int QUIT = Keys.ESCAPE;
 }
