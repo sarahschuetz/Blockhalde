@@ -125,13 +125,13 @@ public class ChunkMeshCache {
 	}
 	
 	public void update() {
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		sortCache();
-		long afterSort = System.currentTimeMillis();
+		//long afterSort = System.currentTimeMillis();
 		uploadUncachedMeshes();
-		long afterUploadingUncached = System.currentTimeMillis();
+		//long afterUploadingUncached = System.currentTimeMillis();
 		updateOutOfDateMeshes();
-		long end = System.currentTimeMillis();
+		//long end = System.currentTimeMillis();
 		
 		//System.out.println("Sorting:               " + (afterSort-start) + "ms");
 		//System.out.println("Uploading uncached:    " + (afterUploadingUncached-afterSort) + "ms");

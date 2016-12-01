@@ -15,7 +15,7 @@ public class BlockChunkTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		chunk = new BlockChunk(new ChunkPosition(0, 0), null);
+		chunk = new BlockChunk(new ChunkPosition(0, 0));
 	}
 	
 	@Test
