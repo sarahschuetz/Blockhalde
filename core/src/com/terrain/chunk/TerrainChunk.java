@@ -30,7 +30,9 @@ public class TerrainChunk implements Chunk {
 						// THIS IS JUST FOR DEMONSTRATION PURPOSES (FUN)
 						// YOU CAN DELETE THIS
 						
-						if(y > 20) {
+						if(y > 100) {
+							type = BlockType.TNT;
+						} else if(y > 20) {
 							type = BlockType.GRASS;
 						} else if(y > 10) {
 							type = BlockType.DIRT;
