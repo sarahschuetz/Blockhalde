@@ -1,4 +1,4 @@
-package test.util;
+package test.terrain.chunk;
 
 import static org.junit.Assert.*;
 
