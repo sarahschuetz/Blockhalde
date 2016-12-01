@@ -1,18 +1,27 @@
 package com.blockhalde.gui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.blockhalde.gui.pie.PieMenu;
 
 public class RendererGUI {
 	private static RendererGUI instance;
 
 	Stage stage;
-	Text debugText;
+	Label debugLabel ;
+	LabelStyle labelStyle;
 	BottomGrid bottomGrid;
+	BitmapFont debugFont;
+	PieMenu pieMenu;
 
 	public static RendererGUI instance(){
 		if(instance == null){
@@ -24,14 +33,27 @@ public class RendererGUI {
 	RendererGUI(){
 		Viewport viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera());
 		stage = new Stage(viewport);
-		debugText = new Text();
+		
+		// setting up debug text
+		debugFont = new BitmapFont();
+		labelStyle = new LabelStyle(debugFont, new Color(0.9f,0.9f,0.9f,1.0f));
+		debugLabel = new Label("", labelStyle);
+		
+		// setting up bottom grid
 		bottomGrid = BottomGrid.getInstance();
-		stage.addActor(debugText);
+		
+		// setting up pie menu
+		//pieMenu = new PieMenu(stage);
+		//pieMenu.setPosition(Gdx.graphics.getWidth()*0.5f, Gdx.graphics.getHeight()*0.5f);
+		
+		stage.addActor(debugLabel);
 		stage.addActor(bottomGrid);
+		//stage.addActor(pieMenu);
 	}
 
 	public void setDebugText(String text){
-		debugText.setText(text);
+		debugLabel.setText(text);
+		debugLabel.setPosition(5, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 5, Align.topLeft);
 	}
 
 	public void resize (int width, int height) {
