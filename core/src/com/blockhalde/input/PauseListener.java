@@ -3,17 +3,21 @@ package com.blockhalde.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.LifecycleListener;
 
-public class InputLifecycleListener implements LifecycleListener {
+public class PauseListener implements LifecycleListener {
+	private static PauseListener instance;
 	private boolean paused = false;
-	
-	public boolean isPaused() {
-		return paused;
+
+	public static void init() {
+		if (instance == null) {
+			instance = new PauseListener();
+			Gdx.app.addLifecycleListener(instance);
+		}
 	}
 
-	public InputLifecycleListener(PlayerVirtualController pvc) {
-		Gdx.app.addLifecycleListener(this);
+	public static boolean isPaused() {
+		return instance.paused;
 	}
-	
+
 	@Override
 	public void pause() {
 		paused = true;

@@ -18,7 +18,6 @@ public class PlayerVirtualController implements VirtualController {
 	private int height = Gdx.graphics.getHeight();
 	private int centerX = width/2;
 	private int centerY = height/2;
-	private InputLifecycleListener lifecycleListener = new InputLifecycleListener(this);
 
 	private float rotationX = 0;
 	private float rotationY = 0;
@@ -30,6 +29,7 @@ public class PlayerVirtualController implements VirtualController {
 
 	public PlayerVirtualController(Camera camera) {
 		this.camera = camera;
+		PauseListener.init();
 	}
 
 	public float getMovementFwd() {
@@ -81,7 +81,7 @@ public class PlayerVirtualController implements VirtualController {
 
 	@Override
 	public void mouseMoved(int screenX, int screenY) {
-		if (!lifecycleListener.isPaused()) {
+		if (!PauseListener.isPaused()) {
 			rotationX += (float)(centerX - screenX) / width * ROTATION_SPEED;
 			rotationY += (float)(centerY - screenY) / height * ROTATION_SPEED;
 
@@ -105,7 +105,7 @@ public class PlayerVirtualController implements VirtualController {
 
 	@Override
 	public void update(float deltaTime) {
-		if (!lifecycleListener.isPaused()) {
+		if (!PauseListener.isPaused()) {
 			Gdx.input.setCursorPosition(centerX, centerY);
 			camera.translate(camera.direction.x * movementFwd, camera.direction.y * movementFwd, camera.direction.z * movementFwd);
 			Vector3 side = camera.direction.cpy().rotate(camera.up, 90f);
