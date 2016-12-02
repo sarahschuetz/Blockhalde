@@ -1,8 +1,9 @@
 package com.terrain.generators;
 
-import com.terrain.chunk.TerrainChunk;
+import com.terrain.chunk.Chunk;
+
 
 public interface TerrainGenerator {
-    void generate(TerrainChunk chunk, String seed);
-    void generate(TerrainChunk chunk, int hash);
+    void generate(Chunk chunk, String seed);
+    void generate(Chunk chunk, int hash);
 }

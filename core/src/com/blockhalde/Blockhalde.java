@@ -7,23 +7,25 @@ import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.input.InputSystem;
 import com.blockhalde.render.CameraSystem;
 import com.blockhalde.render.RenderSystem;
-import com.terrain.world.World;
+import com.terrain.world.WorldManagementSystem;
 
 public class Blockhalde extends ApplicationAdapter {
 	
-	private World world;
+
 	private Engine engine;
 	private CameraSystem cameraSystem;
+
 
 	@Override
 	public void create() {
 		engine = new Engine();
-		world = new World();
-		
+
 		cameraSystem = new CameraSystem();
 		engine.addSystem(cameraSystem);
 		engine.addSystem(new InputSystem());
-		engine.addSystem(new RenderSystem(world));
+		engine.addSystem(new WorldManagementSystem());
+		engine.addSystem(new RenderSystem());
+
 	}
 	
 	@Override

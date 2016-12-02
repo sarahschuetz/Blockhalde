@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
-import com.terrain.world.World;
+import com.terrain.world.WorldManagementSystem;
 
 public class RenderSystem extends EntitySystem {
 
@@ -18,18 +18,20 @@ public class RenderSystem extends EntitySystem {
 	private Texture texture;
 	private ShaderProgram shader;
 	private Engine engine;
-	private World world;
+	private WorldManagementSystem worldManagementSystem;
 	
-	public RenderSystem(World world) {
-		this.world = world;
+	public RenderSystem() {
 		texture = new Texture(Gdx.files.internal("textures/blocks.png"));
 	}
 	
 	@Override
 	public void addedToEngine(Engine engine) {
 		this.engine = engine;
+
+		worldManagementSystem = engine.getSystem(WorldManagementSystem.class);
+
 		//long start = System.currentTimeMillis();
-		meshCache = new ChunkMeshCache(world);
+		meshCache = new ChunkMeshCache(worldManagementSystem);
 		meshCache.update();
 		//System.out.println("Initial mesh generation time: " + (System.currentTimeMillis() - start) + "ms");
 		

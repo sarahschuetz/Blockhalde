@@ -11,11 +11,11 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
-import com.terrain.world.World;
+import com.terrain.world.WorldManagementSystem;
 
 public class ChunkMeshCache {
 
-	private World world;
+	private WorldManagementSystem worldManagementSystem;
 	
 	/**
 	 * The cache may keep meshes for this many subchunks in VRAM before starting to
@@ -29,12 +29,12 @@ public class ChunkMeshCache {
 	
 	private final SubchunkDistanceComparator comp = new SubchunkDistanceComparator();
 	
-	public ChunkMeshCache(World world) {
-		this.world = world;
+	public ChunkMeshCache(WorldManagementSystem worldManagementSystem) {
+		this.worldManagementSystem = worldManagementSystem;
 		builder = new ChunkMeshBuilder();
 		allocateCache();
 		
-		if(world.getVisibleChunks().size() > MAX_CACHED_SUBCHUNKS) {
+		if(worldManagementSystem.getVisibleChunks().size() > MAX_CACHED_SUBCHUNKS) {
 			// FIXME the cache size should be determined by the draw distance, but it does not
 			//       have a getter as of yet
 			throw new RuntimeException("Cache is too small to handle all the visible chunks");
@@ -67,7 +67,7 @@ public class ChunkMeshCache {
 	}
 	
 	/**
-	 * Asks the world for visible chunks and ensures all of them are in the cache.
+	 * Asks the worldManagementSystem for visible chunks and ensures all of them are in the cache.
 	 */
 	private void uploadUncachedMeshes() {
 		// Start overwriting subchunks in the cache at the most distant subchunk
@@ -75,7 +75,7 @@ public class ChunkMeshCache {
 		// upon next update
 		int cacheInsertionIdx = cachedSubs.size() - 1;
 		
-		for(Chunk visibleChunk: world.getVisibleChunks()) {
+		for(Chunk visibleChunk: worldManagementSystem.getVisibleChunks()) {
 			for(int y = 0; y < RenderSystem.SUBCHUNK_HEIGHT; ++y) {
 				CachedSubchunk cacheEntry = findCachedSubchunk(visibleChunk.getChunkPosition(), y);
 				
@@ -114,7 +114,7 @@ public class ChunkMeshCache {
 	private void updateOutOfDateMeshes() {
 		for(CachedSubchunk cached: cachedSubs) {
 			if(!cached.isUnused()) {
-				Chunk chunk = world.getChunk(cached.chunkPos.getXPosition(), cached.chunkPos.getZPosition());
+				Chunk chunk = worldManagementSystem.getChunk(cached.chunkPos.getXPosition(), cached.chunkPos.getZPosition());
 				// FIXME this should be the actual modification date not just some fantasy value
 				// this would be cool : lastSubchunkModification = chunk.getLastSubchunkUpdateTime(cached.subchunkIdx)
 				long lastSubchunkUpdate = Long.MIN_VALUE;
