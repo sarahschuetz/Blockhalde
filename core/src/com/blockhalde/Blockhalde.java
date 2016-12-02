@@ -22,14 +22,15 @@ public class Blockhalde extends ApplicationAdapter {
 		
 		cameraSystem = new CameraSystem();
 		engine.addSystem(cameraSystem);
-		engine.addSystem(new RenderSystem(world));
 		engine.addSystem(new InputSystem());
+		engine.addSystem(new RenderSystem(world));
 	}
 	
 	@Override
 	public void resize(int width, int height){
 		cameraSystem.resize(width, height);
 		RendererGUI.instance().resize(width, height);
+		engine.getSystem(InputSystem.class).resize(width, height);
 	}
 
 	@Override

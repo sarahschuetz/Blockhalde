@@ -37,4 +37,7 @@ public class InputSystem extends EntitySystem {
 		cameraController.update(deltaTime);
 	}
 
+	public void resize(int width, int height) {
+		cameraController.resize(width, height);
+	}
 }

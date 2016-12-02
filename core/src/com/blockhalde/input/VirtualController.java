@@ -8,4 +8,5 @@ public interface VirtualController {
 	public void mouseMoved(int screenX, int screenY); 
 	public void scrolled(int amount);
 	public void update(float deltaTime);
+	public void resize(int width, int height);
 }

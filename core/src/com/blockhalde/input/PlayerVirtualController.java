@@ -8,9 +8,10 @@ import com.blockhalde.gui.RendererGUI;
 
 public class PlayerVirtualController implements VirtualController {
 	private static final float ROTATION_SPEED = 180f;
-	private static final float MAX_ROTATION = 90;
+	private static final float MAX_ROTATION = 90f;
 
 	private Camera camera;
+	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 	private Vector3 startDirection = new Vector3(0, 0, -1);
 	private Vector3 startUp = new Vector3(0, 1, 0);
 
@@ -50,23 +51,23 @@ public class PlayerVirtualController implements VirtualController {
 
 	@Override
 	public void keyDown(int keycode) {
-		if (keycode == Keybindings.FORWARD)           movementFwd += 1;
-		else if (keycode == Keybindings.LEFT)         movementSide += 1;
-		else if (keycode == Keybindings.BACKWARD)     movementFwd += -1;
-		else if (keycode == Keybindings.RIGHT)        movementSide += -1;
-		else if (keycode == Keybindings.JUMP)         isJumping = true;
-		else if (keycode == Keybindings.INV_TOGGLE)   RendererGUI.instance().toggleMenu();
-		else if (keycode == Keybindings.INV_FORWARD)  RendererGUI.instance().scrollItems(1);
-		else if (keycode == Keybindings.INV_BACKWARD) RendererGUI.instance().scrollItems(-1);
-		else if (keycode == Keybindings.QUIT)		  Gdx.app.exit();
+		if (keycode == keybindings.getKey("FORWARD"))           movementFwd += 1;
+		else if (keycode == keybindings.getKey("LEFT"))         movementSide += 1;
+		else if (keycode == keybindings.getKey("BACKWARD"))     movementFwd += -1;
+		else if (keycode == keybindings.getKey("RIGHT"))        movementSide += -1;
+		else if (keycode == keybindings.getKey("JUMP"))         isJumping = true;
+		else if (keycode == keybindings.getKey("INV_TOGGLE"))   RendererGUI.instance().toggleMenu();
+		else if (keycode == keybindings.getKey("INV_FORWARD"))  RendererGUI.instance().scrollItems(1);
+		else if (keycode == keybindings.getKey("INV_BACKWARD")) RendererGUI.instance().scrollItems(-1);
+		else if (keycode == keybindings.getKey("QUIT"))		    Gdx.app.exit();
 	}
 
 	@Override
 	public void keyUp(int keycode) {
-		if (keycode == Keybindings.FORWARD)       movementFwd -= 1;
-		else if (keycode == Keybindings.LEFT)     movementSide -= 1;
-		else if (keycode == Keybindings.BACKWARD) movementFwd -= -1;
-		else if (keycode == Keybindings.RIGHT)    movementSide -= -1;
+		if (keycode == keybindings.getKey("FORWARD"))       movementFwd -= 1;
+		else if (keycode == keybindings.getKey("LEFT"))     movementSide -= 1;
+		else if (keycode == keybindings.getKey("BACKWARD")) movementFwd -= -1;
+		else if (keycode == keybindings.getKey("RIGHT"))    movementSide -= -1;
 	}
 
 	@Override
@@ -114,6 +115,7 @@ public class PlayerVirtualController implements VirtualController {
 		}
 	}
 
+	@Override
 	public void resize(int width, int height) {
 		this.width = width;
 		this.height = height;
