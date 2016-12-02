@@ -23,7 +23,7 @@ public class ChunkMeshBuilder {
 	private TextureAtlas atlas;
 
 	public ChunkMeshBuilder() {
-		atlas = new TextureAtlas(Gdx.files.internal("textures/pack.atlas"));
+		atlas = new TextureAtlas(Gdx.files.internal("textures/blocks.atlas"));
 	}
 	
 	public void updateMesh(Chunk chunk, Mesh mesh, int subchunkIdx) {

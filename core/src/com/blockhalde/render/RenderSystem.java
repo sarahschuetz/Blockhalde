@@ -22,7 +22,7 @@ public class RenderSystem extends EntitySystem {
 	
 	public RenderSystem(World world) {
 		this.world = world;
-		texture = new Texture(Gdx.files.internal("textures/pack.png"));
+		texture = new Texture(Gdx.files.internal("textures/blocks.png"));
 	}
 	
 	@Override

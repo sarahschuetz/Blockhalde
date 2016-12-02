@@ -1,5 +1,5 @@
 
-pack.png
+blocks.png
 size: 128,1024
 format: RGBA8888
 filter: Nearest,Nearest
