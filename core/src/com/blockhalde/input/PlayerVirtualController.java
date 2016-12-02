@@ -1,90 +1,89 @@
 package com.blockhalde.input;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.blockhalde.gui.RendererGUI;
 
+/**
+ * An implementation of the {@link VirtualController} interface that controls the camera 
+ * in first person and uses basic movement.
+ * @author shaendro
+ */
 public class PlayerVirtualController implements VirtualController {
 	private static final float ROTATION_SPEED = 180f;
+	private static final float MAX_ROTATION = 90f;
 
 	private Camera camera;
+	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
+	private Vector3 startDirection = new Vector3(0, 0, -1);
+	private Vector3 startUp = new Vector3(0, 1, 0);
 
-	private int centerX = Gdx.graphics.getWidth()/2;
-	private int centerY = Gdx.graphics.getHeight()/2;
+	private int width = Gdx.graphics.getWidth();
+	private int height = Gdx.graphics.getHeight();
+	private int centerX = width/2;
+	private int centerY = height/2;
+
+	private float rotationX = 0;
+	private float rotationY = 0;
 
 	private float movementFwd = 0;
 	private float movementSide = 0;
-	private boolean isJumping = false;
-	private boolean isDigging = false;
 
+	/**
+	 * Creates a {@link PlayerVirtualController} and attaches the given camera to it.
+	 * @param camera A {@link Camera} for the {@link PlayerVirtualController} to move around
+	 */
 	public PlayerVirtualController(Camera camera) {
 		this.camera = camera;
-	}
-
-	public float getMovementFwd() {
-		return movementFwd;
-	}
-
-	public float getMovementSide() {
-		return movementSide;
-	}
-
-	public boolean isJumping() {
-		return isJumping;
-	}
-
-	public boolean isDigging() {
-		return isDigging;
+		PauseListener.init();
 	}
 
 	@Override
 	public void keyDown(int keycode) {
-		if (keycode == Keybindings.FORWARD)           movementFwd += 1;
-		else if (keycode == Keybindings.LEFT)         movementSide += 1;
-		else if (keycode == Keybindings.BACKWARD)     movementFwd += -1;
-		else if (keycode == Keybindings.RIGHT)        movementSide += -1;
-		else if (keycode == Keybindings.JUMP)         isJumping = true;
-		else if (keycode == Keybindings.INV_TOGGLE)   RendererGUI.instance().toggleMenu();
-		else if (keycode == Keybindings.INV_FORWARD)  RendererGUI.instance().scrollItems(1);
-		else if (keycode == Keybindings.INV_BACKWARD) RendererGUI.instance().scrollItems(-1);
-		else if (keycode == Keybindings.QUIT)		  Gdx.app.exit();
+		if (keycode == keybindings.getKey("FORWARD"))           movementFwd += 1;
+		else if (keycode == keybindings.getKey("LEFT"))         movementSide += 1;
+		else if (keycode == keybindings.getKey("BACKWARD"))     movementFwd += -1;
+		else if (keycode == keybindings.getKey("RIGHT"))        movementSide += -1;
+		else if (keycode == keybindings.getKey("INV_TOGGLE"))   RendererGUI.instance().toggleMenu();
+		else if (keycode == keybindings.getKey("INV_FORWARD"))  RendererGUI.instance().scrollItems(1);
+		else if (keycode == keybindings.getKey("INV_BACKWARD")) RendererGUI.instance().scrollItems(-1);
+		else if (keycode == keybindings.getKey("QUIT"))		    Gdx.app.exit();
 	}
 
 	@Override
 	public void keyUp(int keycode) {
-		if (keycode == Keybindings.FORWARD)       movementFwd -= 1;
-		else if (keycode == Keybindings.LEFT)     movementSide -= 1;
-		else if (keycode == Keybindings.BACKWARD) movementFwd -= -1;
-		else if (keycode == Keybindings.RIGHT)    movementSide -= -1;
+		if (keycode == keybindings.getKey("FORWARD"))       movementFwd -= 1;
+		else if (keycode == keybindings.getKey("LEFT"))     movementSide -= 1;
+		else if (keycode == keybindings.getKey("BACKWARD")) movementFwd -= -1;
+		else if (keycode == keybindings.getKey("RIGHT"))    movementSide -= -1;
 	}
 
 	@Override
 	public void touchDown(int screenX, int screenY, int button) {
-		if (button == Buttons.LEFT) isDigging = true;
 	}
 
 	@Override
 	public void touchUp(int screenX, int screenY, int button) {
-		if (button == Buttons.LEFT) isDigging = false;
 	}
 
 	@Override
 	public void mouseMoved(int screenX, int screenY) {
-		final int width = Gdx.graphics.getWidth();
-		final int height = Gdx.graphics.getHeight();
-		resize(width, height);
+		if (!PauseListener.isPaused()) {
+			rotationX += (float)(centerX - screenX) / width * ROTATION_SPEED;
+			rotationY += (float)(centerY - screenY) / height * ROTATION_SPEED;
 
-		final float deltaX = (float)(centerX - screenX) / width;
-		final float deltaY = (float)(centerY - screenY) / height;
-		Gdx.input.setCursorPosition(centerX, centerY);
+			rotationX = rotationX % 360;
+			if (rotationY > MAX_ROTATION) rotationY = MAX_ROTATION;
+			else if (rotationY < -MAX_ROTATION) rotationY = -MAX_ROTATION;
 
-		camera.rotate(Vector3.Y, deltaX * ROTATION_SPEED);
-		if ((camera.direction.y > -0.965 && deltaY < 0) || (camera.direction.y < 0.965 && deltaY > 0))
-			camera.rotate(camera.direction.cpy().crs(Vector3.Y), deltaY * ROTATION_SPEED);
-		
-		camera.update();
+			camera.direction.set(startDirection);
+			camera.up.set(startUp);
+			camera.rotate(Vector3.Y, rotationX);
+			camera.rotate(camera.direction.cpy().crs(camera.up), rotationY);
+
+			camera.update();
+		}
 	}
 
 	@Override
@@ -93,15 +92,21 @@ public class PlayerVirtualController implements VirtualController {
 	}
 
 	@Override
-	public void update() {
-		camera.translate(camera.direction.x * movementFwd, camera.direction.y * movementFwd, camera.direction.z * movementFwd);
-		Vector3 side = camera.direction.cpy().rotate(90f, 0, 1, 0);
-		camera.translate(side.x * movementSide, 0, side.z * movementSide);
-		camera.update();
+	public void update(float deltaTime) {
+		if (!PauseListener.isPaused()) {
+			Gdx.input.setCursorPosition(centerX, centerY);
+			camera.translate(camera.direction.x * movementFwd, camera.direction.y * movementFwd, camera.direction.z * movementFwd);
+			Vector3 side = camera.direction.cpy().rotate(camera.up, 90f);
+			camera.translate(side.x * movementSide, 0, side.z * movementSide);
+			camera.update();
+		}
 	}
 
-	private void resize(int width, int height) {
-		centerX = width / 2;
-		centerY = height / 2;
+	@Override
+	public void resize(int width, int height) {
+		this.width = width;
+		this.height = height;
+		this.centerX = width/2;
+		this.centerY = height/2;
 	}
 }

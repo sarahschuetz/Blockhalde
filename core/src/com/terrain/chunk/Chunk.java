@@ -3,9 +3,9 @@ package com.terrain.chunk;
 import com.terrain.block.BlockType;
 
 public interface Chunk {
-	static final int X_MAX = 16;
-	static final int Y_MAX = 256;
-	static final int Z_MAX = 16;
+	int X_MAX = 16;
+	int Y_MAX = 256;
+	int Z_MAX = 16;
 
 	int getWidth();
 	int getHeight();
@@ -13,6 +13,7 @@ public interface Chunk {
 	
 	void setBlockAt(int x, int y, int z, BlockType type);
 	short getBlockAt(int relativeX, int relativeY, int relativeZ);
+
 	ChunkPosition getChunkPosition();
 	ChunkPosition getRelativeChunkPosition();
 }
