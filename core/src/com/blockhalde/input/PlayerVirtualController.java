@@ -31,8 +31,8 @@ public class PlayerVirtualController implements VirtualController {
 	private float movementSide = 0;
 
 	/**
-	 * Creates the object and attaches the given camera to it.
-	 * @param camera A camera for the {@link PlayerVirtualController} to move around
+	 * Creates a {@link PlayerVirtualController} and attaches the given camera to it.
+	 * @param camera A {@link Camera} for the {@link PlayerVirtualController} to move around
 	 */
 	public PlayerVirtualController(Camera camera) {
 		this.camera = camera;

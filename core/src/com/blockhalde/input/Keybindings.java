@@ -18,7 +18,7 @@ public class Keybindings {
 	private Map<String, Integer> keyMap = new HashMap<>();
 
 	/**
-	 * Creates a keybindings object that automatically reads 
+	 * Creates a {@link Keybindings} object that automatically reads 
 	 * keybindings from the specified file.
 	 * @param file Internal path to the file
 	 */

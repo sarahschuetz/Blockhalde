@@ -12,7 +12,7 @@ public class PauseListener implements LifecycleListener {
 	private boolean paused = false;
 
 	/**
-	 * Binds the listener to the current application. 
+	 * Binds the {@link PauseListener} to the current application. 
 	 * Must be called for the class to be functional.
 	 */
 	public static void init() {
@@ -25,7 +25,7 @@ public class PauseListener implements LifecycleListener {
 	/**
 	 * @return True if the application is currently paused,
 	 * false if the application is currently not paused 
-	 * or if the listener is not initialized.
+	 * or if the {@link PauseListener} is not initialized.
 	 */
 	public static boolean isPaused() {
 		return (instance != null && instance.paused);

@@ -1,7 +1,7 @@
 package com.blockhalde.input;
 
 /**
- * Defines the methods a controller has to implement 
+ * Defines the methods a {@link VirtualController} has to implement 
  * in order to be attached to the {@link PhysicalInputProcessor}
  * @author shaendro
  */
