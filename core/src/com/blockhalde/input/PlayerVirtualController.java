@@ -1,11 +1,15 @@
 package com.blockhalde.input;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.blockhalde.gui.RendererGUI;
 
+/**
+ * An implementation of the {@link VirtualController} interface that controls the camera 
+ * in first person and uses basic movement.
+ * @author shaendro
+ */
 public class PlayerVirtualController implements VirtualController {
 	private static final float ROTATION_SPEED = 180f;
 	private static final float MAX_ROTATION = 90f;
@@ -25,28 +29,14 @@ public class PlayerVirtualController implements VirtualController {
 
 	private float movementFwd = 0;
 	private float movementSide = 0;
-	private boolean isJumping = false;
-	private boolean isDigging = false;
 
+	/**
+	 * Creates the object and attaches the given camera to it.
+	 * @param camera A camera for the {@link PlayerVirtualController} to move around
+	 */
 	public PlayerVirtualController(Camera camera) {
 		this.camera = camera;
 		PauseListener.init();
-	}
-
-	public float getMovementFwd() {
-		return movementFwd;
-	}
-
-	public float getMovementSide() {
-		return movementSide;
-	}
-
-	public boolean isJumping() {
-		return isJumping;
-	}
-
-	public boolean isDigging() {
-		return isDigging;
 	}
 
 	@Override
@@ -55,7 +45,6 @@ public class PlayerVirtualController implements VirtualController {
 		else if (keycode == keybindings.getKey("LEFT"))         movementSide += 1;
 		else if (keycode == keybindings.getKey("BACKWARD"))     movementFwd += -1;
 		else if (keycode == keybindings.getKey("RIGHT"))        movementSide += -1;
-		else if (keycode == keybindings.getKey("JUMP"))         isJumping = true;
 		else if (keycode == keybindings.getKey("INV_TOGGLE"))   RendererGUI.instance().toggleMenu();
 		else if (keycode == keybindings.getKey("INV_FORWARD"))  RendererGUI.instance().scrollItems(1);
 		else if (keycode == keybindings.getKey("INV_BACKWARD")) RendererGUI.instance().scrollItems(-1);
@@ -72,12 +61,10 @@ public class PlayerVirtualController implements VirtualController {
 
 	@Override
 	public void touchDown(int screenX, int screenY, int button) {
-		if (button == Buttons.LEFT) isDigging = true;
 	}
 
 	@Override
 	public void touchUp(int screenX, int screenY, int button) {
-		if (button == Buttons.LEFT) isDigging = false;
 	}
 
 	@Override

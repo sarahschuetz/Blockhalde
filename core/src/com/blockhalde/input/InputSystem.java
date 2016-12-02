@@ -8,8 +8,11 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.blockhalde.render.CameraSystem;
 
+/**
+ * An {@link EntitySystem} that handles user input.
+ * @author shaendro
+ */
 public class InputSystem extends EntitySystem {
-	
 	private InputProcessor inputProcessor;
 	private VirtualController cameraController;
 
@@ -37,6 +40,12 @@ public class InputSystem extends EntitySystem {
 		cameraController.update(deltaTime);
 	}
 
+	/**
+	 * Is called by the application on resize.
+	 * Relays the command to the {@link VirtualController}.
+	 * @param width The new width of the window
+	 * @param height The new height of the window
+	 */
 	public void resize(int width, int height) {
 		cameraController.resize(width, height);
 	}

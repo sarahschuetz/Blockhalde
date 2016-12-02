@@ -3,6 +3,10 @@ package com.blockhalde.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.LifecycleListener;
 
+/**
+ * A simple {@link LifecycleListener} to recognize the pause state of the application.
+ * @author shaendro
+ */
 public class PauseListener implements LifecycleListener {
 	private static PauseListener instance;
 	private boolean paused = false;
@@ -19,8 +23,8 @@ public class PauseListener implements LifecycleListener {
 	}
 
 	/**
-	 * Returns true if the application is currently paused.
-	 * Returns false if the application is currently not paused 
+	 * @return True if the application is currently paused,
+	 * false if the application is currently not paused 
 	 * or if the listener is not initialized.
 	 */
 	public static boolean isPaused() {
