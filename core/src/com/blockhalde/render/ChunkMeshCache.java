@@ -22,6 +22,8 @@ public class ChunkMeshCache {
 	 * overwrite old chunks when a new one is loaded.
 	 */
 	private static final int MAX_CACHED_SUBCHUNKS = 9 * 16;
+
+	private static final ChunkPosition FARAWAY_CHUNKPOS = new ChunkPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
 	private List<CachedSubchunk> cachedSubs = new ArrayList<CachedSubchunk>(24);
 	private ChunkMeshBuilder builder;
 	
@@ -45,6 +47,7 @@ public class ChunkMeshCache {
 	private void allocateCache() {
 		for(int i = 0; i < MAX_CACHED_SUBCHUNKS; ++i) {
 			CachedSubchunk subchunk = new CachedSubchunk();
+			subchunk.chunkPos = FARAWAY_CHUNKPOS;
 			subchunk.mesh = new Mesh(false, 16*16*16*6*4, 16*16*16*6*6, 
 					new VertexAttributes(
 							new VertexAttribute(Usage.Position, 3, "a_position"),
