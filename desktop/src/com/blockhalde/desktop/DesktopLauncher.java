@@ -12,6 +12,7 @@ public class DesktopLauncher {
 		config.height = 600;
 		config.addIcon("util/icon_128.png", FileType.Internal);
 		config.addIcon("util/icon_32.png", FileType.Internal);
+		config.samples = 4;
 		new LwjglApplication(new Blockhalde(), config);
 	}
 }
