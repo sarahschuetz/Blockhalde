@@ -5,6 +5,7 @@ import com.terrain.block.BlockType;
 public class TerrainChunk implements Chunk {
 
     private final short[][][] blocks = new short[X_MAX][Y_MAX][Z_MAX];
+	private final short[] blocks_flat = new short[X_MAX * Y_MAX * Z_MAX];
     private ChunkPosition chunkPosition;
 
     public TerrainChunk(ChunkPosition chunkPosition) {
