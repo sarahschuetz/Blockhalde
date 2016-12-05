@@ -53,4 +53,10 @@ public interface VirtualController {
 	 * @param height The new height of the window
 	 */
 	public void resize(int width, int height);
+	/**
+	 * Can be called to set the activation state of the controller.
+	 * Inactive controllers should not influence the game in any way.
+	 * @param active The new activation state of the controller
+	 */
+	public void setActive(boolean active);
 }

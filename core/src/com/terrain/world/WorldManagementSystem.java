@@ -26,8 +26,8 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
     // Defines how many chunks are drawn around the player
     private int drawDistance = 1;
-    // TODO: Add player position and generate chunks based on it.
 
+    // TODO: Add player position and generate chunks based on it.
     private Camera camera;
 
     // for testing purposes
@@ -43,7 +43,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
         // TODO: Make the terrain generator somehow changeable
         TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator();
-        terrainGenerator.generate(chunk, "Herst");
+        terrainGenerator.generate(chunk, "Herst Bertl");
 
         worldChunks.put(chunkPosition, chunk);
     }
@@ -78,12 +78,10 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
             }
         }
     }
-
-    /**
-     * Sets a blocktype at the specified world position.
-     */
+   
+    @Override
     public void setBlock(int x, int y, int z, BlockType blockType) {
-        Chunk chunk = getChunk(x, z);
+        final Chunk chunk = getChunk(x, z);
         if (chunk != null) {
             chunk.setBlockAt(x % Chunk.X_MAX, y % Chunk.Y_MAX, z % Chunk.Z_MAX, blockType);
         }
@@ -95,7 +93,6 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     public void setDrawDistance(int drawDistance) {
         this.drawDistance = drawDistance;
     }
-
 
     //-------- WorldInterface Implementation
 
@@ -121,7 +118,11 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     public List<Chunk> getVisibleChunks() {
         return visibleChunks;
     }
-
+    
+    @Override
+    public int getDrawDistance() {
+    	return drawDistance;
+    }
     //-------- EntitySystem overridden methods
 
     @Override

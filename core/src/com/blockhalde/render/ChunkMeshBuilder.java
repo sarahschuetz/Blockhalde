@@ -61,7 +61,9 @@ public class ChunkMeshBuilder {
                     if (blockTypeIdx != BlockType.AIR.getBlockId()) {
                         BlockType blockType = BlockType.fromBlockId(blockTypeIdx);
 
-                        center.set(chunk.getChunkPosition().getXPosition() + firstX + x * blockSize, firstY + y * blockSize, chunk.getChunkPosition().getZPosition() + firstZ + z * blockSize);
+                        center.set(firstX + x * blockSize,
+                        		   firstY + y * blockSize,
+                        		   firstZ + z * blockSize);
 
                         AtlasRegion region = atlas.findRegion(blockType.getSideTextureName());
 
