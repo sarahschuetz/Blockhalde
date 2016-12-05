@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
  * @author shaendro
  */
 public class VirtualPlayerCameraController implements VirtualController {
-	private static final float ROTATION_SPEED = 180f;
+	private static final float ROTATION_SPEED = -180f;
 	private static final float MAX_ROTATION = 90f;
 
 	private InputSystem inputSystem;
