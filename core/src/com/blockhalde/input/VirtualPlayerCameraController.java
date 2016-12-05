@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
  * @author shaendro
  */
 public class VirtualPlayerCameraController implements VirtualController {
-	private static final float ROTATION_SPEED = 180f;
+	private static final float ROTATION_SPEED = -180f;
 	private static final float MAX_ROTATION = 90f;
 
 	private InputSystem inputSystem;
@@ -54,7 +54,6 @@ public class VirtualPlayerCameraController implements VirtualController {
 
 	@Override
 	public void mouseMoved(int screenX, int screenY) {
-		System.out.println(Gdx.input.getDeltaX() + "/" + Gdx.input.getDeltaY());
 		if (!PauseListener.isPaused() && active) {
 			rotationX += (float)(Gdx.input.getDeltaX()) / width * ROTATION_SPEED;
 			rotationY += (float)(Gdx.input.getDeltaY()) / height * ROTATION_SPEED;
