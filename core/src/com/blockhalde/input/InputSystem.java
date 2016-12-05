@@ -16,7 +16,6 @@ public class InputSystem extends EntitySystem {
 	private VirtualController gameController;
 	private VirtualController cameraController;
 	private VirtualController movementController;
-	private boolean cursorVisible = true;
 
 	@Override
 	public void addedToEngine(Engine engine) {
@@ -26,7 +25,7 @@ public class InputSystem extends EntitySystem {
 		movementController = new VirtualPlayerMovementController(this, cameraSystem.getCam());
 		inputProcessor = new PhysicalInputProcessor(gameController, cameraController, movementController);
 		Gdx.input.setInputProcessor(inputProcessor);
-		toggleCursor();
+		setCursorCatched(true);
 	}
 
 	@Override
@@ -47,21 +46,21 @@ public class InputSystem extends EntitySystem {
 			controller.resize(width, height);
 		}
 	}
+
+	public void setCursorCatched(boolean catched) {
+		Gdx.input.setCursorCatched(catched);
+	}
 	
-	public void toggleCursor() {
-		if (cursorVisible) {
+	public void setCursorVisibility(boolean visible) {
+		if (visible) {
+			Gdx.input.setCursorImage(null, 0, 0);
+		} else {
 			Pixmap pm = new Pixmap(16, 16, Format.RGBA8888); 
 			Pixmap.setBlending(Pixmap.Blending.None); 
 			pm.setColor(0f,0f,0f,0f);
 			pm.fillRectangle(0, 0, 16, 16);
 			Gdx.input.setCursorImage(pm, 0, 0);
 			pm.dispose();
-			
-			//CursorCatched would allow the cursor to move over an unfocused window without disappearing.
-			//But it seems to cause rendering errors on some systems...
-			//Gdx.input.setCursorCatched(true);
-		} else {
-			Gdx.input.setCursorImage(null, 0, 0);
 		}
 	}
 }

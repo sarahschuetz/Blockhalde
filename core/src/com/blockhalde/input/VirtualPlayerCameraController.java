@@ -2,6 +2,7 @@ package com.blockhalde.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -9,7 +10,7 @@ import com.badlogic.gdx.math.Vector3;
  * @author shaendro
  */
 public class VirtualPlayerCameraController implements VirtualController {
-	private static final float ROTATION_SPEED = 180f;
+	private static final float ROTATION_SPEED = 0.5f;
 	private static final float MAX_ROTATION = 90f;
 
 	private InputSystem inputSystem;
@@ -54,11 +55,17 @@ public class VirtualPlayerCameraController implements VirtualController {
 
 	@Override
 	public void mouseMoved(int screenX, int screenY) {
-		System.out.println(Gdx.input.getDeltaX() + "/" + Gdx.input.getDeltaY());
 		if (!PauseListener.isPaused() && active) {
-			rotationX += (float)(Gdx.input.getDeltaX()) / width * ROTATION_SPEED;
-			rotationY += (float)(Gdx.input.getDeltaY()) / height * ROTATION_SPEED;
-
+			float deltaX = -Gdx.input.getDeltaX() * ROTATION_SPEED;
+			float deltaY = -Gdx.input.getDeltaY() * ROTATION_SPEED;
+			rotationX += deltaX;
+			rotationY += deltaY;
+			
+			//Windows-only version that does not rely on CursorCatched
+			//rotationX += (float)(centerX - screenX) / width * ROTATION_SPEED;
+			//rotationY += (float)(centerY - screenY) / height * ROTATION_SPEED;
+			//Gdx.input.setCursorPosition(centerX, centerY);
+			
 			rotationX = rotationX % 360;
 			if (rotationY > MAX_ROTATION) rotationY = MAX_ROTATION;
 			else if (rotationY < -MAX_ROTATION) rotationY = -MAX_ROTATION;
@@ -69,7 +76,6 @@ public class VirtualPlayerCameraController implements VirtualController {
 			camera.rotate(camera.direction.cpy().crs(camera.up), rotationY);
 
 			camera.update();
-			//Gdx.input.setCursorPosition(centerX, centerY);
 		}
 	}
 
