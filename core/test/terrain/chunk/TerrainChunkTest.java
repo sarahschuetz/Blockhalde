@@ -37,12 +37,12 @@ public class TerrainChunkTest {
 	
 	@Test
 	public void testBlockTypes() {
-		assertThat(BlockType.AIR, CoreMatchers.is(BlockType.fromBlockId(0)));
-		assertThat(BlockType.WATER, CoreMatchers.is(BlockType.fromBlockId(1)));
-		assertThat(BlockType.DIRT, CoreMatchers.is(BlockType.fromBlockId(2)));
-		assertThat(BlockType.STONE, CoreMatchers.is(BlockType.fromBlockId(3)));
-		assertThat(BlockType.GRASS, CoreMatchers.is(BlockType.fromBlockId(4)));
-		assertThat(BlockType.TNT, CoreMatchers.is(BlockType.fromBlockId(5)));
+		assertThat(BlockType.AIR.getBlockId(), CoreMatchers.is(BlockType.fromBlockId((short) 0).getBlockId()));
+		assertThat(BlockType.WATER.getBlockId(), CoreMatchers.is(BlockType.fromBlockId((short) 1).getBlockId()));
+		assertThat(BlockType.DIRT.getBlockId(), CoreMatchers.is(BlockType.fromBlockId((short) 2).getBlockId()));
+		assertThat(BlockType.STONE.getBlockId(), CoreMatchers.is(BlockType.fromBlockId((short) 3).getBlockId()));
+		assertThat(BlockType.GRASS.getBlockId(), CoreMatchers.is(BlockType.fromBlockId((short) 4).getBlockId()));
+		assertThat(BlockType.TNT.getBlockId(), CoreMatchers.is(BlockType.fromBlockId((short) 5).getBlockId()));
 		
 		assertThat(BlockType.AIR.getBlockId(), CoreMatchers.is((byte) 0));
 		assertThat(BlockType.WATER.getBlockId(), CoreMatchers.is((byte) 1));
@@ -54,16 +54,12 @@ public class TerrainChunkTest {
 	
 	@Test
 	public void testGetBlockAt() {
-		
 		for(short x = 0; x < Chunk.X_MAX; x++) {
 			for(short y = 0; y < Chunk.Y_MAX; y++) {
 				for(short z = 0; z < Chunk.Z_MAX; z++) {
-					
 					assertThat(testArray[x][y][z], CoreMatchers.is(chunk.getBlockAt(x, y, z)));
 				}
 			}
 		}
-		
 	}
-
 }
