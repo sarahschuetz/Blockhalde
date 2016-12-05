@@ -54,9 +54,10 @@ public class VirtualPlayerCameraController implements VirtualController {
 
 	@Override
 	public void mouseMoved(int screenX, int screenY) {
+		System.out.println(Gdx.input.getDeltaX() + "/" + Gdx.input.getDeltaY());
 		if (!PauseListener.isPaused() && active) {
-			rotationX += (float)(centerX - screenX) / width * ROTATION_SPEED;
-			rotationY += (float)(centerY - screenY) / height * ROTATION_SPEED;
+			rotationX += (float)(Gdx.input.getDeltaX()) / width * ROTATION_SPEED;
+			rotationY += (float)(Gdx.input.getDeltaY()) / height * ROTATION_SPEED;
 
 			rotationX = rotationX % 360;
 			if (rotationY > MAX_ROTATION) rotationY = MAX_ROTATION;
@@ -68,6 +69,7 @@ public class VirtualPlayerCameraController implements VirtualController {
 			camera.rotate(camera.direction.cpy().crs(camera.up), rotationY);
 
 			camera.update();
+			//Gdx.input.setCursorPosition(centerX, centerY);
 		}
 	}
 
@@ -78,7 +80,6 @@ public class VirtualPlayerCameraController implements VirtualController {
 	@Override
 	public void update(float deltaTime) {
 		if (!PauseListener.isPaused() && active) {
-			Gdx.input.setCursorPosition(centerX, centerY);
 		}
 	}
 
