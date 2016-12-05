@@ -11,9 +11,11 @@ public interface Chunk {
 	int getHeight();
 	int getDepth();
 	
-	void setBlockAt(int x, int y, int z, BlockType type);
 	short getBlockAt(int relativeX, int relativeY, int relativeZ);
+	void setBlockAt(int relativeX, int relativeY, int relativeZ, BlockType type);
 
 	ChunkPosition getChunkPosition();
 	ChunkPosition getRelativeChunkPosition();
+	
+	long getLastModifiedTime();
 }

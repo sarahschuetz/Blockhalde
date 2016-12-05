@@ -48,11 +48,12 @@ public class ChunkMeshCache {
 		for(int i = 0; i < MAX_CACHED_SUBCHUNKS; ++i) {
 			CachedSubchunk subchunk = new CachedSubchunk();
 			subchunk.chunkPos = FARAWAY_CHUNKPOS;
-			subchunk.mesh = new Mesh(false, 16*16*16*6*4, 16*16*16*6*6, 
+			subchunk.mesh = new Mesh(false, 16*16*16*6*4, 16*16*16*6*6,
 					new VertexAttributes(
 							new VertexAttribute(Usage.Position, 3, "a_position"),
 							new VertexAttribute(Usage.Normal, 3, "a_normal"),
-							new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0")
+							new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
+							new VertexAttribute(Usage.ColorPacked, 4, "a_color")
 					)
 			);
 			

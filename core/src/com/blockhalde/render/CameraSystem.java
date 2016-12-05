@@ -12,8 +12,8 @@ public class CameraSystem extends EntitySystem {
 	@Override
 	public void addedToEngine(Engine engine) {
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		cam.position.set(0f, 0f, 50f);
-		cam.lookAt(0, 0, 0);
+		cam.position.set(-34f, 210f, 62f);
+		cam.position.set(-34f, 210f, 60f);
 		cam.near = 1f;
 		cam.far = 300f;
 		cam.update();

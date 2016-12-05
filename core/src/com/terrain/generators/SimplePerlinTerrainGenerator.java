@@ -34,9 +34,10 @@ public class SimplePerlinTerrainGenerator implements TerrainGenerator {
                         		(x + chunk.getChunkPosition().getXPosition()) / (double) Chunk.X_MAX,
                         		y / (double) Chunk.Y_MAX,
                         		(z + chunk.getChunkPosition().getZPosition()) / (double) Chunk.Z_MAX);
-                        
+
                         if(noise > 0.8f - ((y - minimumAirHeight) * 0.05f)) {
                             chunk.setBlockAt(x, y, z, BlockType.AIR);
+                            
                         } else {
                             if(y <= minimumTNTHeight){
                                 chunk.setBlockAt(x, y, z, BlockType.GRASS);
