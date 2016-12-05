@@ -7,17 +7,15 @@ import com.blockhalde.gui.RendererGUI;
  * An implementation of the {@link VirtualController} interface that controls the game.
  * @author shaendro
  */
-public class VirtualGameController implements VirtualController {
-	private InputSystem inputSystem;
-	private boolean active = true;
+public class VirtualGameController extends VirtualAbstractController {
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 
 	/**
 	 * Creates a {@link VirtualGameController} and attaches the given camera to it.
-	 * @param camera A {@link Camera} for the {@link VirtualGameController} to move around
+	 * @param inputSystem The {@link InputSystem} the controller belongs to
 	 */
 	public VirtualGameController(InputSystem inputSystem) {
-		this.inputSystem = inputSystem;
+		super(inputSystem);
 	}
 
 	@Override
@@ -31,38 +29,9 @@ public class VirtualGameController implements VirtualController {
 	}
 
 	@Override
-	public void keyUp(int keycode) {
-	}
-
-	@Override
-	public void touchDown(int screenX, int screenY, int button) {
-	}
-
-	@Override
-	public void touchUp(int screenX, int screenY, int button) {
-	}
-
-	@Override
-	public void mouseMoved(int screenX, int screenY) {
-	}
-
-	@Override
 	public void scrolled(int amount) {
 		if (active) {
 			RendererGUI.instance().scrollItems(amount);
 		}
-	}
-
-	@Override
-	public void update(float deltaTime) {
-	}
-
-	@Override
-	public void resize(int width, int height) {
-	}
-
-	@Override
-	public void setActive(boolean active) {
-		this.active = active;
 	}
 }

@@ -78,6 +78,9 @@ public class PhysicalInputProcessor implements InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		for (VirtualController virtualController : controllers) {
+			virtualController.touchDragged(screenX, screenY);
+		}
 		return false;
 	}
 

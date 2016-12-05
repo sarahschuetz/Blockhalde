@@ -8,43 +8,33 @@ import com.badlogic.gdx.math.Vector3;
  * An implementation of the {@link VirtualController} interface that controls the player camera.
  * @author shaendro
  */
-public class VirtualPlayerCameraController implements VirtualController {
+public class VirtualPlayerCameraController extends VirtualAbstractController {
 	private static final float ROTATION_SPEED = 0.5f;
 	private static final float MAX_ROTATION = 90f;
 
-	private InputSystem inputSystem;
-	private boolean active = true;
 	private Camera camera;
-	private Vector3 startDirection = new Vector3(0, 0, -1);
-	private Vector3 startUp = new Vector3(0, 1, 0);
+	private Vector3 startDirection;
+	private Vector3 startUp;
 
 	private float rotationX = 0;
 	private float rotationY = 0;
 
 	/**
 	 * Creates a {@link VirtualPlayerCameraController} and attaches the given camera to it.
+	 * @param inputSystem The {@link InputSystem} the controller belongs to
 	 * @param camera A {@link Camera} for the {@link VirtualPlayerCameraController} to move around
 	 */
 	public VirtualPlayerCameraController(InputSystem inputSystem, Camera camera) {
-		this.inputSystem = inputSystem;
+		super(inputSystem);
 		this.camera = camera;
+		this.startDirection = new Vector3(camera.direction);
+		this.startUp = new Vector3(camera.up);
 		PauseListener.init();
 	}
 
 	@Override
-	public void keyDown(int keycode) {
-	}
-
-	@Override
-	public void keyUp(int keycode) {
-	}
-
-	@Override
-	public void touchDown(int screenX, int screenY, int button) {
-	}
-
-	@Override
-	public void touchUp(int screenX, int screenY, int button) {
+	public void touchDragged(int screenX, int screenY) {
+		mouseMoved(screenX, screenY);
 	}
 
 	@Override
@@ -54,11 +44,6 @@ public class VirtualPlayerCameraController implements VirtualController {
 			float deltaY = -Gdx.input.getDeltaY() * ROTATION_SPEED;
 			rotationX += deltaX;
 			rotationY += deltaY;
-			
-			//Windows-only version that does not rely on CursorCatched
-			//rotationX += (float)(centerX - screenX) / width * ROTATION_SPEED;
-			//rotationY += (float)(centerY - screenY) / height * ROTATION_SPEED;
-			//Gdx.input.setCursorPosition(centerX, centerY);
 			
 			rotationX = rotationX % 360;
 			if (rotationY > MAX_ROTATION) rotationY = MAX_ROTATION;
@@ -71,22 +56,5 @@ public class VirtualPlayerCameraController implements VirtualController {
 
 			camera.update();
 		}
-	}
-
-	@Override
-	public void scrolled(int amount) {
-	}
-
-	@Override
-	public void update(float deltaTime) {
-	}
-
-	@Override
-	public void resize(int width, int height) {
-	}
-
-	@Override
-	public void setActive(boolean active) {
-		this.active = active;
 	}
 }
