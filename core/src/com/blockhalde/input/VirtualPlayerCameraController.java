@@ -2,7 +2,6 @@ package com.blockhalde.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g3d.utils.FirstPersonCameraController;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -18,11 +17,6 @@ public class VirtualPlayerCameraController implements VirtualController {
 	private Camera camera;
 	private Vector3 startDirection = new Vector3(0, 0, -1);
 	private Vector3 startUp = new Vector3(0, 1, 0);
-
-	private int width = Gdx.graphics.getWidth();
-	private int height = Gdx.graphics.getHeight();
-	private int centerX = width/2;
-	private int centerY = height/2;
 
 	private float rotationX = 0;
 	private float rotationY = 0;
@@ -85,16 +79,10 @@ public class VirtualPlayerCameraController implements VirtualController {
 
 	@Override
 	public void update(float deltaTime) {
-		if (!PauseListener.isPaused() && active) {
-		}
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		this.width = width;
-		this.height = height;
-		this.centerX = width/2;
-		this.centerY = height/2;
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class InputSystem extends EntitySystem {
 		movementController = new VirtualPlayerMovementController(this, cameraSystem.getCam());
 		inputProcessor = new PhysicalInputProcessor(gameController, cameraController, movementController);
 		Gdx.input.setInputProcessor(inputProcessor);
-		setCursorCatched(true);
+		Gdx.input.setCursorCatched(true);
 	}
 
 	@Override
@@ -47,10 +47,6 @@ public class InputSystem extends EntitySystem {
 		}
 	}
 
-	public void setCursorCatched(boolean catched) {
-		Gdx.input.setCursorCatched(catched);
-	}
-	
 	public void setCursorVisibility(boolean visible) {
 		if (visible) {
 			Gdx.input.setCursorImage(null, 0, 0);

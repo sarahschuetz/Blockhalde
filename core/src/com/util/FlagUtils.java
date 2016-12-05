@@ -79,4 +79,29 @@ public class FlagUtils {
 	public static boolean isBitSetAt(byte mask, byte bitPosition) {
 		return (mask & ((byte) 1 << bitPosition)) != 0;
 	}
+	
+	/**
+	 * Gets the little endian type of byte from the given source (short). <br>
+	 * Example:<br>
+	 * 0010 0010 | 1110 0010 = 8930 <br> <br>
+	 * 
+	 * getByteOf(value, 0) -> 1110 0010 = -30 <br>
+	 * getByteOf(value, 1) -> 0010 0010 = 34
+	 */
+	public static byte getByteOf(short shortSource, int bytePosition) {
+		return bytePosition == 0 ? (byte) shortSource : (byte) (shortSource >> 8);
+	}
+	
+	/**
+	 * Generates a short based on the two given bytes.<br>
+	 * Example:<br><br>
+	 * 
+	 * <pre>
+	 * 0010 0011 | 0011 0010 = 9010 	<br>
+	 * '-------'   '-------'			<br>
+	 *   Byte1        Byte2				<br></pre>
+	 */
+	public static short makeShortFrom(byte byte0, byte byte1) {
+		return (short) (byte1 << 8 | byte0 & 0xFF);
+	}
 }
