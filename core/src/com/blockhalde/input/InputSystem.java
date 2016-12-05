@@ -1,17 +1,17 @@
 package com.blockhalde.input;
 
+import java.util.List;
+
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.blockhalde.render.CameraSystem;
 
 /**
  * An {@link EntitySystem} that handles user input.
  * @author shaendro
  */
 public class InputSystem extends EntitySystem {
+	private Engine engine;
 	private PhysicalInputProcessor inputProcessor;
 	private VirtualController gameController;
 	private VirtualController cameraController;
@@ -19,10 +19,10 @@ public class InputSystem extends EntitySystem {
 
 	@Override
 	public void addedToEngine(Engine engine) {
-		CameraSystem cameraSystem = engine.getSystem(CameraSystem.class);
+		this.engine = engine;
 		gameController = new VirtualGameController(this);
-		cameraController = new VirtualPlayerCameraController(this, cameraSystem.getCam());
-		movementController = new VirtualPlayerMovementController(this, cameraSystem.getCam());
+		cameraController = new VirtualPlayerCameraController(this);
+		movementController = new VirtualPlayerMovementController(this);
 		inputProcessor = new PhysicalInputProcessor(gameController, cameraController, movementController);
 		Gdx.input.setInputProcessor(inputProcessor);
 		Gdx.input.setCursorCatched(true);
@@ -47,16 +47,19 @@ public class InputSystem extends EntitySystem {
 		}
 	}
 
-	public void setCursorVisibility(boolean visible) {
-		if (visible) {
-			Gdx.input.setCursorImage(null, 0, 0);
-		} else {
-			Pixmap pm = new Pixmap(16, 16, Format.RGBA8888); 
-			Pixmap.setBlending(Pixmap.Blending.None); 
-			pm.setColor(0f,0f,0f,0f);
-			pm.fillRectangle(0, 0, 16, 16);
-			Gdx.input.setCursorImage(pm, 0, 0);
-			pm.dispose();
-		}
+	/**
+	 * Is mostly called by {@link VirtualController}s which need access to the {@link Engine}.
+	 * @return The {@link Engine} the {@link InputSystem} is attached to
+	 */
+	public Engine getEngine() {
+		return engine;
+	}
+	
+	/**
+	 * Is mostly called by {@link VirtualController}s which need access to other {@link VirtualController}s.
+	 * @return A {@link List} containing all registered {@link VirtualController}s
+	 */
+	public List<VirtualController> getControllers() {
+		return inputProcessor.getControllers();
 	}
 }

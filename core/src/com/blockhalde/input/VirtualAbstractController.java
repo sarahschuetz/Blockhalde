@@ -9,7 +9,7 @@ public abstract class VirtualAbstractController implements VirtualController {
 	protected boolean active = true;
 
 	/**
-	 * Creates a {@link VirtualController} and attaches the given camera to it.
+	 * Creates a {@link VirtualAbstractController}.
 	 * @param inputSystem The {@link InputSystem} the controller belongs to
 	 */
 	public VirtualAbstractController(InputSystem inputSystem) {

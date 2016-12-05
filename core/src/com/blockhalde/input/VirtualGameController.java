@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.blockhalde.gui.RendererGUI;
 
 /**
- * An implementation of the {@link VirtualController} interface that controls the game.
+ * An implementation of the {@link VirtualController} interface that controls the game interaction.
  * @author shaendro
  */
 public class VirtualGameController extends VirtualAbstractController {
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 
 	/**
-	 * Creates a {@link VirtualGameController} and attaches the given camera to it.
+	 * Creates a {@link VirtualGameController}.
 	 * @param inputSystem The {@link InputSystem} the controller belongs to
 	 */
 	public VirtualGameController(InputSystem inputSystem) {

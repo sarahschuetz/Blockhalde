@@ -1,4 +1,4 @@
-package com.blockhalde.input;
+package com.util;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.LifecycleListener;
