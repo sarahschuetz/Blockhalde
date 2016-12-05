@@ -1,7 +1,6 @@
 package test.util;
 
 import static org.junit.Assert.*;
-
 import static org.hamcrest.CoreMatchers.is;
 import org.junit.Test;
 
@@ -131,5 +130,53 @@ public class FlagUtilsTest {
 		assertThat(FlagUtils.isBitSetAt(mask, (byte) 4), is(true));
 		assertThat(FlagUtils.isBitSetAt(mask, (byte) 1), is(true));
 		assertThat(FlagUtils.isBitSetAt(mask, (byte) 3), is(false));
+	}
+	
+	@Test
+	public void getByteOf_Test() {
+		// 0010 0010 | 0010 0010 = 8738
+		final short value = 8738;
+		
+		// Should be 0010 0010 = 34
+		final byte value0 = FlagUtils.getByteOf(value, 0);
+		assertThat(value0, is((byte) 34));
+		
+		// The same like above
+		final byte value1 = FlagUtils.getByteOf(value, 1);
+		assertThat(value1, is((byte) 34));
+	}
+	
+	@Test
+	public void getByteOf_Test2() {
+		// 0010 0010 | 1110 0010 = 8930
+		final short value = 8930;
+		
+		// Should be 1110 0010 = -30
+		final byte value0 = FlagUtils.getByteOf(value, 0);
+		assertThat(value0, is((byte) -30));
+		
+		// Should be 0010 0010 = 34
+		final byte value1 = FlagUtils.getByteOf(value, 1);
+		assertThat(value1, is((byte) 34));
+	}
+	
+	@Test
+	public void makeShortFrom_Test() {
+		final byte byte0 = 50;	// 0011 0010
+		final byte byte1 = 35;	// 0010 0011
+		
+		final short result = FlagUtils.makeShortFrom(byte0, byte1);
+		
+		assertThat("Should be 9010.", result, is((short) 9010));
+	}
+	
+	@Test
+	public void makeShortFrom_Test2() {
+		final byte byte0 = -77;	// 1011 0011
+		final byte byte1 = -30;	// 1110 0010
+		
+		final short result = FlagUtils.makeShortFrom(byte0, byte1);
+		
+		assertThat("Should be -7501.", result, is((short) -7501));
 	}
 }
