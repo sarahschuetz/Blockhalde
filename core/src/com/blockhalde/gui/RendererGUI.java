@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.blockhalde.gui.pie.PieMenu;
+import com.blockhalde.gui.pie.PieMenuSystem;
 
 public class RendererGUI {
 	private static RendererGUI instance;
@@ -21,7 +21,7 @@ public class RendererGUI {
 	LabelStyle labelStyle;
 	BottomGrid bottomGrid;
 	BitmapFont debugFont;
-	PieMenu pieMenu;
+	PieMenuSystem pieMenu;
 
 	public static RendererGUI instance(){
 		if(instance == null){
@@ -42,13 +42,12 @@ public class RendererGUI {
 		// setting up bottom grid
 		bottomGrid = BottomGrid.getInstance();
 		
-		// setting up pie menu
-		//pieMenu = new PieMenu(stage);
-		//pieMenu.setPosition(Gdx.graphics.getWidth()*0.5f, Gdx.graphics.getHeight()*0.5f);
-		
 		stage.addActor(debugLabel);
 		stage.addActor(bottomGrid);
-		//stage.addActor(pieMenu);
+	}
+	
+	public Stage getStage(){
+		return stage;
 	}
 
 	public void setDebugText(String text){

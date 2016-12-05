@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.blockhalde.gui.RendererGUI;
+import com.blockhalde.gui.pie.PieMenuSystem;
 import com.blockhalde.input.InputSystem;
 import com.blockhalde.render.CameraSystem;
 import com.blockhalde.render.RenderSystem;
@@ -25,7 +26,7 @@ public class Blockhalde extends ApplicationAdapter {
 		engine.addSystem(new InputSystem());
 		engine.addSystem(new WorldManagementSystem());
 		engine.addSystem(new RenderSystem());
-
+		engine.addSystem(new PieMenuSystem());
 	}
 	
 	@Override
