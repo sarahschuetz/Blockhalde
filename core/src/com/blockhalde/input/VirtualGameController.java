@@ -1,7 +1,9 @@
 package com.blockhalde.input;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.blockhalde.gui.RendererGUI;
+import com.blockhalde.gui.pie.PieMenuSystem;
 
 /**
  * An implementation of the {@link VirtualController} interface that controls the game.
@@ -9,6 +11,7 @@ import com.blockhalde.gui.RendererGUI;
  */
 public class VirtualGameController implements VirtualController {
 	private InputSystem inputSystem;
+	private Engine engine;
 	private boolean active = true;
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 
@@ -16,8 +19,9 @@ public class VirtualGameController implements VirtualController {
 	 * Creates a {@link VirtualGameController} and attaches the given camera to it.
 	 * @param camera A {@link Camera} for the {@link VirtualGameController} to move around
 	 */
-	public VirtualGameController(InputSystem inputSystem) {
+	public VirtualGameController(InputSystem inputSystem, Engine engine) {
 		this.inputSystem = inputSystem;
+		this.engine = engine;
 	}
 
 	@Override
@@ -36,14 +40,27 @@ public class VirtualGameController implements VirtualController {
 
 	@Override
 	public void touchDown(int screenX, int screenY, int button) {
+			PieMenuSystem pms = engine.getSystem(PieMenuSystem.class);
+			if(pms != null){
+				pms.setActive(true);
+			}
+			
 	}
 
 	@Override
 	public void touchUp(int screenX, int screenY, int button) {
+		PieMenuSystem pms = engine.getSystem(PieMenuSystem.class);
+		if(pms != null){
+			pms.setActive(false);
+		}
 	}
 
 	@Override
 	public void mouseMoved(int screenX, int screenY) {
+		PieMenuSystem pms = engine.getSystem(PieMenuSystem.class);
+		if(pms != null){
+			pms.mouseMoved(screenX, screenY);
+		}
 	}
 
 	@Override

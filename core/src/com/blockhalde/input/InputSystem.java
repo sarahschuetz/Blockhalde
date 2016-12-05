@@ -21,7 +21,7 @@ public class InputSystem extends EntitySystem {
 	@Override
 	public void addedToEngine(Engine engine) {
 		CameraSystem cameraSystem = engine.getSystem(CameraSystem.class);
-		gameController = new VirtualGameController(this);
+		gameController = new VirtualGameController(this, engine);
 		cameraController = new VirtualPlayerCameraController(this, cameraSystem.getCam());
 		movementController = new VirtualPlayerMovementController(this, cameraSystem.getCam());
 		inputProcessor = new PhysicalInputProcessor(gameController, cameraController, movementController);

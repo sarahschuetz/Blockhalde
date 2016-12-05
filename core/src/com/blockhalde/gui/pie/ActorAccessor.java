@@ -14,6 +14,7 @@ public class ActorAccessor implements TweenAccessor<Actor> {
 
 	@Override
 	public int getValues(Actor actor, int type, float[] returnValues) {
+		System.out.println("get");
 		switch (type) {
 		case X:
 			returnValues[0] = actor.getX();
@@ -33,6 +34,7 @@ public class ActorAccessor implements TweenAccessor<Actor> {
 
 	@Override
 	public void setValues(Actor actor, int type, float[] newValues) {
+		System.out.println("set");
 		switch (type) {
 		case X:
 			actor.setX(newValues[0]);
@@ -41,13 +43,15 @@ public class ActorAccessor implements TweenAccessor<Actor> {
 			actor.setY(newValues[1]);
 			break;
 		case XY:
-			actor.setX(newValues[0]);
-			actor.setY(newValues[1]);
+			actor.setPosition(newValues[0], newValues[1]);
+			System.out.println(newValues[0]);
 			break;
 		default:
 			assert false;
 			break;
 		}
+		
+		
 	}
 
 }

@@ -12,7 +12,7 @@ public class PieSlice extends Label {
 	private Command cmd;
 	static LabelStyle labelStyle;
 	static ShapeRenderer shapeRenderer;
-	static final float RADIUS = 16.0f;
+	static final float DOTRADIUS = 8.0f;
 	
 	static{
 		labelStyle = new LabelStyle(new BitmapFont(), new Color(0.9f,0.9f,0.9f,1.0f));
@@ -45,9 +45,14 @@ public class PieSlice extends Label {
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		shapeRenderer.begin();
 		shapeRenderer.begin(ShapeType.Filled);
-		shapeRenderer.circle(this.getX(), this.getY(), RADIUS);
+		if(isActive){
+			shapeRenderer.setColor(1, 1, 0, 1);
+		}else{
+			shapeRenderer.setColor(1, 1, 1, 1);
+		}
+		 
+		shapeRenderer.circle(this.getX(), this.getY(), DOTRADIUS);
         shapeRenderer.end();
 		super.draw(batch, parentAlpha);
 	}
