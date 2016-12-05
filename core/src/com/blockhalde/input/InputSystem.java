@@ -27,6 +27,7 @@ public class InputSystem extends EntitySystem {
 		inputProcessor = new PhysicalInputProcessor(gameController, cameraController, movementController);
 		Gdx.input.setInputProcessor(inputProcessor);
 		toggleCursor();
+		Gdx.input.setCursorCatched(true);
 	}
 
 	@Override
