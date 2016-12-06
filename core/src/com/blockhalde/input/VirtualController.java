@@ -31,6 +31,12 @@ public interface VirtualController {
 	 */
 	public void touchUp(int screenX, int screenY, int button);
 	/**
+	 * Is called by the {@link PhysicalInputProcessor} when the mouse moves while a mouse button is pressed.
+	 * @param screenX The new x coordinate of the mouse
+	 * @param screenY The new y coordinate of the mouse
+	 */
+	public void touchDragged(int screenX, int screenY);
+	/**
 	 * Is called by the {@link PhysicalInputProcessor} when the mouse moves.
 	 * @param screenX The new x coordinate of the mouse
 	 * @param screenY The new y coordinate of the mouse

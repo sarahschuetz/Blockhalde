@@ -6,9 +6,10 @@ import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.gui.pie.PieMenuSystem;
 
 /**
- * An implementation of the {@link VirtualController} interface that controls the game.
+ * An implementation of the {@link VirtualController} interface that controls the game interaction.
  * @author shaendro
  */
+public class VirtualGameController extends VirtualAbstractController {
 public class VirtualGameController implements VirtualController {
 	private InputSystem inputSystem;
 	private Engine engine;
@@ -16,12 +17,14 @@ public class VirtualGameController implements VirtualController {
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 
 	/**
-	 * Creates a {@link VirtualGameController} and attaches the given camera to it.
-	 * @param camera A {@link Camera} for the {@link VirtualGameController} to move around
+	 * Creates a {@link VirtualGameController}.
+	 * @param inputSystem The {@link InputSystem} the controller belongs to
 	 */
 	public VirtualGameController(InputSystem inputSystem, Engine engine) {
 		this.inputSystem = inputSystem;
 		this.engine = engine;
+	public VirtualGameController(InputSystem inputSystem) {
+		super(inputSystem);
 	}
 
 	@Override
@@ -68,18 +71,5 @@ public class VirtualGameController implements VirtualController {
 		if (active) {
 			RendererGUI.instance().scrollItems(amount);
 		}
-	}
-
-	@Override
-	public void update(float deltaTime) {
-	}
-
-	@Override
-	public void resize(int width, int height) {
-	}
-
-	@Override
-	public void setActive(boolean active) {
-		this.active = active;
 	}
 }

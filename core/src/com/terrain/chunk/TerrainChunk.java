@@ -1,6 +1,7 @@
 package com.terrain.chunk;
 
 import com.terrain.block.BlockType;
+import com.util.FlagUtils;
 
 public class TerrainChunk implements Chunk {
 
@@ -12,47 +13,21 @@ public class TerrainChunk implements Chunk {
         this.chunkPosition = chunkPosition;
     }
     
-    /**
-	 * Gets the block count in X direction. Assuming a block size of 1, this
-	 * is equivalent to the physical width of the chunk.
-	 * 
-	 * @return Block count in X direction
-	 */
     @Override
     public int getWidth() {
         return X_MAX;
     }
 
-    /**
-	 * Gets the block count in Y direction. Assuming a block size of 1, this
-	 * is equivalent to the physical height of the chunk.
-	 * 
-	 * @return Block count in Y direction
-	 */
     @Override
     public int getHeight() {
         return Y_MAX;
     }
 
-    /**
-	 * Gets the block count in Z direction. Assuming a block size of 1, this
-	 * is equivalent to the physical depth of the chunk.
-	 * 
-	 * @return Block count in Z direction
-	 */
     @Override
     public int getDepth() {
         return Z_MAX;
     }
     
-	/**
-	 * Gets the difference in time in nanoseconds between a fixed but arbitrary
-	 * origin time and the last point in time where a block in the block chunk
-	 * was modified in any way. If the chunk has never been modified, this method
-	 * returns the time of creation of the chunk.
-	 * 
-	 * @return Nanosecond time of last block modification
-	 */
     @Override
 	public long getLastModifiedTime() {
 		return lastModifiedTime;
@@ -73,11 +48,7 @@ public class TerrainChunk implements Chunk {
 		int offset = x + X_MAX * (y + Y_MAX * z);
 		return offset;
 	}
-    
-    /**
-     * Gets the block on the specified position (relativeX, relativeY, relativeZ)
-     * using position relative to chunk
-     */
+   
     @Override
     public short getBlockAt(int relativeX, int relativeY, int relativeZ) {
     	int offset = coordsToFlatIndex(relativeX, relativeY, relativeZ);
@@ -89,6 +60,12 @@ public class TerrainChunk implements Chunk {
     	return blocks[offset];
     }
 
+    @Override
+    public byte getBlockTypeAt(int relativeX, int relativeY, int relativeZ) {
+    	final short block = getBlockAt(relativeX, relativeY, relativeZ);
+    	return FlagUtils.getByteOf(block, 0);
+    }
+    
     @Override
     public void setBlockAt(int relativeX, int relativeY, int relativeZ, BlockType type) {
         setBlockAt(coordsToFlatIndex(relativeX, relativeY, relativeZ), type.getBlockId());
@@ -104,18 +81,11 @@ public class TerrainChunk implements Chunk {
 		setLastModifiedNow();
 	}
     
-    /**
-     * Get the position of the chunk
-     */
     @Override
     public ChunkPosition getChunkPosition() {
         return chunkPosition;
     }
     
-    /**
-     * 
-     */
-    @Override
     public ChunkPosition getRelativeChunkPosition() {
         return new ChunkPosition(chunkPosition.getXPosition() / Chunk.X_MAX, chunkPosition.getZPosition() / Chunk.Z_MAX);
     }
