@@ -30,6 +30,7 @@ out/
 com_crashlytics_export_strings.xml
 
 ## Eclipse
+.classpath
 .project
 .metadata
 .recommenders
