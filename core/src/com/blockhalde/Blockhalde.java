@@ -43,7 +43,7 @@ public class Blockhalde extends ApplicationAdapter {
 		RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
 				"\ncam pos " + cameraSystem.getCam().position.toString() + 
 				"\nM: toggle menu, Q + E: iterate items" +
-				"\nN: toggle Perlin Noise Debug View");
+				"\nN: toggle Perlin Noise Debug View (use V and B to go up and down the Z axis)");
 		RendererGUI.instance().render();
 	}
 }

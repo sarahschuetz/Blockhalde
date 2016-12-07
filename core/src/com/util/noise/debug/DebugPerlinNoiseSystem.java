@@ -41,5 +41,13 @@ public class DebugPerlinNoiseSystem extends EntitySystem {
 	public void toggleDebugView() {
 		noise.setVisible(!noise.isVisible());
 	}
+	
+	public void incrementNoiseZ() {
+		noise.incrementZ();
+	}
+	
+	public void decrementNoiseZ() {
+		noise.decrementZ();
+	}
 
 }

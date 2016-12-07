@@ -1,6 +1,7 @@
 package com.util.noise.debug;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -13,6 +14,7 @@ public class NoiseImg  extends Actor {
 	
 	private double width = Gdx.graphics.getWidth();
 	private double height = Gdx.graphics.getHeight();
+	private int z = 0;
 	
 	private final PerlinNoise3D perlin = new PerlinNoise3D();
 	
@@ -27,7 +29,7 @@ public class NoiseImg  extends Actor {
 		
 		for(int x = 0; x < width; x++) {
 			for(int y = 0; y < height; y++) {
-				float perlinValue = (float) perlin.calcPerlinAt(x / width, y / height, 0);
+				float perlinValue = (float) perlin.calcPerlinAt(x / width, y / height, z);
 				pixmap.setColor(perlinValue, perlinValue, perlinValue, 1f);
 				pixmap.drawPixel(x, y);
 			}
@@ -35,6 +37,18 @@ public class NoiseImg  extends Actor {
 		
 		texture = new Texture(pixmap);
 		pixmap.dispose();
+		System.out.println(Keys.valueOf("+"));
+	}
+	
+	public void incrementZ() {
+		z++;
+		System.out.println("z up");
+		
+	}
+	
+	public void decrementZ() {
+		z--;
+		System.out.println("z down");
 	}
 
 	@Override

@@ -26,6 +26,8 @@ public class VirtualGameController extends VirtualAbstractController {
 			else if (keycode == keybindings.getKey("INV_FORWARD"))  RendererGUI.instance().scrollItems(1);
 			else if (keycode == keybindings.getKey("INV_BACKWARD")) RendererGUI.instance().scrollItems(-1);
 			else if (keycode == keybindings.getKey("NOISE_DEBUG"))  inputSystem.getEngine().getSystem(DebugPerlinNoiseSystem.class).toggleDebugView();
+			else if (keycode == keybindings.getKey("NOISE_DEBUG_Z_UP"))  inputSystem.getEngine().getSystem(DebugPerlinNoiseSystem.class).incrementNoiseZ();
+			else if (keycode == keybindings.getKey("NOISE_DEBUG_Z_DOWN"))  inputSystem.getEngine().getSystem(DebugPerlinNoiseSystem.class).decrementNoiseZ();
 			else if (keycode == keybindings.getKey("QUIT"))		    Gdx.app.exit();
 		}
 	}
