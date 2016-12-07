@@ -29,7 +29,7 @@ public class NoiseImg  extends Actor {
 		
 		for(int x = 0; x < width; x++) {
 			for(int y = 0; y < height; y++) {
-				float perlinValue = (float) perlin.calcPerlinAt(x / width, y / height, z);
+				float perlinValue = (float) perlin.calcPerlinAt(x / width, y / height, z, 6, 12);
 				pixmap.setColor(perlinValue, perlinValue, perlinValue, 1f);
 				pixmap.drawPixel(x, y);
 			}
@@ -37,18 +37,15 @@ public class NoiseImg  extends Actor {
 		
 		texture = new Texture(pixmap);
 		pixmap.dispose();
-		System.out.println(Keys.valueOf("+"));
 	}
 	
 	public void incrementZ() {
 		z++;
-		System.out.println("z up");
 		
 	}
 	
 	public void decrementZ() {
 		z--;
-		System.out.println("z down");
 	}
 
 	@Override

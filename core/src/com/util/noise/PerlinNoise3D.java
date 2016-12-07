@@ -71,6 +71,29 @@ public class PerlinNoise3D {
 	}
 
 	/**
+	 * Use octaves and persistence for calculating perlin noise
+	 * 
+	 * @return double between 0.0 and 1.0
+	 */
+	public double calcPerlinAt(double x, double y, double z, int octaves, double persistence) {
+		double total = 0;
+	    double frequency = 1;
+	    double amplitude = 1;
+	    double maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
+	    
+	    for(int i = 0; i < octaves; i++) {
+	        total += calcPerlinAt(x * frequency, y * frequency, z * frequency) * amplitude;
+	        maxValue += amplitude;
+	        
+	        amplitude *= persistence;
+	        frequency *= 2;
+	    }
+	    
+	    return total / maxValue;
+	}
+	
+	
+	/**
 	 * 
 	 * @return double between 0.0 and 1.0
 	 */
@@ -209,4 +232,5 @@ public class PerlinNoise3D {
 	private static double lerp(double a, double b, double x) {
 	    return a + x * (b - a);
 	}
+	
 }
