@@ -9,6 +9,7 @@ import com.blockhalde.player.Player;
 import com.blockhalde.render.CameraSystem;
 import com.blockhalde.render.RenderSystem;
 import com.terrain.world.WorldManagementSystem;
+import com.util.noise.debug.DebugPerlinNoiseSystem;
 
 public class Blockhalde extends ApplicationAdapter {
 	
@@ -24,6 +25,7 @@ public class Blockhalde extends ApplicationAdapter {
 		engine.addSystem(new InputSystem());
 		engine.addSystem(new WorldManagementSystem());
 		engine.addSystem(new RenderSystem());
+		engine.addSystem(new DebugPerlinNoiseSystem());
 		
 		engine.addEntity(new Player(cameraSystem.getCam()));
 	}
@@ -40,7 +42,8 @@ public class Blockhalde extends ApplicationAdapter {
 		engine.update(Gdx.graphics.getRawDeltaTime());
 		RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
 				"\ncam pos " + cameraSystem.getCam().position.toString() + 
-				"\nM: toggle menu, Q + E: iterate items");
+				"\nM: toggle menu, Q + E: iterate items" +
+				"\nN: toggle Perlin Noise Debug View");
 		RendererGUI.instance().render();
 	}
 }

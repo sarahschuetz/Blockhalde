@@ -2,6 +2,7 @@ package com.blockhalde.input;
 
 import com.badlogic.gdx.Gdx;
 import com.blockhalde.gui.RendererGUI;
+import com.util.noise.debug.DebugPerlinNoiseSystem;
 
 /**
  * An implementation of the {@link VirtualController} interface that controls the game interaction.
@@ -24,6 +25,7 @@ public class VirtualGameController extends VirtualAbstractController {
 			if (keycode == keybindings.getKey("INV_TOGGLE"))        RendererGUI.instance().toggleMenu();
 			else if (keycode == keybindings.getKey("INV_FORWARD"))  RendererGUI.instance().scrollItems(1);
 			else if (keycode == keybindings.getKey("INV_BACKWARD")) RendererGUI.instance().scrollItems(-1);
+			else if (keycode == keybindings.getKey("NOISE_DEBUG"))  inputSystem.getEngine().getSystem(DebugPerlinNoiseSystem.class).toggleDebugView();
 			else if (keycode == keybindings.getKey("QUIT"))		    Gdx.app.exit();
 		}
 	}
