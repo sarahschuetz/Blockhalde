@@ -1,6 +1,5 @@
 package com.blockhalde.input;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.gui.pie.PieMenuSystem;
@@ -10,9 +9,6 @@ import com.blockhalde.gui.pie.PieMenuSystem;
  * @author shaendro
  */
 public class VirtualGameController extends VirtualAbstractController {
-public class VirtualGameController implements VirtualController {
-	private InputSystem inputSystem;
-	private Engine engine;
 	private boolean active = true;
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 
@@ -20,9 +16,6 @@ public class VirtualGameController implements VirtualController {
 	 * Creates a {@link VirtualGameController}.
 	 * @param inputSystem The {@link InputSystem} the controller belongs to
 	 */
-	public VirtualGameController(InputSystem inputSystem, Engine engine) {
-		this.inputSystem = inputSystem;
-		this.engine = engine;
 	public VirtualGameController(InputSystem inputSystem) {
 		super(inputSystem);
 	}
@@ -37,39 +30,41 @@ public class VirtualGameController implements VirtualController {
 		}
 	}
 
-	@Override
-	public void keyUp(int keycode) {
-	}
-
-	@Override
-	public void touchDown(int screenX, int screenY, int button) {
-			PieMenuSystem pms = engine.getSystem(PieMenuSystem.class);
-			if(pms != null){
-				pms.setActive(true);
-			}
-			
-	}
-
-	@Override
-	public void touchUp(int screenX, int screenY, int button) {
-		PieMenuSystem pms = engine.getSystem(PieMenuSystem.class);
-		if(pms != null){
-			pms.setActive(false);
-		}
-	}
-
-	@Override
-	public void mouseMoved(int screenX, int screenY) {
-		PieMenuSystem pms = engine.getSystem(PieMenuSystem.class);
-		if(pms != null){
-			pms.mouseMoved(screenX, screenY);
-		}
-	}
 
 	@Override
 	public void scrolled(int amount) {
 		if (active) {
 			RendererGUI.instance().scrollItems(amount);
+		}
+	}
+	
+	@Override
+	public void touchDown(int screenX, int screenY, int button) {
+		if(button == 1){
+			PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
+			if(pms != null){
+				pms.setActive(true);
+				inputSystem.getCameraController().setActive(false);
+			}
+		}
+	}
+
+	@Override
+	public void touchUp(int screenX, int screenY, int button) {
+		if(button == 1){
+			PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
+			if(pms != null){
+				pms.setActive(false);
+				inputSystem.getCameraController().setActive(true);
+			}
+		}
+	}
+
+	@Override
+	public void touchDragged(int screenX, int screenY) {
+		PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
+		if(pms != null){
+			pms.touchDragged(screenX, screenY);
 		}
 	}
 }

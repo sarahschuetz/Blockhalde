@@ -1,5 +1,7 @@
 package com.blockhalde.gui;
 
+import aurelienribon.tweenengine.TweenManager;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -11,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.blockhalde.gui.pie.PieMenuSystem;
 
 public class RendererGUI {
 	private static RendererGUI instance;
@@ -21,8 +22,7 @@ public class RendererGUI {
 	LabelStyle labelStyle;
 	BottomGrid bottomGrid;
 	BitmapFont debugFont;
-	PieMenuSystem pieMenu;
-
+	
 	public static RendererGUI instance(){
 		if(instance == null){
 			instance = new RendererGUI();
@@ -54,6 +54,11 @@ public class RendererGUI {
 		debugLabel.setText(text);
 		debugLabel.setPosition(5, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 5, Align.topLeft);
 	}
+	
+	public void addDebugText(String text){
+		debugLabel.setText(debugLabel.getText().append(text));
+		debugLabel.setPosition(10, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 10, Align.topLeft);
+	}
 
 	public void resize (int width, int height) {
 		// Passing true when updating the viewport changes camera pos making 0,0 the bottom left corner.
@@ -64,6 +69,7 @@ public class RendererGUI {
 		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
 		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 		stage.draw();
+		debugLabel.setText("");
 	}
 
 	public void toggleMenu() {

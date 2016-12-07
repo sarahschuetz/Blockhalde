@@ -40,7 +40,7 @@ public class Blockhalde extends ApplicationAdapter {
 	@Override
 	public void render() {
 		engine.update(Gdx.graphics.getRawDeltaTime());
-		RendererGUI.instance().setDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
+		RendererGUI.instance().addDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
 				"\ncam pos " + cameraSystem.getCam().position.toString() + 
 				"\nM: toggle menu, Q + E: iterate items");
 		RendererGUI.instance().render();
