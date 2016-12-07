@@ -32,12 +32,12 @@ public class DebugPerlinNoiseSystem extends EntitySystem {
 		noise.setVisible(!noise.isVisible());
 	}
 	
-	public void incrementNoiseZ() {
-		noise.incrementZ();
+	public void incrementNoiseY() {
+		noise.incrementY();
 	}
 	
-	public void decrementNoiseZ() {
-		noise.decrementZ();
+	public void decrementNoiseY() {
+		noise.decrementY();
 	}
 
 }
