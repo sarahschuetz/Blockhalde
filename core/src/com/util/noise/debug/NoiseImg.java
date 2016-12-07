@@ -1,7 +1,6 @@
 package com.util.noise.debug;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
@@ -21,6 +20,7 @@ public class NoiseImg  extends Actor {
 	
 	public NoiseImg() {
 		setVisible(false);
+		generateNoiseTexture();
 	}
 	
 	private void generateNoiseTexture() {
@@ -40,21 +40,16 @@ public class NoiseImg  extends Actor {
 	
 	public void incrementZ() {
 		z++;
-		
+		generateNoiseTexture();
 	}
 	
 	public void decrementZ() {
 		z--;
+		generateNoiseTexture();
 	}
 
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		
-		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
-		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-		
-		generateNoiseTexture();
-		
 		batch.disableBlending();
 	    batch.draw(texture, 10, 10);
 	}
