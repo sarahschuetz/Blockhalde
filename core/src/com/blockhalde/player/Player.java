@@ -15,6 +15,7 @@ public class Player extends Entity {
 		add(new PlayerDataComponent());
 		add(new CameraComponent(camera));
 		add(new PositionComponent(camera.position));
+		add(new DebugComponent());
 	}
 	
 	/**
