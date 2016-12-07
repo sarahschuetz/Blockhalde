@@ -42,7 +42,8 @@ public class Blockhalde extends ApplicationAdapter {
 		engine.update(Gdx.graphics.getRawDeltaTime());
 		RendererGUI.instance().addDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
 				"\ncam pos " + cameraSystem.getCam().position.toString() + 
-				"\nM: toggle menu, Q + E: iterate items");
+				"\nM: toggle menu, Q + E: iterate items" +
+				"\nright click for pie menu");
 		RendererGUI.instance().render();
 	}
 }
