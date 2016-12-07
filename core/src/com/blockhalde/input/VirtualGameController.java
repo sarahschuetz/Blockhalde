@@ -8,6 +8,7 @@ import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.player.CameraComponent;
 import com.blockhalde.player.DebugComponent;
 import com.blockhalde.player.PlayerDataComponent;
+import com.util.noise.debug.DebugPerlinNoiseSystem;
 
 /**
  * An implementation of the {@link VirtualController} interface that controls the game interaction.
@@ -27,11 +28,15 @@ public class VirtualGameController extends VirtualAbstractController {
 	@Override
 	public void keyDown(int keycode) {
 		if (active) {
-			if (keycode == keybindings.getKey("INV_TOGGLE"))          RendererGUI.instance().toggleMenu();
-			else if (keycode == keybindings.getKey("INV_FORWARD"))    RendererGUI.instance().scrollItems(1);
-			else if (keycode == keybindings.getKey("INV_BACKWARD"))   RendererGUI.instance().scrollItems(-1);
-			else if (keycode == keybindings.getKey("QUIT"))		      Gdx.app.exit();
-			else if (keycode == keybindings.getKey("TOGGLE_FLYING")) toggleFlying();
+			if (keycode == keybindings.getKey("INV_TOGGLE"))              RendererGUI.instance().toggleMenu();
+			else if (keycode == keybindings.getKey("INV_FORWARD"))        RendererGUI.instance().scrollItems(1);
+			else if (keycode == keybindings.getKey("INV_BACKWARD"))       RendererGUI.instance().scrollItems(-1);
+			else if (keycode == keybindings.getKey("QUIT"))		          Gdx.app.exit();
+			else if (keycode == keybindings.getKey("TOGGLE_FLYING"))      toggleFlying();
+			else if (keycode == keybindings.getKey("NOISE_DEBUG"))        inputSystem.getEngine().getSystem(DebugPerlinNoiseSystem.class).toggleDebugView();
+			else if (keycode == keybindings.getKey("NOISE_DEBUG_Y_UP"))   inputSystem.getEngine().getSystem(DebugPerlinNoiseSystem.class).incrementNoiseY();
+			else if (keycode == keybindings.getKey("NOISE_DEBUG_Y_DOWN")) inputSystem.getEngine().getSystem(DebugPerlinNoiseSystem.class).decrementNoiseY();
+			else if (keycode == keybindings.getKey("QUIT"))		          Gdx.app.exit();
 		}
 	}
 
