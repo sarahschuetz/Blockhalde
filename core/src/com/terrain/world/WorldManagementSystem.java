@@ -25,7 +25,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     private final List<Chunk> visibleChunks = new ArrayList<Chunk>();
 
     // Defines how many chunks are drawn around the player
-    private int drawDistance = 1;
+    private int drawDistance = 3;
 
     // TODO: Add player position and generate chunks based on it.
     private Camera camera;
@@ -140,14 +140,14 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
         }
 
         //TODO: change later
-        //calculateVisibleChunks(camera.position, drawDistance);
-        calculateVisibleChunks(playerPosition, drawDistance);
+        calculateVisibleChunks(camera.position, drawDistance);
+        //calculateVisibleChunks(playerPosition, drawDistance);
     }
 
     @Override
     public void update(float deltaTime) {
         //TODO: change later
-        //calculateVisibleChunks(camera.position, drawDistance);
-        calculateVisibleChunks(playerPosition, drawDistance);
+        calculateVisibleChunks(camera.position, drawDistance);
+        //calculateVisibleChunks(playerPosition, drawDistance);
     }
 }

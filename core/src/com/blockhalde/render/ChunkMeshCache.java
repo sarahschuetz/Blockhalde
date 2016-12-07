@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -21,15 +22,18 @@ public class ChunkMeshCache {
 	 * The cache may keep meshes for this many subchunks in VRAM before starting to
 	 * overwrite old chunks when a new one is loaded.
 	 */
-	private static final int MAX_CACHED_SUBCHUNKS = 9 * 16;
+	private static final int MAX_CACHED_SUBCHUNKS = 9 * 16 * 10;
 
 	private static final ChunkPosition FARAWAY_CHUNKPOS = new ChunkPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
 	private List<CachedSubchunk> cachedSubs = new ArrayList<CachedSubchunk>(24);
 	private ChunkMeshBuilder builder;
 	
 	private final SubchunkDistanceComparator comp = new SubchunkDistanceComparator();
+
+	private Camera cam;
 	
-	public ChunkMeshCache(WorldManagementSystem worldManagementSystem) {
+	public ChunkMeshCache(WorldManagementSystem worldManagementSystem, Camera cam) {
+		this.cam = cam;
 		this.worldManagementSystem = worldManagementSystem;
 		builder = new ChunkMeshBuilder();
 		allocateCache();
@@ -62,8 +66,7 @@ public class ChunkMeshCache {
 	}
 	
 	private void sortCache() {
-		// FIXME this should be the player position, not (0,0,0)
-		comp.setReferencePosition(new Vector3(0, 0, 0));
+		comp.setReferencePosition(cam.position);
 		Collections.sort(cachedSubs, comp);
 	}
 	

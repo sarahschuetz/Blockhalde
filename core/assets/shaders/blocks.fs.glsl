@@ -11,17 +11,6 @@ varying vec4 v_color;
 uniform sampler2D u_texture;
 
 void main() {
-
-	vec3 normal = normalize(v_normal);
-	vec3 eyeVec = normalize(v_eyeVec);
-
-	float diffuse = max(dot(normal,eyeVec),0.3);
-	diffuse = min(diffuse,1.0);
-
-	vec3 reflectVec = reflect(-eyeVec,normal);
-	float spec = pow( max( dot(reflectVec, eyeVec), 0.0), 2.0);
-	vec4 c_spec = clamp(spec * vec4(0.5,0.5,0.5,1.0), 0.0, 1.0);
-
-    gl_FragColor = texture2D(u_texture, v_texCoords)* diffuse + c_spec;  //vec4(v_texCoords.x, v_texCoords.y, 0.0, 1.0)
-    gl_FragColor = gl_FragColor*vec4(v_color.rrr, gl_FragColor.a);
+    gl_FragColor.rgb = texture2D(u_texture, v_texCoords).rgb * v_color.rrr;  //vec4(v_texCoords.x, v_texCoords.y, 0.0, 1.0)
+	gl_FragColor.a = 1.0;
 }

@@ -30,8 +30,11 @@ public class RenderSystem extends EntitySystem {
 
 		worldManagementSystem = engine.getSystem(WorldManagementSystem.class);
 
+		CameraSystem camSys = engine.getSystem(CameraSystem.class);
+		Camera cam = camSys.getCam();
+		
 		//long start = System.currentTimeMillis();
-		meshCache = new ChunkMeshCache(worldManagementSystem);
+		meshCache = new ChunkMeshCache(worldManagementSystem, cam);
 		meshCache.update();
 		//System.out.println("Initial mesh generation time: " + (System.currentTimeMillis() - start) + "ms");
 		
