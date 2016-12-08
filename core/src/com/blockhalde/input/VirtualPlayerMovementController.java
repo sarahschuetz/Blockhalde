@@ -19,11 +19,13 @@ import com.util.PauseListener;
  */
 public class VirtualPlayerMovementController extends VirtualAbstractController {
 	private static final float GRAVITY = 0.98f;
-	private static final float MOVEMENT_SPEED = 0.2f;
-	private static final float PLAYER_HEIGHT = 2.3f;
-	private static final float MAX_FALL_SPEED = -5f;
+	private static final float MAX_FALL_SPEED = -4f;
+	private static final float FLY_SPEED = 6f;
+	private static final float WALK_SPEED = 2f;
 	private static final float JUMP_STRENGTH = 0.3f;
+	private static final float PLAYER_HEIGHT = 2.3f;
 	private static final float COLLISION_DISTANCE = 0.001f;
+	private static final float VERTICAL_PEEK_DISTANCE = 0.5f;
 
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 
@@ -47,10 +49,10 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 	@Override
 	public void keyDown(int keycode) {
 		if (active) {
-			if (keycode == keybindings.getKey("FORWARD"))       movementFwrd += MOVEMENT_SPEED;
-			else if (keycode == keybindings.getKey("LEFT"))     movementSide += MOVEMENT_SPEED;
-			else if (keycode == keybindings.getKey("BACKWARD")) movementFwrd -= MOVEMENT_SPEED;
-			else if (keycode == keybindings.getKey("RIGHT"))    movementSide -= MOVEMENT_SPEED;
+			if (keycode == keybindings.getKey("FORWARD"))       movementFwrd += FLY_SPEED;
+			else if (keycode == keybindings.getKey("LEFT"))     movementSide += FLY_SPEED;
+			else if (keycode == keybindings.getKey("BACKWARD")) movementFwrd -= FLY_SPEED;
+			else if (keycode == keybindings.getKey("RIGHT"))    movementSide -= FLY_SPEED;
 			else if (keycode == keybindings.getKey("JUMP"))     jumping = true;
 		}
 	}
@@ -58,10 +60,10 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 	@Override
 	public void keyUp(int keycode) {
 		if (active) {
-			if (keycode == keybindings.getKey("FORWARD"))       movementFwrd -= MOVEMENT_SPEED;
-			else if (keycode == keybindings.getKey("LEFT"))     movementSide -= MOVEMENT_SPEED;
-			else if (keycode == keybindings.getKey("BACKWARD")) movementFwrd += MOVEMENT_SPEED;
-			else if (keycode == keybindings.getKey("RIGHT"))    movementSide += MOVEMENT_SPEED;
+			if (keycode == keybindings.getKey("FORWARD"))       movementFwrd -= FLY_SPEED;
+			else if (keycode == keybindings.getKey("LEFT"))     movementSide -= FLY_SPEED;
+			else if (keycode == keybindings.getKey("BACKWARD")) movementFwrd += FLY_SPEED;
+			else if (keycode == keybindings.getKey("RIGHT"))    movementSide += FLY_SPEED;
 			else if (keycode == keybindings.getKey("JUMP"))     jumping = false;
 		}
 	}
@@ -76,8 +78,8 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 				Vector3 position = player.getComponent(PositionComponent.class).getPosition();
 				boolean flying = player.getComponent(DebugComponent.class).isFlying();
 				Vector3 oldPosition = position.cpy();
-				position.add(prepareMovementVectorFwrd(camera, flying));
-				position.add(prepareMovementVectorSide(camera, flying));
+				position.add(prepareMovementVectorFwrd(camera, flying, deltaTime));
+				position.add(prepareMovementVectorSide(camera, flying, deltaTime));
 				position.add(prepareMovementVectorDown(oldPosition, flying, deltaTime));
 				correctPosition(oldPosition, position, flying);
 				camera.position.set(position.x, position.y + PLAYER_HEIGHT, position.z);
@@ -86,47 +88,53 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 		}
 	}
 
-	private Vector3 prepareMovementVectorFwrd(Camera camera, boolean flying) {
+	private Vector3 prepareMovementVectorFwrd(Camera camera, boolean flying, float deltaTime) {
 		if (flying) {
-			float balancedMovementFwrd = 2f * (float) movementFwrd / (movementSide != 0 ? 2 : 1);
+			float balancedMovementFwrd = deltaTime * FLY_SPEED * movementFwrd / (movementSide != 0 ? 2 : 1);
 			return movementVectorFwrd.set(camera.direction.x * balancedMovementFwrd, camera.direction.y * balancedMovementFwrd, camera.direction.z * balancedMovementFwrd);
 		} else {
-			float balancedMovementFwrd = (float) movementFwrd / (movementSide != 0 ? 2 : 1);
+			float balancedMovementFwrd = deltaTime * WALK_SPEED * movementFwrd / (movementSide != 0 ? 2 : 1);
 			return movementVectorFwrd.set(camera.direction).rotate(camera.up, 90f).rotate(Vector3.Y, -90f).set(movementVectorFwrd.x * balancedMovementFwrd, movementVectorFwrd.y * balancedMovementFwrd, movementVectorFwrd.z * balancedMovementFwrd);
 		}
 	}
 
-	private Vector3 prepareMovementVectorSide(Camera camera, boolean flying) {
-		float balancedMovementSide = (float) movementSide / (movementFwrd != 0 ? 2 : 1);			
-		if (flying) balancedMovementSide *= 2f;
-		return movementVectorSide.set(camera.direction).rotate(camera.up, 90f).set(movementVectorSide.x * balancedMovementSide, movementVectorSide.y * balancedMovementSide, movementVectorSide.z * balancedMovementSide);
+	private Vector3 prepareMovementVectorSide(Camera camera, boolean flying, float deltaTime) {
+		if (flying){
+			float balancedMovementSide = deltaTime * FLY_SPEED * movementSide / (movementFwrd != 0 ? 2 : 1);			
+			return movementVectorSide.set(camera.direction).rotate(camera.up, 90f).set(movementVectorSide.x * balancedMovementSide, movementVectorSide.y * balancedMovementSide, movementVectorSide.z * balancedMovementSide);
+		} else {
+			float balancedMovementSide = deltaTime * WALK_SPEED * movementSide / (movementFwrd != 0 ? 2 : 1);			
+			return movementVectorSide.set(camera.direction).rotate(camera.up, 90f).set(movementVectorSide.x * balancedMovementSide, movementVectorSide.y * balancedMovementSide, movementVectorSide.z * balancedMovementSide);
+		}
 	}
 
 	private Vector3 prepareMovementVectorDown(Vector3 position, boolean flying, float deltaTime) {
 		if (!flying){
-			BlockType blockBelow = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int)position.x, (int)position.y - 1, (int)position.z));
-			if (blockBelow.getBlockId() == BlockType.AIR.getBlockId()) {
+			boolean blockedY = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int)position.x, (int) (position.y - VERTICAL_PEEK_DISTANCE), (int)position.z)).getBlockId() != BlockType.AIR.getBlockId();
+			if (!blockedY) {
 				movementDown -= GRAVITY * deltaTime;
 				if (movementDown < MAX_FALL_SPEED) movementDown = MAX_FALL_SPEED;
-			}
-			else {
-				movementDown = jumping ? JUMP_STRENGTH : 0;
+			} else {
+				if (jumping) movementDown = JUMP_STRENGTH;
+				else if (movementDown < 0) movementDown = 0;
 			}
 			return movementVectorDown.set(0, movementDown, 0);
+		} else {
+			movementDown = 0;
+			return movementVectorDown.set(0, 0, 0);
 		}
-		return movementVectorDown.set(0, 0, 0);
 	}
 
 	private void correctPosition(Vector3 oldPosition, Vector3 position, boolean flying) {
 		if (!flying){
-			if (movementDown == 0f) position.y = (int) position.y;
-			
 			int xMoved = (int) oldPosition.x - (int) position.x;
 			int zMoved = (int) oldPosition.z - (int) position.z;
 			boolean blocked = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) position.x, (int) position.y, (int) position.z)).getBlockId() != BlockType.AIR.getBlockId();
 			boolean blockedX = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x - xMoved, (int) position.y, (int) oldPosition.z)).getBlockId() != BlockType.AIR.getBlockId();
 			boolean blockedZ = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x, (int) position.y, (int) oldPosition.z - zMoved)).getBlockId() != BlockType.AIR.getBlockId();
-			
+
+			if (movementDown == 0.0) position.y = (int) position.y + COLLISION_DISTANCE;
+
 			if (blocked) {
 				if (xMoved != 0 && (blockedX || zMoved != 0 && !blockedZ)) {
 					if (xMoved > 0) position.x = (int) position.x + (oldPosition.x > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
@@ -136,7 +144,9 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 					if (zMoved > 0) position.z = (int) position.z + (oldPosition.z > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
 					else position.z = (int) position.z + (oldPosition.z > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
 				}
-				if (xMoved == 0 && zMoved == 0) System.out.println("Position Correction Error");
+				if (xMoved == 0 && zMoved == 0) {
+					position.y = (int) position.y + 1;
+				}
 			}
 		}
 	}
