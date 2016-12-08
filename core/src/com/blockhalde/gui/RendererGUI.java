@@ -1,7 +1,5 @@
 package com.blockhalde.gui;
 
-import aurelienribon.tweenengine.TweenManager;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -51,13 +49,14 @@ public class RendererGUI {
 	}
 
 	public void setDebugText(String text){
+		debugLabel.setPosition(5, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 5, Align.topRight);
+
 		debugLabel.setText(text);
-		debugLabel.setPosition(5, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 5, Align.topLeft);
 	}
 	
 	public void addDebugText(String text){
 		debugLabel.setText(debugLabel.getText().append(text));
-		debugLabel.setPosition(10, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 10, Align.topLeft);
+		debugLabel.setPosition(10, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 10, Align.topRight);
 	}
 
 	public void resize (int width, int height) {

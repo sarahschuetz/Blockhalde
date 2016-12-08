@@ -13,6 +13,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.blockhalde.gui.RendererGUI;
 
@@ -22,14 +23,16 @@ import com.blockhalde.gui.RendererGUI;
  * It is using tweenengine @see <a href="https://code.google.com/archive/p/java-universal-tween-engine/wikis/GetStarted.wiki">tweenengine wiki</a> for smooth motion.
  */
 public class PieMenuSystem extends EntitySystem{
-	private static final float RADIUS = 60.0f;
+	private static final float RADIUS = 35.0f;
 	private float degreeInterval;
 	private Vector2 center;
 	private Vector2 localPos;
 	private Stage stage;
 	private boolean isActive;
 	private Array<PieSlice> slices;
-	public TweenManager tweenManager;
+	private TweenManager tweenManager;
+	
+	private ArrowActor arrow;
 
 	public PieMenuSystem(){
 		this.stage = RendererGUI.instance().getStage();
@@ -45,11 +48,13 @@ public class PieMenuSystem extends EntitySystem{
 			}
 		};
 		
+		
 		Command cmdDebug = new Command(){
 			public void execute() {
 				System.out.println("Debug");
 			}
 		};
+	
 		
 		Command cmdCraft = new Command(){
 			public void execute() {
@@ -59,13 +64,13 @@ public class PieMenuSystem extends EntitySystem{
 		
 		Command cmdCall = new Command(){
 			public void execute() {
-				System.out.println("H: Hi, here's Heinzibert!");
+				System.out.println("Heinzibert: Hi, here's Heinzibert!");
 				
 				new java.util.Timer().schedule( 
 				        new java.util.TimerTask() {
 				            @Override
 				            public void run() {
-				            	System.out.println("H: What do you want?");
+				            	System.out.println("Heinzibert: What do you want?");
 				            }
 				        }, 
 				        2000 
@@ -75,10 +80,10 @@ public class PieMenuSystem extends EntitySystem{
 				        new java.util.TimerTask() {
 				            @Override
 				            public void run() {
-				            	System.out.println("H: Hello?");
+				            	System.out.println("Heinzibert: Hello??");
 				            }
 				        }, 
-				        5000 
+				        8000 
 				);
 
 			}
@@ -86,7 +91,7 @@ public class PieMenuSystem extends EntitySystem{
 		
 		slices.add(new PieSlice("Inventory").setCommand(cmdInventory));
 		slices.add(new PieSlice("Craft").setCommand(cmdCraft));
-		//slices.add(new PieSlice("Debug").setCommand(cmdDebug));
+		slices.add(new PieSlice("Debug").setCommand(cmdDebug));
 		slices.add(new PieSlice("Call Heinzibert").setCommand(cmdCall));
 		// -------------------
 		
@@ -94,6 +99,11 @@ public class PieMenuSystem extends EntitySystem{
 			stage.addActor(p);
 		}
 		calcPositions();
+		
+		arrow = new ArrowActor();
+		arrow.setPosition(center.x, center.y);
+		
+		stage.addActor(arrow);
 		
 		isActive = true;
 		setActive(false);
@@ -120,16 +130,21 @@ public class PieMenuSystem extends EntitySystem{
 			tweenManager.killAll();
 			
 			if(isActive){
-				// tween in pie slices
+				if(arrow != null) arrow.setVisible(true);
+				meanDirection.setZero();
+				arrow.setVector(meanDirection.cpy());
+				
+				// tween in
 				for(PieSlice p : slices){
-					
 					p.setVisible(true);
 					Tween.to(p, ActorAccessor.XY, 0.4f).target(p.getOriginalPos().x, p.getOriginalPos().y).ease(Elastic.OUT).start(tweenManager);
 				}
 			}else{
-				// tween out pie slices
+				if(arrow != null) arrow.setVisible(false);
+
 				tweenManager.killAll();
 				
+				// tween out
 				for(final PieSlice p : slices){
 					TweenCallback tc = new TweenCallback(){
 						public void onEvent(int type, BaseTween<?> baseTween) {
@@ -152,45 +167,73 @@ public class PieMenuSystem extends EntitySystem{
 	}
 	
 	private void calcPositions(){
-		degreeInterval = -360 / slices.size;
+		degreeInterval = 360 / slices.size;
 		localPos = new Vector2(0,RADIUS);
 		
 		for(int n = 0; n < slices.size; n++){
 			PieSlice pie = slices.get(n);
 			pie.setPosition(center.x, center.y);
 			pie.setOriginalPos(localPos.cpy().scl(1.2f).add(center));
+			float degree = degreeInterval*n;
+			if(degree < 30 || degree >= 330){
+				pie.setAlignment(Align.top);
+			}else if(degree >= 30 && degree < 150){
+				pie.setAlignment(Align.left);
+			}else if(degree >= 150 && degree < 210){
+				pie.setAlignment(Align.bottom);
+			}else{
+				pie.setAlignment(Align.right);
+			}
+			
 			localPos.rotate(degreeInterval);
 		}
 	}
 	
 	private int lastScreenX, lastScreenY = 0;
+	private Vector2 meanDirection = new Vector2();
 	
 	public void touchDragged(int screenX, int screenY) {
 		if(isActive){
-			Vector2 dir = new Vector2(lastScreenX - screenX, lastScreenY - screenY);
-			dir.rotate(-90);
-			float angle = dir.angle();
-			int index = Math.abs(Math.round(angle/degreeInterval));
-			//System.out.println(dir.len2());
+			
+			// mouse coords to stage coords
+			Vector2 mouseDir = new Vector2(screenX - lastScreenX , lastScreenY - screenY);
+			
+			// calc mean
+			meanDirection.add(mouseDir);
+			if(meanDirection.len2() >= 625){
+				meanDirection.nor().scl(25);
+			}
+			
+			arrow.setVector(meanDirection.cpy());
+			
+			// calculate index of selected
+			float angle = meanDirection.cpy().rotate(-degreeInterval*0.5f).angle();
+			int index = Math.abs((int)((angle)/degreeInterval));
+			if(index >= slices.size){
+				index = slices.size-1;
+			}
 			
 			if(index < slices.size)
 			for(int i = 0; i < slices.size; i++){
 				PieSlice p = slices.get(i);
-				if(i != index){ //|| dir.len2() < 10){
-					if(p.isActive()){
-						p.setActive(false);
-						Tween.to(slices.get(i), ActorAccessor.XY, 0.1f).target(p.getOriginalPos().x, p.getOriginalPos().y).ease(TweenEquations.easeInOutCubic).start(tweenManager);
-					}
-				}else{
+				// check index & if direction vector is long enough for selection
+				if(i == index && meanDirection.len2() > 600){ 
 					if(!p.isActive()){
 						p.setActive(true);
-						if(!tweenManager.containsTarget(p)){
-							Vector2 target = p.getOriginalPos().cpy().sub(center).scl(1.5f).add(center);
-							Tween.to(slices.get(i), ActorAccessor.XY, 0.1f).target(target.x, target.y).ease(TweenEquations.easeInOutCubic).start(tweenManager);
-						}
+						tweenManager.killTarget(p);
+						Vector2 target = p.getOriginalPos().cpy().sub(center).scl(1.1f).add(center);
+						Tween.to(slices.get(i), ActorAccessor.XY, 0.08f).target(target.x, target.y).ease(TweenEquations.easeInOutCubic).start(tweenManager);
+						Tween.to(slices.get(i), ActorAccessor.SCALEXY, 0.08f).target(1.2f, 1.2f).ease(TweenEquations.easeInOutCubic).start(tweenManager);
+					}
+				}else{
+					if(p.isActive() ){
+						p.setActive(false);
+						Tween.to(slices.get(i), ActorAccessor.XY, 0.08f).target(p.getOriginalPos().x, p.getOriginalPos().y).ease(TweenEquations.easeInOutCubic).start(tweenManager);
+						Tween.to(slices.get(i), ActorAccessor.SCALEXY, 0.08f).target(1f, 1f).ease(TweenEquations.easeInOutCubic).start(tweenManager);
 					}
 				}
 			}
+			
 		}
 		
 		lastScreenX = screenX;
