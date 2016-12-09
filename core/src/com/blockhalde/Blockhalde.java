@@ -10,6 +10,7 @@ import com.blockhalde.player.Player;
 import com.blockhalde.render.CameraSystem;
 import com.blockhalde.render.RenderSystem;
 import com.terrain.world.WorldManagementSystem;
+import com.util.noise.debug.DebugPerlinNoiseSystem;
 
 public class Blockhalde extends ApplicationAdapter {
 	
@@ -25,6 +26,7 @@ public class Blockhalde extends ApplicationAdapter {
 		engine.addSystem(new InputSystem());
 		engine.addSystem(new WorldManagementSystem());
 		engine.addSystem(new RenderSystem());
+		engine.addSystem(new DebugPerlinNoiseSystem());
 		
 		engine.addEntity(new Player(cameraSystem.getCam()));
 		engine.addSystem(new PieMenuSystem());
@@ -43,6 +45,7 @@ public class Blockhalde extends ApplicationAdapter {
 		RendererGUI.instance().addDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
 				"\ncam pos " + cameraSystem.getCam().position.toString() + 
 				"\nM: toggle menu, Q + E: iterate items" +
+				"\nN: toggle Perlin Noise Debug View (use V and B to go up and down the Z axis)");
 				"\nright click for pie menu");
 		RendererGUI.instance().render();
 	}
