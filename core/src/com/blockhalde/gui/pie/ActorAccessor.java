@@ -12,6 +12,7 @@ public class ActorAccessor implements TweenAccessor<Actor> {
 	public static final int Y = 2;
 	public static final int XY = 3;
 	public static final int SCALEXY = 4;
+	public static final int ALPHA = 5;
 
 	@Override
 	public int getValues(Actor actor, int type, float[] returnValues) {
@@ -29,6 +30,10 @@ public class ActorAccessor implements TweenAccessor<Actor> {
 		case SCALEXY:
 			returnValues[0] = actor.getScaleX();
 			returnValues[1] = actor.getScaleY();
+			return 2;
+		case ALPHA:
+			returnValues[0] = actor.getColor().a;
+			return 1;
 		default:
 			assert false;
 			return 0;
@@ -50,6 +55,8 @@ public class ActorAccessor implements TweenAccessor<Actor> {
 		case SCALEXY:
 			actor.setScale(newValues[0], newValues[1]);
 			break;
+		case ALPHA:
+			actor.getColor().a = newValues[0];
 		default:
 			assert false;
 			break;

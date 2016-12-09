@@ -23,13 +23,13 @@ public class Blockhalde extends ApplicationAdapter {
 		
 		cameraSystem = new CameraSystem();
 		engine.addSystem(cameraSystem);
+		engine.addSystem(new PieMenuSystem());
 		engine.addSystem(new InputSystem());
 		engine.addSystem(new WorldManagementSystem());
 		engine.addSystem(new RenderSystem());
 		engine.addSystem(new DebugPerlinNoiseSystem());
 		
 		engine.addEntity(new Player(cameraSystem.getCam()));
-		engine.addSystem(new PieMenuSystem());
 	}
 	
 	@Override
@@ -44,8 +44,7 @@ public class Blockhalde extends ApplicationAdapter {
 		engine.update(Gdx.graphics.getRawDeltaTime());
 		RendererGUI.instance().addDebugText("fps " + Gdx.graphics.getFramesPerSecond() + 
 				"\ncam pos " + cameraSystem.getCam().position.toString() + 
-				"\nM: toggle menu, Q + E: iterate items" +
-				"\nN: toggle Perlin Noise Debug View (use V and B to go up and down the Z axis)");
+				"\nN: toggle Perlin Noise Debug View (use V and B to go up and down the Z axis)" + 
 				"\nright click for pie menu");
 		RendererGUI.instance().render();
 	}

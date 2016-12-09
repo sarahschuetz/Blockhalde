@@ -31,7 +31,6 @@ public class PieMenuSystem extends EntitySystem{
 	private boolean isActive;
 	private Array<PieSlice> slices;
 	private TweenManager tweenManager;
-	
 	private ArrowActor arrow;
 
 	public PieMenuSystem(){
@@ -44,18 +43,10 @@ public class PieMenuSystem extends EntitySystem{
 		// --- SETUP TEST SLICES ---
 		Command cmdInventory = new Command(){
 			public void execute() {
-				System.out.println("Inventory");
-			}
-		};
-		
-		
-		Command cmdDebug = new Command(){
-			public void execute() {
-				System.out.println("Debug");
+				RendererGUI.instance().toggleMenu();
 			}
 		};
 	
-		
 		Command cmdCraft = new Command(){
 			public void execute() {
 				System.out.println("Craft");
@@ -91,8 +82,7 @@ public class PieMenuSystem extends EntitySystem{
 		
 		slices.add(new PieSlice("Inventory").setCommand(cmdInventory));
 		slices.add(new PieSlice("Craft").setCommand(cmdCraft));
-		slices.add(new PieSlice("Debug").setCommand(cmdDebug));
-		slices.add(new PieSlice("Call Heinzibert").setCommand(cmdCall));
+		slices.add(new PieSlice("Call Heinzi").setCommand(cmdCall));
 		// -------------------
 		
 		for(PieSlice p : slices){
@@ -115,8 +105,10 @@ public class PieMenuSystem extends EntitySystem{
 	 * @param command the command executed when slice is selected
 	 */
 	public void addPieSlice(String name, Command command){
-		slices.add(new PieSlice(name).setCommand(command));
+		PieSlice slice = new PieSlice(name).setCommand(command);
+		slices.add(slice);
 		calcPositions();
+		stage.addActor(slice);
 	}
 	
 	/**
@@ -138,6 +130,7 @@ public class PieMenuSystem extends EntitySystem{
 				for(PieSlice p : slices){
 					p.setVisible(true);
 					Tween.to(p, ActorAccessor.XY, 0.4f).target(p.getOriginalPos().x, p.getOriginalPos().y).ease(Elastic.OUT).start(tweenManager);
+					Tween.to(p, ActorAccessor.ALPHA,  0.05f).target(1).ease(TweenEquations.easeOutQuad).start(tweenManager);
 				}
 			}else{
 				if(arrow != null) arrow.setVisible(false);
@@ -152,6 +145,7 @@ public class PieMenuSystem extends EntitySystem{
 						}
 					};
 					Tween.to(p, ActorAccessor.XY, 0.3f).target(center.x, center.y).ease(TweenEquations.easeInBack).start(tweenManager).setCallback(tc);
+					Tween.to(p, ActorAccessor.ALPHA, 0.4f).target(0).ease(TweenEquations.easeOutQuad).start(tweenManager);
 					
 					if(p.isActive()){
 						p.execute();
@@ -173,19 +167,19 @@ public class PieMenuSystem extends EntitySystem{
 		for(int n = 0; n < slices.size; n++){
 			PieSlice pie = slices.get(n);
 			pie.setPosition(center.x, center.y);
-			pie.setOriginalPos(localPos.cpy().scl(1.2f).add(center));
 			float degree = degreeInterval*n;
 			if(degree < 30 || degree >= 330){
 				pie.setAlignment(Align.top);
 			}else if(degree >= 30 && degree < 150){
-				pie.setAlignment(Align.left);
+				pie.setAlignment(Align.right);
 			}else if(degree >= 150 && degree < 210){
 				pie.setAlignment(Align.bottom);
 			}else{
-				pie.setAlignment(Align.right);
+
+				pie.setAlignment(Align.left);
 			}
-			
-			localPos.rotate(degreeInterval);
+			pie.setOriginalPos(localPos.cpy().scl(1.2f).add(center));
+			localPos.rotate(-degreeInterval);
 		}
 	}
 	
@@ -207,13 +201,13 @@ public class PieMenuSystem extends EntitySystem{
 			arrow.setVector(meanDirection.cpy());
 			
 			// calculate index of selected
-			float angle = meanDirection.cpy().rotate(-degreeInterval*0.5f).angle();
+			float angle = meanDirection.cpy().rotate(-90-degreeInterval*0.5f).angle(); // rotate to 12 o'clock and minus half the degree interval
 			int index = Math.abs((int)((angle)/degreeInterval));
 			if(index >= slices.size){
 				index = slices.size-1;
 			}
+			index = slices.size - index - 1;	// invert index (because angle() is counterclockwise)
 			
-			if(index < slices.size)
 			for(int i = 0; i < slices.size; i++){
 				PieSlice p = slices.get(i);
 				// check index & if direction vector is long enough for selection
@@ -221,6 +215,7 @@ public class PieMenuSystem extends EntitySystem{
 					if(!p.isActive()){
 						p.setActive(true);
 						tweenManager.killTarget(p);
+						p.getColor().a = 1;
 						Vector2 target = p.getOriginalPos().cpy().sub(center).scl(1.1f).add(center);
 						Tween.to(slices.get(i), ActorAccessor.XY, 0.08f).target(target.x, target.y).ease(TweenEquations.easeInOutCubic).start(tweenManager);
 						Tween.to(slices.get(i), ActorAccessor.SCALEXY, 0.08f).target(1.2f, 1.2f).ease(TweenEquations.easeInOutCubic).start(tweenManager);

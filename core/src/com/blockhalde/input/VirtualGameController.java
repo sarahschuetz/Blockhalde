@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.blockhalde.gui.RendererGUI;
+import com.blockhalde.gui.pie.Command;
 import com.blockhalde.gui.pie.PieMenuSystem;
 import com.blockhalde.player.CameraComponent;
 import com.blockhalde.player.DebugComponent;
@@ -25,6 +26,16 @@ public class VirtualGameController extends VirtualAbstractController {
 	 */
 	public VirtualGameController(InputSystem inputSystem) {
 		super(inputSystem);
+		
+		// add menu point to toggle gravity
+		PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
+		if(pms != null){
+			pms.addPieSlice("Gravity", new Command(){
+				public void execute() {
+					toggleFlying();
+				}
+			});
+		}
 	}
 
 	@Override
