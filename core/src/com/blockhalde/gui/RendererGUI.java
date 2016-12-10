@@ -1,9 +1,14 @@
 package com.blockhalde.gui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -11,9 +16,11 @@ public class RendererGUI {
 	private static RendererGUI instance;
 
 	Stage stage;
-	Text debugText;
+	Label debugLabel ;
+	LabelStyle labelStyle;
 	BottomGrid bottomGrid;
-
+	BitmapFont debugFont;
+	
 	public static RendererGUI instance(){
 		if(instance == null){
 			instance = new RendererGUI();
@@ -24,14 +31,32 @@ public class RendererGUI {
 	RendererGUI(){
 		Viewport viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera());
 		stage = new Stage(viewport);
-		debugText = new Text();
+		
+		// setting up debug text
+		debugFont = new BitmapFont();
+		labelStyle = new LabelStyle(debugFont, new Color(0.9f,0.9f,0.9f,1.0f));
+		debugLabel = new Label("", labelStyle);
+		
+		// setting up bottom grid
 		bottomGrid = BottomGrid.getInstance();
-		stage.addActor(debugText);
+		
+		stage.addActor(debugLabel);
 		stage.addActor(bottomGrid);
+	}
+	
+	public Stage getStage(){
+		return stage;
 	}
 
 	public void setDebugText(String text){
-		debugText.setText(text);
+		debugLabel.setPosition(5, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 5, Align.topRight);
+
+		debugLabel.setText(text);
+	}
+	
+	public void addDebugText(String text){
+		debugLabel.setText(debugLabel.getText().append(text));
+		debugLabel.setPosition(10, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 10, Align.topRight);
 	}
 
 	public void resize (int width, int height) {
@@ -43,6 +68,7 @@ public class RendererGUI {
 		Gdx.gl.glDisable(GL20.GL_CULL_FACE);
 		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 		stage.draw();
+		debugLabel.setText("");
 	}
 
 	public void toggleMenu() {

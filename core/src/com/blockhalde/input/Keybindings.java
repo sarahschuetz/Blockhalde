@@ -10,16 +10,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 
 /**
- * A glorified {@link Map} that reads keybindings from a .properties file 
- * and offers them via a get-method.
+ * A glorified {@link Map} that reads keybindings from a .properties file and offers them via a get-method.
  * @author shaendro
  */
 public class Keybindings {
 	private Map<String, Integer> keyMap = new HashMap<>();
 
 	/**
-	 * Creates a {@link Keybindings} object that automatically reads 
-	 * keybindings from the specified file.
+	 * Creates a {@link Keybindings} object that automatically reads keybindings from the specified file.
 	 * @param file Internal path to the file
 	 */
 	public Keybindings(String file) {
@@ -42,8 +40,7 @@ public class Keybindings {
 
 	/**
 	 * @param command The name of the keybinding
-	 * @return The keycode for the specified command
-	 * or -1 if the command is not recognized.
+	 * @return The keycode for the specified command or -1 if the command is not recognized.
 	 */
 	public int getKey(String command) {
 		Integer value = keyMap.get(command);

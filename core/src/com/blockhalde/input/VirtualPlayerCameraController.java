@@ -1,98 +1,59 @@
 package com.blockhalde.input;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
+import com.blockhalde.player.CameraComponent;
+import com.blockhalde.player.PlayerDataComponent;
+import com.util.PauseListener;
 
 /**
  * An implementation of the {@link VirtualController} interface that controls the player camera.
  * @author shaendro
  */
-public class VirtualPlayerCameraController implements VirtualController {
-	private static final float ROTATION_SPEED = 180f;
+public class VirtualPlayerCameraController extends VirtualAbstractController {
+	private static final float ROTATION_SPEED = 0.5f;
 	private static final float MAX_ROTATION = 90f;
-
-	private InputSystem inputSystem;
-	private boolean active = true;
-	private Camera camera;
-	private Vector3 startDirection = new Vector3(0, 0, -1);
-	private Vector3 startUp = new Vector3(0, 1, 0);
-
-	private int width = Gdx.graphics.getWidth();
-	private int height = Gdx.graphics.getHeight();
-	private int centerX = width/2;
-	private int centerY = height/2;
 
 	private float rotationX = 0;
 	private float rotationY = 0;
 
 	/**
-	 * Creates a {@link VirtualPlayerCameraController} and attaches the given camera to it.
-	 * @param camera A {@link Camera} for the {@link VirtualPlayerCameraController} to move around
+	 * Creates a {@link VirtualPlayerCameraController}.
+	 * @param inputSystem The {@link InputSystem} the controller belongs to
 	 */
-	public VirtualPlayerCameraController(InputSystem inputSystem, Camera camera) {
-		this.inputSystem = inputSystem;
-		this.camera = camera;
+	public VirtualPlayerCameraController(InputSystem inputSystem) {
+		super(inputSystem);
 		PauseListener.init();
 	}
 
 	@Override
-	public void keyDown(int keycode) {
-	}
-
-	@Override
-	public void keyUp(int keycode) {
-	}
-
-	@Override
-	public void touchDown(int screenX, int screenY, int button) {
-	}
-
-	@Override
-	public void touchUp(int screenX, int screenY, int button) {
+	public void touchDragged(int screenX, int screenY) {
+		mouseMoved(screenX, screenY);
 	}
 
 	@Override
 	public void mouseMoved(int screenX, int screenY) {
-		System.out.println(Gdx.input.getDeltaX() + "/" + Gdx.input.getDeltaY());
 		if (!PauseListener.isPaused() && active) {
-			rotationX += (float)(Gdx.input.getDeltaX()) / width * ROTATION_SPEED;
-			rotationY += (float)(Gdx.input.getDeltaY()) / height * ROTATION_SPEED;
+			ImmutableArray<Entity> query = inputSystem.getEngine().getEntitiesFor(Family.all(PlayerDataComponent.class, CameraComponent.class).get());
+			if (query.size() != 0) {
+				Entity player = query.first();
+				rotationX += -Gdx.input.getDeltaX() * ROTATION_SPEED;
+				rotationY += -Gdx.input.getDeltaY() * ROTATION_SPEED;
 
-			rotationX = rotationX % 360;
-			if (rotationY > MAX_ROTATION) rotationY = MAX_ROTATION;
-			else if (rotationY < -MAX_ROTATION) rotationY = -MAX_ROTATION;
+				rotationX = rotationX % 360;
+				if (rotationY > MAX_ROTATION) rotationY = MAX_ROTATION;
+				else if (rotationY < -MAX_ROTATION) rotationY = -MAX_ROTATION;
 
-			camera.direction.set(startDirection);
-			camera.up.set(startUp);
-			camera.rotate(Vector3.Y, rotationX);
-			camera.rotate(camera.direction.cpy().crs(camera.up), rotationY);
-
-			camera.update();
-			//Gdx.input.setCursorPosition(centerX, centerY);
+				player.getComponent(CameraComponent.class).resetCamera();
+				Camera camera = player.getComponent(CameraComponent.class).getCamera();
+				camera.rotate(Vector3.Y, rotationX);
+				camera.rotate(camera.direction.cpy().crs(camera.up), rotationY);
+				camera.update();
+			}
 		}
-	}
-
-	@Override
-	public void scrolled(int amount) {
-	}
-
-	@Override
-	public void update(float deltaTime) {
-		if (!PauseListener.isPaused() && active) {
-		}
-	}
-
-	@Override
-	public void resize(int width, int height) {
-		this.width = width;
-		this.height = height;
-		this.centerX = width/2;
-		this.centerY = height/2;
-	}
-
-	@Override
-	public void setActive(boolean active) {
-		this.active = active;
 	}
 }

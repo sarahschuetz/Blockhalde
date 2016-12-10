@@ -44,7 +44,7 @@ public class PhysicalInputProcessor implements InputProcessor {
 		for (VirtualController virtualController : controllers) {
 			virtualController.keyDown(keycode);
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -52,12 +52,12 @@ public class PhysicalInputProcessor implements InputProcessor {
 		for (VirtualController virtualController : controllers) {
 			virtualController.keyUp(keycode);
 		}
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean keyTyped(char character) {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class PhysicalInputProcessor implements InputProcessor {
 		for (VirtualController virtualController : controllers) {
 			virtualController.touchDown(screenX, screenY, button);
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -73,12 +73,15 @@ public class PhysicalInputProcessor implements InputProcessor {
 		for (VirtualController virtualController : controllers) {
 			virtualController.touchUp(screenX, screenY, button);
 		}
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		return true;
+		for (VirtualController virtualController : controllers) {
+			virtualController.touchDragged(screenX, screenY);
+		}
+		return false;
 	}
 
 	@Override
@@ -86,7 +89,7 @@ public class PhysicalInputProcessor implements InputProcessor {
 		for (VirtualController virtualController : controllers) {
 			virtualController.mouseMoved(screenX, screenY);
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -94,6 +97,6 @@ public class PhysicalInputProcessor implements InputProcessor {
 		for (VirtualController virtualController : controllers) {
 			virtualController.scrolled(amount);
 		}
-		return true;
+		return false;
 	}
 }

@@ -5,16 +5,18 @@ package com.terrain.block;
  * data range.
  */
 public enum BlockType {
-	AIR(-1.0f, null, null, null),
-	WATER(-1.0f, null, null, null),
-	DIRT(0.1f, "dirt", "dirt", "dirt"),
-	STONE(0.5f, "stone", "stone", "stone"),
-	GRASS(0.1f, "grass_top", "grass_side", "dirt"),
-	TNT(0.05f, "tnt_top", "tnt_side", "tnt_bottom");
+	AIR((byte) 0, -1.0f, null, null, null),
+	WATER((byte) 1, -1.0f, null, null, null),
+	DIRT((byte) 2, 0.1f, "dirt", "dirt", "dirt"),
+	STONE((byte) 3, 0.5f, "stone", "stone", "stone"),
+	GRASS((byte) 4, 0.1f, "grass_top", "grass_side", "dirt"),
+	TNT((byte) 5, 0.05f, "tnt_top", "tnt_side", "tnt_bottom");
 	
-	public static BlockType fromBlockId(int id) {
+	public static BlockType fromBlockId(short id) {
 		return BlockType.values()[id];
 	}
+	
+	private byte blockId;
 	
 	private String topTextureName;
 	private String sideTextureName;
@@ -27,11 +29,13 @@ public enum BlockType {
 	 */
 	private float sturdiness;
 	
-	BlockType(float sturdiness, String topTex, String sideTex, String bottomTex) {
+	BlockType(byte blockId, float sturdiness, String topTex, String sideTex, String bottomTex) {
+		
 		this.sturdiness = sturdiness;
 		this.topTextureName = topTex;
 		this.bottomTextureName = bottomTex;
 		this.sideTextureName = sideTex;
+		this.blockId = blockId;
 	}
 	
 	public String getTopTextureName() {
@@ -47,7 +51,7 @@ public enum BlockType {
 	}
 
 	public byte getBlockId() {
-		return (byte) ordinal();
+		return blockId;
 	}
 	
 	public float getSturdiness() {
