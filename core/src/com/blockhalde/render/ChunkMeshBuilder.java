@@ -90,7 +90,7 @@ public class ChunkMeshBuilder {
                         int topRightBack = getVertexAO(chunk.getBlockAt(x+1, y, z-1), chunk.getBlockAt(x, y+1, z-1),chunk.getBlockAt(x+1, y+1, z-1));
 
                         if ((z + 1) == chunk.getDepth()
-                                || chunk.getBlockAt(x, y, z + 1) == BlockType.AIR.getBlockId()) {
+                                || world.getBlock(x, y, z + 1) == BlockType.AIR.getBlockId()) {
                             // Front plane
                             bottomLeft.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
                             bottomRight.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
@@ -100,7 +100,7 @@ public class ChunkMeshBuilder {
                             addCubePlane(builder, center, bottomLeft, bottomLeftFront, bottomRight, bottomRightFront, topRight, topRightFront, topLeft, topLeftFront, normal, uvBottomLeft, uvTopRight);
                         }
 
-                        if (z == 0 || chunk.getBlockAt(x, y, z - 1) == BlockType.AIR.getBlockId()) {
+                        if (z == 0 || world.getBlock(x, y, z - 1) == BlockType.AIR.getBlockId()) {
                             // Back plane
                             bottomLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
                             bottomRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
@@ -111,7 +111,7 @@ public class ChunkMeshBuilder {
                         }
 
                         if ((x + 1) == chunk.getWidth()
-                                || chunk.getBlockAt(x + 1, y, z) == BlockType.AIR.getBlockId()) {
+                                || world.getBlock(x + 1, y, z) == BlockType.AIR.getBlockId()) {
                             // Right plane
                             bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
                             bottomRight.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
@@ -121,7 +121,7 @@ public class ChunkMeshBuilder {
                             addCubePlane(builder, center, bottomLeft, bottomRightFront, bottomRight, bottomRightBack, topRight, topRightBack, topLeft, topRightFront, normal, uvBottomLeft, uvTopRight);
                         }
 
-                        if (x == 0 || chunk.getBlockAt(x - 1, y, z) == BlockType.AIR.getBlockId()) {
+                        if (x == 0 || world.getBlock(x - 1, y, z) == BlockType.AIR.getBlockId()) {
                             // Left plane
                             bottomLeft.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
                             bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
@@ -132,7 +132,7 @@ public class ChunkMeshBuilder {
                         }
 
                         if ((y + 1) == chunk.getHeight()
-                                || chunk.getBlockAt(x, y + 1, z) == BlockType.AIR.getBlockId()) {
+                                || world.getBlock(x, y + 1, z) == BlockType.AIR.getBlockId()) {
 
                             region = atlas.findRegion(blockType.getTopTextureName());
                             uvBottomLeft.set(region.getU(), region.getV());
@@ -147,7 +147,7 @@ public class ChunkMeshBuilder {
                             addCubePlane(builder, center, bottomLeft, topLeftFront, bottomRight, topRightFront, topRight, topRightBack, topLeft, topLeftBack, normal, uvBottomLeft, uvTopRight);
                         }
 
-                        if (y == 0 || chunk.getBlockAt(x, y - 1, z) == BlockType.AIR.getBlockId()) {
+                        if (y == 0 || world.getBlock(x, y - 1, z) == BlockType.AIR.getBlockId()) {
 
                             region = atlas.findRegion(blockType.getBottomTextureName());
                             uvBottomLeft.set(region.getU(), region.getV());
