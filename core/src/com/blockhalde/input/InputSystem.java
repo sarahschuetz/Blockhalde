@@ -62,4 +62,8 @@ public class InputSystem extends EntitySystem {
 	public List<VirtualController> getControllers() {
 		return inputProcessor.getControllers();
 	}
+
+	public VirtualController getCameraController() {
+		return cameraController;
+	}
 }
