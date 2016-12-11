@@ -35,7 +35,7 @@ public class ChunkMeshCache {
 	public ChunkMeshCache(WorldManagementSystem worldManagementSystem, Camera cam) {
 		this.cam = cam;
 		this.worldManagementSystem = worldManagementSystem;
-		builder = new ChunkMeshBuilder();
+		builder = new ChunkMeshBuilder(worldManagementSystem);
 		allocateCache();
 		
 		if(worldManagementSystem.getVisibleChunks().size() > MAX_CACHED_SUBCHUNKS) {
@@ -94,7 +94,7 @@ public class ChunkMeshCache {
 	}
 	
 	private void update(CachedSubchunk cached, Chunk chunk) {
-		builder.updateMesh(chunk, cached.mesh, cached.subchunkIdx);
+		builder.updateMesh(cached.mesh, chunk.getChunkPosition(), cached.subchunkIdx);
 		cached.lastMeshUpdate = System.nanoTime();
 	}
 	

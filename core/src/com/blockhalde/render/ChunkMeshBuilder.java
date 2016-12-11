@@ -13,6 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
+import com.terrain.chunk.ChunkPosition;
+import com.terrain.world.WorldInterface;
 
 public class ChunkMeshBuilder {
 
@@ -22,12 +24,14 @@ public class ChunkMeshBuilder {
     private VertexInfo rightTop = new VertexInfo();
 
     private TextureAtlas atlas;
+	private WorldInterface world;
 
-    public ChunkMeshBuilder() {
+    public ChunkMeshBuilder(WorldInterface world) {
+    	this.world = world;
         atlas = new TextureAtlas(Gdx.files.internal("textures/blocks.atlas"));
     }
 
-    public void updateMesh(Chunk chunk, Mesh mesh, int subchunkIdx) {
+    public void updateMesh(Mesh mesh, ChunkPosition pos, int subchunkIdx) {
         Vector3 center = new Vector3();
         Vector3 bottomLeft = new Vector3();
         Vector3 bottomRight = new Vector3();
@@ -40,6 +44,8 @@ public class ChunkMeshBuilder {
         float blockSize = 1.0f;
         float blockSizeHalved = blockSize * 0.5f;
 
+        Chunk chunk = world.getChunk(pos.getXPosition(), pos.getZPosition()); 
+        
         int chunkWidth = chunk.getWidth();
         int chunkDepth = chunk.getDepth();
 
