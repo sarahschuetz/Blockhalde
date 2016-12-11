@@ -41,8 +41,7 @@ public class ChunkMeshBuilder {
         Vector2 uvBottomLeft = new Vector2();
         Vector2 uvTopRight = new Vector2();
 
-        float blockSize = 1.0f;
-        float blockSizeHalved = blockSize * 0.5f;
+        float blockSizeHalved = 0.5f;
 
         int xPos = pos.getXPosition();
         int zPos = pos.getZPosition();
@@ -57,22 +56,24 @@ public class ChunkMeshBuilder {
         float firstY = blockSizeHalved;
         float firstZ = blockSizeHalved + zPos * chunkDepth;
 
+//        System.out.println(pos.getXPosition() + "/" + pos.getZPosition());
+        
         MeshBuilder builder = new MeshBuilder();
         //get attributes from mesh - otherwise only leads to compatibilty problems when new attributes are introduced
         builder.begin(mesh.getVertexAttributes(), GL20.GL_TRIANGLES);
 
-        for (int x = xPos * chunkWidth; x < xPos * chunkWidth + chunkWidth; ++x) {
+        for (int x = xPos; x < xPos + chunkWidth; ++x) {
             for (int y = subchunkIdx * 16; y < (subchunkIdx + 1) * 16; ++y) {
-                for (int z = zPos * chunkDepth; z < zPos * chunkDepth + chunkDepth; ++z) {
+                for (int z = zPos; z < zPos + chunkDepth; ++z) {
 
                     short blockTypeIdx = world.getBlockType(x, y, z);
 
                     if (blockTypeIdx != BlockType.AIR.getBlockId()) {
                         BlockType blockType = BlockType.fromBlockId(blockTypeIdx);
 
-                        center.set(x * blockSize + blockSizeHalved,
-                        		   y * blockSize + blockSizeHalved,
-                        		   z * blockSize + blockSizeHalved);
+                        center.set(x + blockSizeHalved,
+                        		   y + blockSizeHalved,
+                        		   z + blockSizeHalved);
 
                         AtlasRegion region = atlas.findRegion(blockType.getSideTextureName());
 
