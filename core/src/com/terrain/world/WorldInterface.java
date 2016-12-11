@@ -12,9 +12,14 @@ public interface WorldInterface {
 	Chunk getChunk(int xPosition, int zPosition);
 
 	/**
-	 * Gets the blocktype at the specified world position
+	 * Gets the block at the specified world position
 	 */
 	short getBlock(int x, int y, int z);
+
+	/**
+	 * Gets the blocktype at the specified world position
+	 */
+	byte getBlockType(int x, int y, int z);
 	
 	 /**
      * Sets a blocktype at the specified world position.

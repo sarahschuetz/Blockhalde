@@ -115,6 +115,15 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     }
 
     @Override
+    public byte getBlockType(int x, int y, int z) {
+        Chunk chunk = getChunk(x, z);
+        if (chunk != null) {
+            return chunk.getBlockTypeAt(x % Chunk.X_MAX, y % Chunk.Y_MAX, z % Chunk.Z_MAX);
+        }
+        return BlockType.AIR.getBlockId();
+    }
+
+    @Override
     public List<Chunk> getVisibleChunks() {
         return visibleChunks;
     }
