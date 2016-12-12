@@ -30,6 +30,10 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
     // TODO: Add player position and generate chunks based on it.
     private Camera camera;
+    
+    // TODO: Change so that Seed is not fix implemented here
+    private TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
+//       private TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
 
     // for testing purposes
     private Chunk currentPlayerChunk;
@@ -43,8 +47,6 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
         Chunk chunk = new TerrainChunk(chunkPosition);
 
         // TODO: Make the terrain generator somehow changeable
-        TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
-//        TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
         terrainGenerator.generate(chunk);
 
         worldChunks.put(chunkPosition, chunk);
@@ -95,10 +97,14 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     public void setDrawDistance(int drawDistance) {
         this.drawDistance = drawDistance;
     }
+    
+    public TerrainGenerator getTerrainGenerator() {
+    	return terrainGenerator;
+    }
 
     //-------- WorldInterface Implementation
 
-    @Override
+	@Override
     public Chunk getChunk(int xPosition, int zPosition) {
         ChunkPosition chunkPosition = new ChunkPosition(xPosition/Chunk.X_MAX* Chunk.X_MAX, zPosition/Chunk.Z_MAX*Chunk.Z_MAX);
         if (worldChunks.containsKey(chunkPosition)) {
