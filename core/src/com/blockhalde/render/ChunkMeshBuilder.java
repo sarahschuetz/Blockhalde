@@ -83,12 +83,14 @@ public class ChunkMeshBuilder {
 	}
 
 	private Chunk fetchChunk(ChunkPosition pos, int offsetX, int offsetZ, UniformChunk fallbackChunk) {
-		int posX = pos.getXPosition() + offsetX;
-		int posZ = pos.getZPosition() + offsetZ;
+		int posX = pos.getXPosition() + offsetX * Chunk.X_MAX;
+		int posZ = pos.getZPosition() + offsetZ * Chunk.Z_MAX;
 
+		System.out.println(posX + "/" + posZ);
 		Chunk chunk = world.getChunk(posX, posZ);
 
 		if (chunk == null) {
+			System.out.println("Returnign fallback chunk");
 			fallbackChunk.setChunkPosition(posX, posZ);
 			chunk = fallbackChunk;
 		}
@@ -108,7 +110,7 @@ public class ChunkMeshBuilder {
 		} else if (relativeZ < 0) {
 			return negZChunk.getBlockTypeAt(relativeX, relativeY, Chunk.Z_MAX + relativeZ);
 		} else if (relativeZ >= Chunk.Z_MAX) {
-			return negZChunk.getBlockTypeAt(relativeX, relativeY, relativeZ - Chunk.Z_MAX);
+			return posZChunk.getBlockTypeAt(relativeX, relativeY, relativeZ - Chunk.Z_MAX);
 		} else {
 			return centerChunk.getBlockTypeAt(relativeX, relativeY, relativeZ);
 		}
@@ -126,23 +128,15 @@ public class ChunkMeshBuilder {
 
 		float blockSizeHalved = 0.5f;
 
-		int xPos = pos.getXPosition();
-		int zPos = pos.getZPosition();
-
-		Chunk chunk = world.getChunk(xPos, zPos);
-
-		int chunkWidth = chunk.getWidth();
-		int chunkDepth = chunk.getDepth();
-
 		centerChunk = fetchChunk(pos);
 
 		if (centerChunk == null) {
 			throw new RuntimeException("Expected specified position to be already loaded in ChunkMeshBuilder update");
 		} else {
 			posZChunk = fetchChunk(pos, 0, 1, posZNullChunk);
-			negZChunk = fetchChunk(pos, 0, -1, posZNullChunk);
-			posXChunk = fetchChunk(pos, 1, 0, posZNullChunk);
-			negXChunk = fetchChunk(pos, -1, 0, posZNullChunk);
+			negZChunk = fetchChunk(pos, 0, -1, negZNullChunk);
+			posXChunk = fetchChunk(pos, 1, 0, posXNullChunk);
+			negXChunk = fetchChunk(pos, -1, 0, negXNullChunk);
 		}
 
 		MeshBuilder builder = new MeshBuilder();
@@ -160,10 +154,7 @@ public class ChunkMeshBuilder {
 						BlockType blockType = BlockType.fromBlockId(blockId);
 
 						center.set(x + blockSizeHalved + pos.getXPosition(), y + blockSizeHalved,
-								z + +pos.getZPosition() + blockSizeHalved);
-
-						// builder.ellipse(0.3f, 0.3f, 0.3f, 0.3f, 3, center.x,
-						// center.y, center.z, 0, 0, 1);
+								z + pos.getZPosition() + blockSizeHalved);
 
 						AtlasRegion region = atlas.findRegion(blockType.getSideTextureName());
 
