@@ -47,7 +47,7 @@ public class MessageDispatcher implements Telegraph {
 
 	private boolean debugEnabled;
 
-	private Logger logger = new Logger("MessageDispatcher", Application.LOG_INFO);
+	private Logger logger = new Logger("MessageDispatcher", Logger.INFO);
 
 	/** Creates a {@code MessageDispatcher} */
 	public MessageDispatcher () {
@@ -479,10 +479,9 @@ public class MessageDispatcher implements Telegraph {
 
 		// If there is no delay, route telegram immediately
 		if (delay <= 0.0f) {
-
 			// TODO: should we set the timestamp here?
-			// telegram.setTimestamp(GdxAI.getTimepiece().getTime());
-
+			//telegram.setTimestamp(GdxAI.getTimepiece().getTime());
+			
 			if (debugEnabled) {
 				float currentTime = GdxAI.getTimepiece().getTime();
 				logger.info(
