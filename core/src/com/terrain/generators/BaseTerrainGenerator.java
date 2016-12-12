@@ -19,6 +19,7 @@ public abstract class BaseTerrainGenerator implements TerrainGenerator {
 		this(seed.hashCode());
 	}
 
+	@Override
 	public PerlinNoise3D getPerlinNoise() {
 		return perlinNoise;
 	}
