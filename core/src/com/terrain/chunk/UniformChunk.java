@@ -23,7 +23,7 @@ public class UniformChunk extends AbstractChunk {
 	}
 
 	private short makeBlock(byte uniformBlockId) {
-		return FlagUtils.makeShortFrom((byte) 0, uniformBlockId);
+		return uniformBlockId;
 	}
 
 	public void setUniformBlockType(BlockType type) {
