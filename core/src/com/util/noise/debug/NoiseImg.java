@@ -27,8 +27,8 @@ public class NoiseImg  extends Actor {
 	
 	private void generateNoiseTextures() {
 		
-		int octaves = 1;
-		double persistence = 1;
+		int octaves = 5;
+		double persistence = 3;
 		
 		Pixmap pixmapScreen = new Pixmap(1260, 700, Format.RGBA8888);	
 		

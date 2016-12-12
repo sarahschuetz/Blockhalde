@@ -76,10 +76,10 @@ public class PerlinNoise3D {
 	 * @return double between 0.0 and 1.0
 	 */
 	public double calcPerlinAt(double x, double y, double z, int octaves, double persistence) {
-		double total = 0;
-	    double frequency = 1;
-	    double amplitude = 1;
-	    double maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
+		double total = 0.0;
+	    double frequency = 1.0;
+	    double amplitude = 1.0;
+	    double maxValue = 0.0;  // Used for normalizing result to 0.0 - 1.0
 	    
 	    for(int i = 0; i < octaves; i++) {
 	        total += calcPerlinAt(x * frequency, y * frequency, z * frequency) * amplitude;
