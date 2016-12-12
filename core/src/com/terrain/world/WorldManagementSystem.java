@@ -4,7 +4,10 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.msg.MessageManager;
 import com.blockhalde.render.CameraSystem;
+import com.messaging.MessageIdConstants;
+import com.messaging.message.ChunkMessage;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
@@ -38,23 +41,26 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
      * Creates a new blank chunk at the specified position in the world
      */
     protected void createChunk(int xPosition, int zPosition) {
-        ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
-        Chunk chunk = new TerrainChunk(chunkPosition);
+        final ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
+        final Chunk chunk = new TerrainChunk(chunkPosition);
 
         // TODO: Make the terrain generator somehow changeable
         TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator();
         terrainGenerator.generate(chunk, "Herst Bertl");
 
         worldChunks.put(chunkPosition, chunk);
+        
+        MessageManager.getInstance().dispatchMessage(0f, null, null, MessageIdConstants.CHUNK_CREATED_MSG_ID, new ChunkMessage(chunkPosition));
     }
 
     /**
      * Removes the chunk that is located at the specified position in the world
      */
     protected void destroyChunk(int xPosition, int zPosition) {
-        ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
+        final ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
         if (worldChunks.containsKey(chunkPosition)) {
             worldChunks.remove(chunkPosition);
+            MessageManager.getInstance().dispatchMessage(0, null, null, MessageIdConstants.CHUNK_DELETED_MSG_ID, new ChunkMessage(chunkPosition));
         }
     }
 
