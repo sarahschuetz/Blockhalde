@@ -129,9 +129,12 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 		if (!flying){
 			int xMoved = (int) oldPosition.x - (int) position.x;
 			int zMoved = (int) oldPosition.z - (int) position.z;
-			boolean blocked = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) position.x, (int) position.y, (int) position.z)).getBlockId() != BlockType.AIR.getBlockId();
-			boolean blockedX = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x - xMoved, (int) position.y, (int) oldPosition.z)).getBlockId() != BlockType.AIR.getBlockId();
-			boolean blockedZ = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x, (int) position.y, (int) oldPosition.z - zMoved)).getBlockId() != BlockType.AIR.getBlockId();
+			boolean blocked = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) position.x, (int) position.y, (int) position.z)).getBlockId() != BlockType.AIR.getBlockId() 
+					|| BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) position.x, (int) position.y + 1, (int) position.z)).getBlockId() != BlockType.AIR.getBlockId();
+			boolean blockedX = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x - xMoved, (int) position.y, (int) oldPosition.z)).getBlockId() != BlockType.AIR.getBlockId()
+					|| BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x - xMoved, (int) position.y + 1, (int) oldPosition.z)).getBlockId() != BlockType.AIR.getBlockId();
+			boolean blockedZ = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x, (int) position.y, (int) oldPosition.z - zMoved)).getBlockId() != BlockType.AIR.getBlockId()
+					|| BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x, (int) position.y + 1, (int) oldPosition.z - zMoved)).getBlockId() != BlockType.AIR.getBlockId();
 
 			if (movementDown == 0.0) position.y = (int) position.y + COLLISION_DISTANCE;
 
