@@ -7,5 +7,4 @@ public class Noise3D {
     protected double offsetY;
     protected double offsetZ;
     
-    
 }
