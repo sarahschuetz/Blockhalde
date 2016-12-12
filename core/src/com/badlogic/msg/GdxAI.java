@@ -16,8 +16,6 @@
 
 package com.badlogic.msg;
 
-import com.badlogic.gdx.Gdx;
-
 /** Environment class holding references to the {@link Timepiece} instance. The references
  * are held in static fields which allows static access to all sub systems.
  * <p>

@@ -4,11 +4,15 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.msg.MessageManager;
 import com.blockhalde.render.CameraSystem;
+import com.messaging.MessageIdConstants;
+import com.messaging.message.ChunkMessage;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
 import com.terrain.chunk.TerrainChunk;
+import com.terrain.generators.PurePerlinTerrainGenerator;
 import com.terrain.generators.SimplePerlinTerrainGenerator;
 import com.terrain.generators.TerrainGenerator;
 
@@ -29,6 +33,10 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
     // TODO: Add player position and generate chunks based on it.
     private Camera camera;
+    
+    // TODO: Change so that Seed is not fix implemented here
+    private TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
+//       private TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
 
     // for testing purposes
     private Chunk currentPlayerChunk;
@@ -38,23 +46,25 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
      * Creates a new blank chunk at the specified position in the world
      */
     protected void createChunk(int xPosition, int zPosition) {
-        ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
-        Chunk chunk = new TerrainChunk(chunkPosition);
+        final ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
+        final Chunk chunk = new TerrainChunk(chunkPosition);
 
         // TODO: Make the terrain generator somehow changeable
-        TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator();
-        terrainGenerator.generate(chunk, "Herst Bertl");
+        terrainGenerator.generate(chunk);
 
         worldChunks.put(chunkPosition, chunk);
+        
+        MessageManager.getInstance().dispatchMessage(0f, null, null, MessageIdConstants.CHUNK_CREATED_MSG_ID, new ChunkMessage(chunkPosition));
     }
 
     /**
      * Removes the chunk that is located at the specified position in the world
      */
     protected void destroyChunk(int xPosition, int zPosition) {
-        ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
+        final ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
         if (worldChunks.containsKey(chunkPosition)) {
             worldChunks.remove(chunkPosition);
+            MessageManager.getInstance().dispatchMessage(0, null, null, MessageIdConstants.CHUNK_DELETED_MSG_ID, new ChunkMessage(chunkPosition));
         }
     }
 
@@ -93,10 +103,14 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     public void setDrawDistance(int drawDistance) {
         this.drawDistance = drawDistance;
     }
+    
+    public TerrainGenerator getTerrainGenerator() {
+    	return terrainGenerator;
+    }
 
     //-------- WorldInterface Implementation
 
-    @Override
+	@Override
     public Chunk getChunk(int xPosition, int zPosition) {
         ChunkPosition chunkPosition = new ChunkPosition(xPosition/Chunk.X_MAX* Chunk.X_MAX, zPosition/Chunk.Z_MAX*Chunk.Z_MAX);
         if (worldChunks.containsKey(chunkPosition)) {

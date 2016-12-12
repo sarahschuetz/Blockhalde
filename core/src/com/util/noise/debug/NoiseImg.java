@@ -9,26 +9,27 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.terrain.chunk.Chunk;
 import com.util.noise.PerlinNoise3D;
 
-public class NoiseImg  extends Actor {
+public class NoiseImg extends Actor {
 	
 	private double width = Gdx.graphics.getWidth();
 	private double height = Gdx.graphics.getHeight();
 	private int y = 0;
 	
-	private final PerlinNoise3D perlin = new PerlinNoise3D(new String("Herst Bertl").hashCode());
+	private PerlinNoise3D perlin;
 	
 	private Texture textureScreen;
 	private Texture textureChunk;
 	
-	public NoiseImg() {
+	public NoiseImg(PerlinNoise3D noise) {
 		setVisible(false);
+		perlin = noise;
 		generateNoiseTextures();
 	}
 	
 	private void generateNoiseTextures() {
 		
-		int octaves = 1;
-		double persistence = 1;
+		int octaves = 5;
+		double persistence = 3;
 		
 		Pixmap pixmapScreen = new Pixmap(1260, 700, Format.RGBA8888);	
 		
