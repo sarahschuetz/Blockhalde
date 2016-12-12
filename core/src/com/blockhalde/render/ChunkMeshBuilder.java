@@ -86,11 +86,9 @@ public class ChunkMeshBuilder {
 		int posX = pos.getXPosition() + offsetX * Chunk.X_MAX;
 		int posZ = pos.getZPosition() + offsetZ * Chunk.Z_MAX;
 
-		System.out.println(posX + "/" + posZ);
 		Chunk chunk = world.getChunk(posX, posZ);
 
 		if (chunk == null) {
-			System.out.println("Returnign fallback chunk");
 			fallbackChunk.setChunkPosition(posX, posZ);
 			chunk = fallbackChunk;
 		}

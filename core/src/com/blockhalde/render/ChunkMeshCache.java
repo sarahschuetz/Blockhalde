@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
+import com.terrain.world.WorldInterface;
 import com.terrain.world.WorldManagementSystem;
 
 public class ChunkMeshCache {
@@ -31,6 +32,8 @@ public class ChunkMeshCache {
 	private final SubchunkDistanceComparator comp = new SubchunkDistanceComparator();
 
 	private Camera cam;
+	
+	private long lastUpdateStartTime;
 	
 	public ChunkMeshCache(WorldManagementSystem worldManagementSystem, Camera cam) {
 		this.cam = cam;
@@ -88,27 +91,44 @@ public class ChunkMeshCache {
 					cacheEntry.chunkPos = visibleChunk.getChunkPosition();
 					cacheEntry.subchunkIdx = y;
 					update(cacheEntry, visibleChunk);
+					updateNeighbors(cacheEntry.chunkPos);
 				}
 			}
 		}
 	}
 	
+	private void updateNeighbors(ChunkPosition chunkPos) {
+		for(int x = chunkPos.getXPosition() - 16; x < chunkPos.getXPosition() + 17; x += 32) {
+			for(int z = chunkPos.getZPosition() - 16; z < chunkPos.getZPosition() + 17; z += 32) {
+				for(int subchunkIdx = 0; subchunkIdx < 16; ++subchunkIdx) {
+					CachedSubchunk cached = findCachedSubchunk(x, subchunkIdx, z);
+					if(cached != null && cached.lastMeshUpdate < lastUpdateStartTime) {
+						update(cached, worldManagementSystem.getChunk(x, z));
+					}
+				}
+			}
+		}
+	}
+
 	private void update(CachedSubchunk cached, Chunk chunk) {
 		builder.updateMesh(cached.mesh, chunk.getChunkPosition(), cached.subchunkIdx);
 		cached.lastMeshUpdate = System.nanoTime();
 	}
 	
-	private CachedSubchunk findCachedSubchunk(ChunkPosition chunkPos, int subchunkIdx) {
+	private CachedSubchunk findCachedSubchunk(int x, int subchunkIdx, int z) {
 		for(CachedSubchunk subchunk: cachedSubs) {
 			if(!subchunk.isUnused() && subchunk.subchunkIdx == subchunkIdx &&
-			   subchunk.chunkPos.getXPosition() == chunkPos.getXPosition() &&
-			   subchunk.chunkPos.getZPosition() == chunkPos.getZPosition()) {
-				
+			   subchunk.chunkPos.getXPosition() == x &&
+			   subchunk.chunkPos.getZPosition() == z) {
 				return subchunk;
 			}
 		}
 		
 		return null;
+	}
+	
+	private CachedSubchunk findCachedSubchunk(ChunkPosition chunkPos, int subchunkIdx) {
+		return findCachedSubchunk(chunkPos.getXPosition(), subchunkIdx, chunkPos.getZPosition());
 	}
 	
 	/**
@@ -132,6 +152,8 @@ public class ChunkMeshCache {
 	}
 	
 	public void update() {
+		lastUpdateStartTime = System.nanoTime();
+		
 		//long start = System.currentTimeMillis();
 		sortCache();
 		//long afterSort = System.currentTimeMillis();
