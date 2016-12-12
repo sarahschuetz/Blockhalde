@@ -4,21 +4,28 @@ import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.util.noise.PerlinNoise3D;
 
-public class PurePerlinTerrainGenerator implements TerrainGenerator {
+public class PurePerlinTerrainGenerator extends BaseTerrainGenerator {
 	
 //	private int minimumDirtHeight = 120;
 //    private int minimumGrassHeight = 160;
 //    private int minimumTNTHeight = 206;
     private int minimumAirHeight = 60;
 
-	@Override
-	public void generate(Chunk chunk, String seed) {
-		generate(chunk, seed.hashCode());
+	public PurePerlinTerrainGenerator() {
+		super();
+	}
+
+	public PurePerlinTerrainGenerator(int hash) {
+		super(hash);
+	}
+
+	public PurePerlinTerrainGenerator(String seed) {
+		super(seed);
 	}
 
 	@Override
-	public void generate(Chunk chunk, int hash) {
-		PerlinNoise3D perlinNoise = new PerlinNoise3D(hash);
+	public void generate(Chunk chunk) {
+		PerlinNoise3D perlinNoise = getPerlinNoise();
 		double smoothness = Math.random() * 10.0 + 120.0; // random between 20 & 30
 		
 		for(int x = 0; x < Chunk.X_MAX; x++ ) {
@@ -36,18 +43,6 @@ public class PurePerlinTerrainGenerator implements TerrainGenerator {
                 	} else {
                 		chunk.setBlockAt(x, y, z, BlockType.DIRT);
                 	}
-                	
-                	
-//                	double noise = perlinNoise.calcPerlinAt(
-//                    		(x + chunk.getChunkPosition().getXPosition()) / (double) Chunk.X_MAX,
-//                    		y / (double) Chunk.Y_MAX,
-//                    		(z + chunk.getChunkPosition().getZPosition()) / (double) Chunk.Z_MAX, 3, 7);
-                	
-//                	if(noise < 0.5) {
-//                		chunk.setBlockAt(x, y, z, BlockType.DIRT);
-//                	} else {
-//                		chunk.setBlockAt(x, y, z, BlockType.AIR);
-//                	}
                 }
             }
 		}

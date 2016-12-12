@@ -43,9 +43,9 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
         Chunk chunk = new TerrainChunk(chunkPosition);
 
         // TODO: Make the terrain generator somehow changeable
-        TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator();
-//        TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator();
-        terrainGenerator.generate(chunk, "Herst Bertl");
+        TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
+//        TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
+        terrainGenerator.generate(chunk);
 
         worldChunks.put(chunkPosition, chunk);
     }
