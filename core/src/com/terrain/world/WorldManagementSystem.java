@@ -12,6 +12,7 @@ import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
 import com.terrain.chunk.TerrainChunk;
+import com.terrain.generators.PurePerlinTerrainGenerator;
 import com.terrain.generators.SimplePerlinTerrainGenerator;
 import com.terrain.generators.TerrainGenerator;
 
@@ -45,8 +46,9 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
         final Chunk chunk = new TerrainChunk(chunkPosition);
 
         // TODO: Make the terrain generator somehow changeable
-        TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator();
-        terrainGenerator.generate(chunk, "Herst Bertl");
+        TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
+//        TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
+        terrainGenerator.generate(chunk);
 
         worldChunks.put(chunkPosition, chunk);
         

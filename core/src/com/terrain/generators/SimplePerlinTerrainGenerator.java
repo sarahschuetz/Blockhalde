@@ -5,21 +5,27 @@ import com.terrain.chunk.Chunk;
 import com.util.noise.PerlinNoise3D;
 
 
-public class SimplePerlinTerrainGenerator implements TerrainGenerator {
+public class SimplePerlinTerrainGenerator extends BaseTerrainGenerator {
     private int minimumDirtHeight = 120;
     private int minimumGrassHeight = 160;
     private int minimumTNTHeight = 206;
     private int minimumAirHeight = 200;
+    
+    public SimplePerlinTerrainGenerator() {
+		super();
+	}
 
+	public SimplePerlinTerrainGenerator(int hash) {
+		super(hash);
+	}
 
-    @Override
-    public void generate(Chunk chunk, String seed) {
-        generate(chunk, seed.hashCode());
-    }
+	public SimplePerlinTerrainGenerator(String seed) {
+		super(seed);
+	}
 
 	@Override
-	public void generate(Chunk chunk, int hash) {
-		PerlinNoise3D perlinNoise = new PerlinNoise3D(hash);
+	public void generate(Chunk chunk) {
+		PerlinNoise3D perlinNoise = getPerlinNoise();
 
         for(int x = 0; x < Chunk.X_MAX; x++ ) {
             for(int y = 0; y < Chunk.Y_MAX; y++) {
