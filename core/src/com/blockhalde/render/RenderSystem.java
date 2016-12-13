@@ -22,6 +22,8 @@ import com.badlogic.msg.Telegram;
 import com.badlogic.msg.Telegraph;
 import com.messaging.MessageIdConstants;
 import com.messaging.message.ChunkMessage;
+import com.terrain.chunk.Chunk;
+import com.terrain.chunk.ChunkPosition;
 import com.terrain.world.WorldManagementSystem;
 
 public class RenderSystem extends EntitySystem {
@@ -72,8 +74,34 @@ public class RenderSystem extends EntitySystem {
 	public void loadChunk(ChunkMessage chunkMessage) {
 		//System.out.println("Chunk created:    " + chunkMessage.getChunkPosition().getXPosition() + "/" + chunkMessage.getChunkPosition().getZPosition());
 		
+		long msgTime = chunkMessage.getTime();
+		int x = chunkMessage.getChunkPosition().getXPosition();
+		int z = chunkMessage.getChunkPosition().getZPosition();
+
+		System.out.println("Getting chunks");
+//		Chunk neighbour1 = worldManagementSystem.getChunk(x - 16, z);
+//		Chunk neighbour2 = worldManagementSystem.getChunk(x + 16, z);
+//		Chunk neighbour3 = worldManagementSystem.getChunk(x, z - 16);
+//		Chunk neighbour4 = worldManagementSystem.getChunk(x, z + 16);
+		
 		for(int subchunkIdx = 0; subchunkIdx < 16; ++subchunkIdx) {
 			worker.enqueue(new ChunkMeshRequest(chunkMessage.getChunkPosition(), subchunkIdx));
+			
+//			if(neighbour1 != null && neighbour1.getLastModifiedTime() < msgTime) {
+//				worker.enqueue(new ChunkMeshRequest(neighbour1.getChunkPosition(), subchunkIdx));
+//			}
+//			
+//			if(neighbour2 != null && neighbour2.getLastModifiedTime() < msgTime) {
+//				worker.enqueue(new ChunkMeshRequest(neighbour2.getChunkPosition(), subchunkIdx));
+//			}
+//			
+//			if(neighbour3 != null && neighbour3.getLastModifiedTime() < msgTime) {
+//				worker.enqueue(new ChunkMeshRequest(neighbour3.getChunkPosition(), subchunkIdx));
+//			}
+//			
+//			if(neighbour4 != null && neighbour4.getLastModifiedTime() < msgTime) {
+//				worker.enqueue(new ChunkMeshRequest(neighbour4.getChunkPosition(), subchunkIdx));
+//			}
 		}
 	}
 	
@@ -118,10 +146,31 @@ public class RenderSystem extends EntitySystem {
 		
 		shader.end();
 	}
+	
+	private CachedSubchunk findCachedSubchunk(int x, int subchunkIdx, int z) {
+		for(CachedSubchunk subchunk: cache) {
+			if(!subchunk.isUnused() && subchunk.subchunkIdx == subchunkIdx &&
+			   subchunk.chunkPos.getXPosition() == x &&
+			   subchunk.chunkPos.getZPosition() == z) {
+				return subchunk;
+			}
+		}
+		
+		return null;
+	}
+	
+	private CachedSubchunk findCachedSubchunk(ChunkPosition chunkPos, int subchunkIdx) {
+		return findCachedSubchunk(chunkPos.getXPosition(), subchunkIdx, chunkPos.getZPosition());
+	}
 
 	private void drainWorkerQueue() {
 		CachedSubchunk cached;
 		while((cached = workerQueue.poll()) != null) {
+			CachedSubchunk alreadyCached = findCachedSubchunk(cached.chunkPos, cached.subchunkIdx);
+			if(alreadyCached != null) {
+				cache.remove(alreadyCached);
+			}
+			
 			cache.add(cached);
 		}
 	}
