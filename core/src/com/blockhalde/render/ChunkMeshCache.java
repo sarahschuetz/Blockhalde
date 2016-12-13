@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -11,9 +12,17 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
+import com.terrain.world.WorldInterface;
 import com.terrain.world.WorldManagementSystem;
 
 public class ChunkMeshCache {
+
+	public static final VertexAttributes BLOCK_MESH_ATTRS = new VertexAttributes(
+		new VertexAttribute(Usage.Position, 3, "a_position"),
+		new VertexAttribute(Usage.Normal, 3, "a_normal"),
+		new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
+		new VertexAttribute(Usage.ColorPacked, 4, "a_color")
+	);
 
 	private WorldManagementSystem worldManagementSystem;
 	
@@ -21,17 +30,22 @@ public class ChunkMeshCache {
 	 * The cache may keep meshes for this many subchunks in VRAM before starting to
 	 * overwrite old chunks when a new one is loaded.
 	 */
-	private static final int MAX_CACHED_SUBCHUNKS = 9 * 16;
+	private static final int MAX_CACHED_SUBCHUNKS = 9 * 16 * 10;
 
 	private static final ChunkPosition FARAWAY_CHUNKPOS = new ChunkPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
 	private List<CachedSubchunk> cachedSubs = new ArrayList<CachedSubchunk>(24);
 	private ChunkMeshBuilder builder;
 	
 	private final SubchunkDistanceComparator comp = new SubchunkDistanceComparator();
+
+	private Camera cam;
 	
-	public ChunkMeshCache(WorldManagementSystem worldManagementSystem) {
+	private long lastUpdateStartTime;
+	
+	public ChunkMeshCache(WorldManagementSystem worldManagementSystem, Camera cam) {
+		this.cam = cam;
 		this.worldManagementSystem = worldManagementSystem;
-		builder = new ChunkMeshBuilder();
+//		builder = new ChunkMeshBuilder(worldManagementSystem);
 		allocateCache();
 		
 		if(worldManagementSystem.getVisibleChunks().size() > MAX_CACHED_SUBCHUNKS) {
@@ -46,15 +60,10 @@ public class ChunkMeshCache {
 	 */
 	private void allocateCache() {
 		for(int i = 0; i < MAX_CACHED_SUBCHUNKS; ++i) {
-			CachedSubchunk subchunk = new CachedSubchunk();
+			CachedSubchunk subchunk = new CachedSubchunk(null, null, i, lastUpdateStartTime);
 			subchunk.chunkPos = FARAWAY_CHUNKPOS;
 			subchunk.mesh = new Mesh(false, 16*16*16*6*4, 16*16*16*6*6,
-					new VertexAttributes(
-							new VertexAttribute(Usage.Position, 3, "a_position"),
-							new VertexAttribute(Usage.Normal, 3, "a_normal"),
-							new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
-							new VertexAttribute(Usage.ColorPacked, 4, "a_color")
-					)
+					BLOCK_MESH_ATTRS
 			);
 			
 			cachedSubs.add(subchunk);
@@ -62,8 +71,7 @@ public class ChunkMeshCache {
 	}
 	
 	private void sortCache() {
-		// FIXME this should be the player position, not (0,0,0)
-		comp.setReferencePosition(new Vector3(0, 0, 0));
+		comp.setReferencePosition(cam.position);
 		Collections.sort(cachedSubs, comp);
 	}
 	
@@ -85,27 +93,44 @@ public class ChunkMeshCache {
 					cacheEntry.chunkPos = visibleChunk.getChunkPosition();
 					cacheEntry.subchunkIdx = y;
 					update(cacheEntry, visibleChunk);
+					updateNeighbors(cacheEntry.chunkPos);
 				}
 			}
 		}
 	}
 	
+	private void updateNeighbors(ChunkPosition chunkPos) {
+		for(int x = chunkPos.getXPosition() - 16; x < chunkPos.getXPosition() + 17; x += 32) {
+			for(int z = chunkPos.getZPosition() - 16; z < chunkPos.getZPosition() + 17; z += 32) {
+				for(int subchunkIdx = 0; subchunkIdx < 16; ++subchunkIdx) {
+					CachedSubchunk cached = findCachedSubchunk(x, subchunkIdx, z);
+					if(cached != null && cached.lastMeshUpdate < lastUpdateStartTime) {
+						update(cached, worldManagementSystem.getChunk(x, z));
+					}
+				}
+			}
+		}
+	}
+
 	private void update(CachedSubchunk cached, Chunk chunk) {
-		builder.updateMesh(chunk, cached.mesh, cached.subchunkIdx);
-		cached.lastMeshUpdate = System.nanoTime();
+//		builder.updateMesh(cached.mesh, chunk.getChunkPosition(), cached.subchunkIdx);
+//		cached.lastMeshUpdate = System.nanoTime();
 	}
 	
-	private CachedSubchunk findCachedSubchunk(ChunkPosition chunkPos, int subchunkIdx) {
+	private CachedSubchunk findCachedSubchunk(int x, int subchunkIdx, int z) {
 		for(CachedSubchunk subchunk: cachedSubs) {
 			if(!subchunk.isUnused() && subchunk.subchunkIdx == subchunkIdx &&
-			   subchunk.chunkPos.getXPosition() == chunkPos.getXPosition() &&
-			   subchunk.chunkPos.getZPosition() == chunkPos.getZPosition()) {
-				
+			   subchunk.chunkPos.getXPosition() == x &&
+			   subchunk.chunkPos.getZPosition() == z) {
 				return subchunk;
 			}
 		}
 		
 		return null;
+	}
+	
+	private CachedSubchunk findCachedSubchunk(ChunkPosition chunkPos, int subchunkIdx) {
+		return findCachedSubchunk(chunkPos.getXPosition(), subchunkIdx, chunkPos.getZPosition());
 	}
 	
 	/**
@@ -129,6 +154,8 @@ public class ChunkMeshCache {
 	}
 	
 	public void update() {
+		lastUpdateStartTime = System.nanoTime();
+		
 		//long start = System.currentTimeMillis();
 		sortCache();
 		//long afterSort = System.currentTimeMillis();

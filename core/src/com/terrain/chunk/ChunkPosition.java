@@ -18,6 +18,14 @@ public class ChunkPosition {
     public int getZPosition() {
         return zPosition;
     }
+    
+    public void setXPosition(int xPosition) {
+		this.xPosition = xPosition;
+	}
+    
+    public void setZPosition(int zPosition) {
+		this.zPosition = zPosition;
+	}
 
     @Override
     public boolean equals(Object o) {
