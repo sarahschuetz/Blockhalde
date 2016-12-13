@@ -99,16 +99,12 @@ public class RenderSystem extends EntitySystem {
 		
 		Camera cam = engine.getSystem(CameraSystem.class).getCam();
 		
-		// Normal matrix is inverse transposed modelview matrix
-		Matrix4 normalMatrix = cam.view.cpy().inv().tra();
-		
 		// No model matrix necessary, position is encoded in mesh data
 		shader.setUniformMatrix("u_view", cam.view);
 		shader.setUniformMatrix("u_projection", cam.projection);
 
 		texture.bind();
 		shader.setUniformi("u_texture", 0);
-		shader.setUniformMatrix("u_normalMatrix", normalMatrix);
 
 		for(CachedSubchunk cached: cache) {
 			if(!cached.isUnused()) {
