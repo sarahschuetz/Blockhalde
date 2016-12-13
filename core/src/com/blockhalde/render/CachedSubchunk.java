@@ -9,6 +9,18 @@ public class CachedSubchunk {
 	public long lastMeshUpdate = Long.MIN_VALUE;
 	public Mesh mesh;
 	
+	
+	
+	public CachedSubchunk(Mesh mesh, ChunkPosition chunkPos, int subchunkIdx, long lastMeshUpdate) {
+		super();
+		this.chunkPos = chunkPos;
+		this.subchunkIdx = subchunkIdx;
+		this.lastMeshUpdate = lastMeshUpdate;
+		this.mesh = mesh;
+	}
+
+
+
 	public boolean isUnused() {
 		return subchunkIdx == -1;
 	}

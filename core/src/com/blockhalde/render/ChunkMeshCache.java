@@ -17,6 +17,13 @@ import com.terrain.world.WorldManagementSystem;
 
 public class ChunkMeshCache {
 
+	public static final VertexAttributes BLOCK_MESH_ATTRS = new VertexAttributes(
+		new VertexAttribute(Usage.Position, 3, "a_position"),
+		new VertexAttribute(Usage.Normal, 3, "a_normal"),
+		new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
+		new VertexAttribute(Usage.ColorPacked, 4, "a_color")
+	);
+
 	private WorldManagementSystem worldManagementSystem;
 	
 	/**
@@ -38,7 +45,7 @@ public class ChunkMeshCache {
 	public ChunkMeshCache(WorldManagementSystem worldManagementSystem, Camera cam) {
 		this.cam = cam;
 		this.worldManagementSystem = worldManagementSystem;
-		builder = new ChunkMeshBuilder(worldManagementSystem);
+//		builder = new ChunkMeshBuilder(worldManagementSystem);
 		allocateCache();
 		
 		if(worldManagementSystem.getVisibleChunks().size() > MAX_CACHED_SUBCHUNKS) {
@@ -53,15 +60,10 @@ public class ChunkMeshCache {
 	 */
 	private void allocateCache() {
 		for(int i = 0; i < MAX_CACHED_SUBCHUNKS; ++i) {
-			CachedSubchunk subchunk = new CachedSubchunk();
+			CachedSubchunk subchunk = new CachedSubchunk(null, null, i, lastUpdateStartTime);
 			subchunk.chunkPos = FARAWAY_CHUNKPOS;
 			subchunk.mesh = new Mesh(false, 16*16*16*6*4, 16*16*16*6*6,
-					new VertexAttributes(
-							new VertexAttribute(Usage.Position, 3, "a_position"),
-							new VertexAttribute(Usage.Normal, 3, "a_normal"),
-							new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
-							new VertexAttribute(Usage.ColorPacked, 4, "a_color")
-					)
+					BLOCK_MESH_ATTRS
 			);
 			
 			cachedSubs.add(subchunk);
@@ -111,8 +113,8 @@ public class ChunkMeshCache {
 	}
 
 	private void update(CachedSubchunk cached, Chunk chunk) {
-		builder.updateMesh(cached.mesh, chunk.getChunkPosition(), cached.subchunkIdx);
-		cached.lastMeshUpdate = System.nanoTime();
+//		builder.updateMesh(cached.mesh, chunk.getChunkPosition(), cached.subchunkIdx);
+//		cached.lastMeshUpdate = System.nanoTime();
 	}
 	
 	private CachedSubchunk findCachedSubchunk(int x, int subchunkIdx, int z) {

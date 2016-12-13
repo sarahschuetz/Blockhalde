@@ -1,23 +1,23 @@
 package com.blockhalde.render;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import java.util.concurrent.Callable;
+
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
 import com.terrain.chunk.UniformChunk;
 import com.terrain.world.WorldInterface;
 
-public class ChunkMeshBuilder {
+public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 
 	private static final ChunkPosition NULL_POSITION = new ChunkPosition(Integer.MIN_VALUE, Integer.MIN_VALUE);
 	private static final byte AIR_ID = BlockType.AIR.getBlockId();
@@ -26,6 +26,15 @@ public class ChunkMeshBuilder {
 	private VertexInfo leftTop = new VertexInfo();
 	private VertexInfo rightBottom = new VertexInfo();
 	private VertexInfo rightTop = new VertexInfo();
+	
+	private Vector3 center = new Vector3();
+	private Vector3 bottomLeft = new Vector3();
+	private Vector3 bottomRight = new Vector3();
+	private Vector3 topRight = new Vector3();
+	private Vector3 topLeft = new Vector3();
+	private Vector3 normal = new Vector3();
+	private Vector2 uvBottomLeft = new Vector2();
+	private Vector2 uvTopRight = new Vector2();
 
 	private TextureAtlas atlas;
 	private WorldInterface world;
@@ -76,10 +85,13 @@ public class ChunkMeshBuilder {
 	 * specified chunk position.
 	 */
 	private Chunk negXChunk;
+	private int subchunkIdx;
+	private ChunkPosition pos;
+	private Mesh mesh;
 
-	public ChunkMeshBuilder(WorldInterface world) {
+	public ChunkMeshBuilder(WorldInterface world, TextureAtlas atlas) {
 		this.world = world;
-		atlas = new TextureAtlas(Gdx.files.internal("textures/blocks.atlas"));
+		this.atlas = atlas;
 	}
 
 	private Chunk fetchChunk(ChunkPosition pos, int offsetX, int offsetZ, UniformChunk fallbackChunk) {
@@ -113,19 +125,11 @@ public class ChunkMeshBuilder {
 			return centerChunk.getBlockTypeAt(relativeX, relativeY, relativeZ);
 		}
 	}
-
-	public void updateMesh(Mesh mesh, ChunkPosition pos, int subchunkIdx) {
-		Vector3 center = new Vector3();
-		Vector3 bottomLeft = new Vector3();
-		Vector3 bottomRight = new Vector3();
-		Vector3 topRight = new Vector3();
-		Vector3 topLeft = new Vector3();
-		Vector3 normal = new Vector3();
-		Vector2 uvBottomLeft = new Vector2();
-		Vector2 uvTopRight = new Vector2();
-
-		float blockSizeHalved = 0.5f;
-
+	
+	public void init(ChunkPosition pos, int subchunkIdx) {
+		this.mesh = null;
+		this.pos = pos;
+		this.subchunkIdx = subchunkIdx;
 		centerChunk = fetchChunk(pos);
 
 		if (centerChunk == null) {
@@ -136,11 +140,16 @@ public class ChunkMeshBuilder {
 			posXChunk = fetchChunk(pos, 1, 0, posXNullChunk);
 			negXChunk = fetchChunk(pos, -1, 0, negXNullChunk);
 		}
+	}
+	
+	@Override
+	public MeshBuilder call() throws Exception {
+		float blockSizeHalved = 0.5f;
 
-		MeshBuilder builder = new MeshBuilder();
+		final MeshBuilder builder = new MeshBuilder();
 		// get attributes from mesh - otherwise only leads to compatibilty
 		// problems when new attributes are introduced
-		builder.begin(mesh.getVertexAttributes(), GL20.GL_TRIANGLES);
+		builder.begin(ChunkMeshCache.BLOCK_MESH_ATTRS, GL20.GL_TRIANGLES);
 
 		for (int x = 0; x < Chunk.X_MAX; ++x) {
 			for (int y = subchunkIdx * 16; y < (subchunkIdx + 1) * 16; ++y) {
@@ -266,8 +275,12 @@ public class ChunkMeshBuilder {
 				}
 			}
 		}
-
-		builder.end(mesh);
+		
+		if (builder.getNumVertices() == 0) {
+			return null;
+		} else {
+			return builder;
+		}
 	}
 
 	public void addCubePlane(MeshBuilder builder, Vector3 center, Vector3 bottomLeftOffset, int bottomLeftAO,
@@ -301,5 +314,10 @@ public class ChunkMeshBuilder {
 		if (neighborCorner != BlockType.AIR.getBlockId())
 			ao++;
 		return 2 - ao;
+	}
+
+	@Override
+	public void reset() {
+		mesh = null;
 	}
 }

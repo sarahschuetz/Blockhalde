@@ -81,9 +81,30 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
             for (int x = -drawDistance + origin.getXPosition(); x <= drawDistance + origin.getXPosition(); x++) {
                 for (int z = -drawDistance + origin.getZPosition(); z <= drawDistance + origin.getZPosition(); z++) {
                     Chunk chunk = getChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
+                    
                     if (chunk != null) {
                         visibleChunks.add(chunk);
                     }
+                }
+            }
+        }
+    }
+    
+    public void generateNearChunks() {
+    	visibleChunks.clear();
+        Chunk newPlayerChunk = getChunk((int) playerPosition.x, (int) playerPosition.z);
+        if(newPlayerChunk!=null){
+            ChunkPosition origin = currentPlayerChunk.getRelativeChunkPosition();
+            for (int x = -drawDistance + origin.getXPosition(); x <= drawDistance + origin.getXPosition(); x++) {
+                for (int z = -drawDistance + origin.getZPosition(); z <= drawDistance + origin.getZPosition(); z++) {
+                    Chunk chunk = getChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
+                    
+                    if (chunk == null) {
+                    	createChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
+                    	chunk = getChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
+                    }
+                    
+                    visibleChunks.add(chunk);
                 }
             }
         }
@@ -164,7 +185,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
         //TODO: change later
         calculateVisibleChunks(camera.position, drawDistance);
-        //calculateVisibleChunks(playerPosition, drawDistance);
+        ////calculateVisibleChunks(playerPosition, drawDistance);
     }
 
     @Override
