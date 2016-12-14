@@ -84,7 +84,7 @@ public class RenderSystem extends EntitySystem {
 
 	@Override
 	public void update(float deltaTime) {
-		worldManagementSystem.generateNearChunks();
+//		worldManagementSystem.generateNearChunks();
 		
 		drainWorkerQueue();
 		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
