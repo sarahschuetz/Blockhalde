@@ -34,9 +34,6 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     // Defines how many chunks are drawn around the player
     private int drawDistance = 11;
 
-    // TODO: Add player position and generate chunks based on it.
-    private Camera camera;
-    
     // TODO: Change so that Seed is not fix implemented here
     private PerlinTerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
 //       private TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
