@@ -253,7 +253,7 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 			ao++;
 		if (neighborCorner != BlockType.AIR.getBlockId())
 			ao++;
-		return 2 - ao;
+		return 3 - ao;
 	}
 
 	@Override
