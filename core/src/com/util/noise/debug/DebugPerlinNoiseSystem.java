@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.terrain.generators.PerlinTerrainGenerator;
 import com.terrain.world.WorldManagementSystem;
 
 public class DebugPerlinNoiseSystem extends EntitySystem {
@@ -20,7 +21,7 @@ public class DebugPerlinNoiseSystem extends EntitySystem {
 		Viewport viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera());
 		this.stage = new Stage(viewport);
 		
-		this.noise = new NoiseImg(engine.getSystem(WorldManagementSystem.class).getTerrainGenerator().getPerlinNoise());
+		this.noise = new NoiseImg(engine.getSystem(WorldManagementSystem.class).getTerrainGenerator());
 		this.stage.addActor(this.noise);
 	}
 
