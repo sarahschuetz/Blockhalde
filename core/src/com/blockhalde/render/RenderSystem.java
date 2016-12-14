@@ -22,6 +22,8 @@ import com.badlogic.msg.Telegram;
 import com.badlogic.msg.Telegraph;
 import com.messaging.MessageIdConstants;
 import com.messaging.message.ChunkMessage;
+import com.terrain.chunk.Chunk;
+import com.terrain.chunk.ChunkPosition;
 import com.terrain.world.WorldManagementSystem;
 
 public class RenderSystem extends EntitySystem {
@@ -32,7 +34,7 @@ public class RenderSystem extends EntitySystem {
 	private Texture texture;
 	private ShaderProgram shader;
 	private Engine engine;
-	private WorldManagementSystem worldManagementSystem;
+	private WorldManagementSystem world;
 	private ChunkMeshWorker worker;
 	private BlockingQueue<CachedSubchunk> workerQueue = new ArrayBlockingQueue<>(1024);
 	private List<CachedSubchunk> cache = new ArrayList<>();
@@ -43,7 +45,7 @@ public class RenderSystem extends EntitySystem {
 		
 		this.engine = engine;
 
-		worldManagementSystem = engine.getSystem(WorldManagementSystem.class);
+		world = engine.getSystem(WorldManagementSystem.class);
 
 		CameraSystem camSys = engine.getSystem(CameraSystem.class);
 		Camera cam = camSys.getCam();
@@ -64,17 +66,109 @@ public class RenderSystem extends EntitySystem {
 		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
 		
-		worker = new ChunkMeshWorker(worldManagementSystem, workerQueue);
+		worker = new ChunkMeshWorker(world, workerQueue);
 		
 		new Thread(worker).start();
 	}
 	
-	public void loadChunk(ChunkMessage chunkMessage) {
-		//System.out.println("Chunk created:    " + chunkMessage.getChunkPosition().getXPosition() + "/" + chunkMessage.getChunkPosition().getZPosition());
+	private void enqueue(ChunkMeshRequest req) {
+		CachedSubchunk cached = findCachedSubchunk(req.getPosition(), req.subchunkIdx);
 		
-		for(int subchunkIdx = 0; subchunkIdx < 16; ++subchunkIdx) {
-			worker.enqueue(new ChunkMeshRequest(chunkMessage.getChunkPosition(), subchunkIdx));
+		boolean chunkDirty = false;
+		
+		if(cached == null || true) {
+			chunkDirty = true;
 		}
+		
+		if(chunkDirty) {
+			worker.enqueue(req);
+		}
+	}
+	
+	private boolean hasFullNeighborhood(ChunkPosition pos) {
+		int x = pos.getXPosition();
+		int z = pos.getZPosition();
+		
+		return world.getChunk(x - 16, z) != null &&
+		       world.getChunk(x + 16, z) != null &&
+		       world.getChunk(x, z - 16) != null &&
+		       world.getChunk(x, z + 16) != null;
+	}
+	
+	/**
+	 * Gets an array of five chunks containing the center and the four
+	 * neighbouring chunks. If any neighbor is missing, returns null
+	 * instead.
+	 * 
+	 * @param center
+	 * @return
+	 */
+	/*Chunk[] getNeighborhood(ChunkPosition center) {
+		int x = chunkMessage.getChunkPosition().getXPosition();
+		int z = chunkMessage.getChunkPosition().getZPosition();
+
+		Chunk centerChunk = world.getChunk(x, z);
+		
+		return new Chunk[] {
+				
+		};
+	}*/
+	
+	public void loadChunk(ChunkMessage chunkMessage) {
+		System.out.println("Chunk created:    " + chunkMessage.getChunkPosition().getXPosition() + "/" + chunkMessage.getChunkPosition().getZPosition());
+		
+		int x = chunkMessage.getChunkPosition().getXPosition();
+		int z = chunkMessage.getChunkPosition().getZPosition();
+
+		Chunk[] neighborhood = {
+			world.getChunk(x, z),
+			world.getChunk(x, z + 16),
+			world.getChunk(x, z - 16),
+			world.getChunk(x + 16, z),
+			world.getChunk(x - 16, z)
+		};
+		
+		for(Chunk neighbor: neighborhood) {
+			if(neighbor != null) {
+				x = neighbor.getChunkPosition().getXPosition();
+				z = neighbor.getChunkPosition().getZPosition();
+				
+				Chunk center = neighbor;
+				Chunk posX = world.getChunk(x + 16, z);
+				Chunk negX = world.getChunk(x - 16, z);
+				Chunk posZ = world.getChunk(x, z + 16);
+				Chunk negZ = world.getChunk(x, z - 16);
+				
+				// If all neighbors are loaded, generate the center chunk
+				if(posX != null && negX != null && posZ != null && negZ != null) {
+					for(int subchunkIdx = 0; subchunkIdx < 16; ++subchunkIdx) {
+						ChunkMeshRequest req = new ChunkMeshRequest(center, posZ, negZ, posX, negX, subchunkIdx);
+						enqueue(req);
+					}
+				}
+			}
+		}
+		
+		
+		/*for(int subchunkIdx = 0; subchunkIdx < 16; ++subchunkIdx) {
+			enqueue(new ChunkMeshRequest(chunkMessage.getChunkPosition(), subchunkIdx));
+			
+			if(neighbour1 != null) {
+				enqueue(new ChunkMeshRequest(neighbour1.getChunkPosition(), subchunkIdx));
+			}
+			
+			if(neighbour2 != null) {
+				enqueue(new ChunkMeshRequest(neighbour2.getChunkPosition(), subchunkIdx));
+			}
+			
+			if(neighbour3 != null) {
+				enqueue(new ChunkMeshRequest(neighbour3.getChunkPosition(), subchunkIdx));
+			}
+			
+			if(neighbour4 != null) {
+				enqueue(new ChunkMeshRequest(neighbour4.getChunkPosition(), subchunkIdx));
+			}
+		}*/
 	}
 	
 	@Override
@@ -84,7 +178,7 @@ public class RenderSystem extends EntitySystem {
 
 	@Override
 	public void update(float deltaTime) {
-		worldManagementSystem.generateNearChunks();
+		world.generateNearChunks();
 		
 		drainWorkerQueue();
 		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
@@ -114,10 +208,31 @@ public class RenderSystem extends EntitySystem {
 		
 		shader.end();
 	}
+	
+	private CachedSubchunk findCachedSubchunk(int x, int subchunkIdx, int z) {
+		for(CachedSubchunk subchunk: cache) {
+			if(!subchunk.isUnused() && subchunk.subchunkIdx == subchunkIdx &&
+			   subchunk.chunkPos.getXPosition() == x &&
+			   subchunk.chunkPos.getZPosition() == z) {
+				return subchunk;
+			}
+		}
+		
+		return null;
+	}
+	
+	private CachedSubchunk findCachedSubchunk(ChunkPosition chunkPos, int subchunkIdx) {
+		return findCachedSubchunk(chunkPos.getXPosition(), subchunkIdx, chunkPos.getZPosition());
+	}
 
 	private void drainWorkerQueue() {
 		CachedSubchunk cached;
 		while((cached = workerQueue.poll()) != null) {
+			CachedSubchunk alreadyCached = findCachedSubchunk(cached.chunkPos, cached.subchunkIdx);
+			if(alreadyCached != null) {
+				cache.remove(alreadyCached);
+			}
+			
 			cache.add(cached);
 		}
 	}
