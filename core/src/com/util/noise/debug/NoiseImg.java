@@ -21,26 +21,21 @@ public class NoiseImg extends Actor {
 	private Texture textureScreen;
 	private Texture textureChunk;
 	
-	protected double smoothness;
-	protected int octaves;
-	protected double persistance;
-	protected double frequency;
+	private int octaves;
+	private double persistence;
+	private double frequency;
 	
 	public NoiseImg(PerlinTerrainGenerator generator) {
 		setVisible(false);
 		perlin = generator.getPerlinNoise();
-		this.smoothness = generator.getSmoothness();
 		this.octaves = generator.getOctaves();
-		this.persistance = generator.getPersistence();
+		this.persistence = generator.getPersistence();
 		this.frequency = generator.getFrequency();
 		
 		generateNoiseTextures();
 	}
 	
 	private void generateNoiseTextures() {
-		
-		int octaves = 5;
-		double persistence = 3;
 		
 		Pixmap pixmapScreen = new Pixmap(1260, 700, Format.RGBA8888);	
 		
