@@ -19,11 +19,11 @@ import com.util.PauseListener;
  * @author shaendro
  */
 public class VirtualPlayerMovementController extends VirtualAbstractController {
-	private static final float GRAVITY = 0.98f;
-	private static final float MAX_FALL_SPEED = 4f;
-	private static final float FLY_SPEED = 6f;
+	private static final float GRAVITY = 9.8f;
+	private static final float MAX_FALL_SPEED = GRAVITY * 5f;
+	private static final float JUMP_STRENGTH = 13f;
 	private static final float WALK_SPEED = 2f;
-	private static final float JUMP_STRENGTH = 0.3f;
+	private static final float FLY_SPEED = WALK_SPEED * 3f;
 	private static final float PLAYER_HEIGHT = 1.8f;
 	private static final float COLLISION_DISTANCE = 0.01f;
 	private static final float VERTICAL_PEEK_DISTANCE = 0.5f;
@@ -37,7 +37,7 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 	private Vector3 movementVectorFwrd = new Vector3();
 	private Vector3 movementVectorSide = new Vector3();
 	private Vector3 movementVectorDown = new Vector3();
-	private boolean jumping;
+	private boolean jumping = false;
 
 	/**
 	 * Creates a {@link VirtualPlayerMovementController}.
@@ -99,13 +99,13 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 		Vector3 position = player.getComponent(PositionComponent.class).getPosition();
 		if (!player.getComponent(DebugComponent.class).isFlying()){
 			if (!blockAt(position.x, position.y - VERTICAL_PEEK_DISTANCE, position.z)) {
-				movementDown -= GRAVITY * deltaTime;
+				movementDown -= GRAVITY * deltaTime * 5f;
 				if (movementDown < -MAX_FALL_SPEED) movementDown = -MAX_FALL_SPEED;
 			} else {
 				if (jumping) movementDown = JUMP_STRENGTH;
 				else if (movementDown < 0) movementDown = 0;
 			}
-			movementVectorDown.set(0, movementDown, 0);
+			movementVectorDown.set(0, movementDown * deltaTime, 0);
 		} else {
 			movementDown = 0;
 			movementVectorDown.set(0, 0, 0);

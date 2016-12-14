@@ -83,9 +83,13 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
    
     @Override
     public void setBlock(int x, int y, int z, BlockType blockType) {
+    	if (x < 0) x = x - Chunk.X_MAX;
+    	if (z < 0) z = z - Chunk.Z_MAX;
         final Chunk chunk = getChunk(x, z);
         if (chunk != null) {
-            chunk.setBlockAt(x % Chunk.X_MAX, y % Chunk.Y_MAX, z % Chunk.Z_MAX, blockType);
+        	int relativeX = x < 0 ? Chunk.X_MAX + (x % Chunk.X_MAX) - 1 : x % Chunk.X_MAX;
+        	int relativeZ = z < 0 ? Chunk.Z_MAX + (z % Chunk.Z_MAX) - 1 : z % Chunk.Z_MAX;
+            chunk.setBlockAt(relativeX, y, relativeZ, blockType);
         }
     }
 

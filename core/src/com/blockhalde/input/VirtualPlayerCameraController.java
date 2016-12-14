@@ -74,12 +74,12 @@ public class VirtualPlayerCameraController extends VirtualAbstractController {
 		if (query.size() != 0) {
 			Entity player = query.first();
 			Camera camera = player.getComponent(CameraComponent.class).getCamera();
-			blockPosition = camera.position.cpy();
+			Vector3 checkPosition = camera.position.cpy();
 			WorldManagementSystem wms = inputSystem.getEngine().getSystem(WorldManagementSystem.class);
 			for (int i = 0; i < RAYCAST_STEPS; i++) {
-				blockPosition.add(camera.direction.x * RAYCAST_STEPSIZE, camera.direction.y * RAYCAST_STEPSIZE, camera.direction.z * RAYCAST_STEPSIZE);
-				if (wms.getBlockType((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z) != BlockType.AIR.getBlockId()) {
-					blockPosition.set((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z);
+				checkPosition.add(camera.direction.x * RAYCAST_STEPSIZE, camera.direction.y * RAYCAST_STEPSIZE, camera.direction.z * RAYCAST_STEPSIZE);
+				if (wms.getBlockType((int) checkPosition.x, (int) checkPosition.y, (int) checkPosition.z) != BlockType.AIR.getBlockId()) {
+					blockPosition = new Vector3((int) checkPosition.x, (int) checkPosition.y, (int) checkPosition.z);
 					return;
 				}
 			}
