@@ -12,6 +12,7 @@ import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
 import com.terrain.chunk.TerrainChunk;
+import com.terrain.generators.PerlinTerrainGenerator;
 import com.terrain.generators.PurePerlinTerrainGenerator;
 import com.terrain.generators.SimplePerlinTerrainGenerator;
 import com.terrain.generators.TerrainGenerator;
@@ -36,7 +37,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     private Camera camera;
     
     // TODO: Change so that Seed is not fix implemented here
-    private TerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
+    private PerlinTerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
 //       private TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
 
     // for testing purposes
@@ -126,7 +127,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
         this.drawDistance = drawDistance;
     }
     
-    public TerrainGenerator getTerrainGenerator() {
+    public PerlinTerrainGenerator getTerrainGenerator() {
     	return terrainGenerator;
     }
 

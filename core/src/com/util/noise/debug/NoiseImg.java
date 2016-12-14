@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.terrain.chunk.Chunk;
+import com.terrain.generators.PerlinTerrainGenerator;
 import com.util.noise.PerlinNoise3D;
 
 public class NoiseImg extends Actor {
@@ -20,16 +21,21 @@ public class NoiseImg extends Actor {
 	private Texture textureScreen;
 	private Texture textureChunk;
 	
-	public NoiseImg(PerlinNoise3D noise) {
+	private int octaves;
+	private double persistence;
+	private double frequency;
+	
+	public NoiseImg(PerlinTerrainGenerator generator) {
 		setVisible(false);
-		perlin = noise;
+		perlin = generator.getPerlinNoise();
+		this.octaves = generator.getOctaves();
+		this.persistence = generator.getPersistence();
+		this.frequency = generator.getFrequency();
+		
 		generateNoiseTextures();
 	}
 	
 	private void generateNoiseTextures() {
-		
-		int octaves = 5;
-		double persistence = 3;
 		
 		Pixmap pixmapScreen = new Pixmap(1260, 700, Format.RGBA8888);	
 		
