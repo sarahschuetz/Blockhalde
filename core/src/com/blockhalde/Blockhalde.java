@@ -12,6 +12,7 @@ import com.blockhalde.gui.RendererGUI;
 import com.blockhalde.gui.pie.PieMenuSystem;
 import com.blockhalde.input.InputSystem;
 import com.blockhalde.player.Player;
+import com.blockhalde.player.PlayerPositionTrackingSystem;
 import com.blockhalde.render.CameraSystem;
 import com.blockhalde.render.RenderSystem;
 import com.messaging.MessageIdConstants;
@@ -26,7 +27,7 @@ public class Blockhalde extends ApplicationAdapter {
 
 	@Override
 	public void create() {
-		MessageManager.getInstance().setDebugEnabled(true);
+//		MessageManager.getInstance().setDebugEnabled(true);
 		// !!!!!Add message listener before world system creation!!!!!
 		MessageManager.getInstance().addListener(new Telegraph() {
 			
@@ -57,6 +58,7 @@ public class Blockhalde extends ApplicationAdapter {
 		engine.addSystem(new DebugPerlinNoiseSystem());
 		
 		engine.addEntity(new Player(cameraSystem.getCam()));
+		engine.addSystem(new PlayerPositionTrackingSystem());
 	}
 	
 	@Override
