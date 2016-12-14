@@ -2,6 +2,7 @@ package com.terrain.world;
 
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
+import com.terrain.chunk.ChunkPosition;
 
 import java.util.List;
 
@@ -11,6 +12,11 @@ public interface WorldInterface {
      */
 	Chunk getChunk(int xPosition, int zPosition);
 
+	/**
+	 * Returns the chunk based on the chunk position. 
+	 */
+	Chunk getChunk(ChunkPosition chunkPosition);
+	
 	/**
 	 * Gets the block at the specified world position
 	 */

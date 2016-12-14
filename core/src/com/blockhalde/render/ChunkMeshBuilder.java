@@ -3,7 +3,9 @@ package com.blockhalde.render;
 import java.util.concurrent.Callable;
 
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
@@ -13,14 +15,17 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
-import com.terrain.chunk.ChunkPosition;
-import com.terrain.chunk.UniformChunk;
-import com.terrain.world.WorldInterface;
 
 public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 
-	private static final ChunkPosition NULL_POSITION = new ChunkPosition(Integer.MIN_VALUE, Integer.MIN_VALUE);
 	private static final byte AIR_ID = BlockType.AIR.getBlockId();
+	
+	public static final VertexAttributes BLOCK_MESH_ATTRS = new VertexAttributes(
+		new VertexAttribute(Usage.Position, 3, "a_position"),
+		new VertexAttribute(Usage.Normal, 3, "a_normal"),
+		new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
+		new VertexAttribute(Usage.ColorPacked, 4, "a_color")
+	);
 	
 	private VertexInfo leftBottom = new VertexInfo();
 	private VertexInfo leftTop = new VertexInfo();
@@ -39,29 +44,9 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 	private TextureAtlas atlas;
 	private ChunkMeshRequest req;
 
-	private Mesh mesh;
-
 	public ChunkMeshBuilder(TextureAtlas atlas) {
 		this.atlas = atlas;
 	}
-
-	/*private Chunk fetchChunk(ChunkPosition pos, int offsetX, int offsetZ, UniformChunk fallbackChunk) {
-		int posX = pos.getXPosition() + offsetX * Chunk.X_MAX;
-		int posZ = pos.getZPosition() + offsetZ * Chunk.Z_MAX;
-
-		Chunk chunk = world.getChunk(posX, posZ);
-
-		if (chunk == null) {
-			fallbackChunk.setChunkPosition(posX, posZ);
-			chunk = fallbackChunk;
-		}
-
-		return chunk;
-	}
-
-	private Chunk fetchChunk(ChunkPosition pos) {
-		return world.getChunk(pos.getXPosition(), pos.getZPosition());
-	}*/
 
 	byte blockTypeAt(int relativeX, int relativeY, int relativeZ) {
 		if (relativeX < 0) {
@@ -78,7 +63,6 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 	}
 	
 	public void init(ChunkMeshRequest req) {
-		this.mesh = null;
 		this.req = req;
 	}
 	
@@ -89,7 +73,7 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 		final MeshBuilder builder = new MeshBuilder();
 		// get attributes from mesh - otherwise only leads to compatibilty
 		// problems when new attributes are introduced
-		builder.begin(ChunkMeshCache.BLOCK_MESH_ATTRS, GL20.GL_TRIANGLES);
+		builder.begin(BLOCK_MESH_ATTRS, GL20.GL_TRIANGLES);
 
 		for (int x = 0; x < Chunk.X_MAX; ++x) {
 			for (int y = req.subchunkIdx * 16; y < (req.subchunkIdx + 1) * 16; ++y) {
@@ -258,6 +242,5 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 
 	@Override
 	public void reset() {
-		mesh = null;
 	}
 }

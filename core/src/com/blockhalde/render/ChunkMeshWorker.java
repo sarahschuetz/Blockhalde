@@ -2,7 +2,6 @@ package com.blockhalde.render;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
@@ -13,19 +12,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.utils.Pool;
-import com.terrain.world.WorldInterface;
 
 public class ChunkMeshWorker implements Runnable {
 
 	private ForkJoinPool taskPool = ForkJoinPool.commonPool();
-	/**
-	 * Blocks if more than 128 subchunks are pending for mesh generation
-	 **/
 	private BlockingQueue<ChunkMeshRequest> pendingRequests = new LinkedBlockingDeque<>();
 	private BlockingQueue<CachedSubchunk> cachedSubchunks;
 	
 	private TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("textures/blocks.atlas"));
-	private WorldInterface world;
 	private Pool<ChunkMeshBuilder> builderPool = new Pool<ChunkMeshBuilder>() {
 		@Override
 		protected ChunkMeshBuilder newObject() {
@@ -35,8 +29,7 @@ public class ChunkMeshWorker implements Runnable {
 	};
 	private boolean running = false;
 
-	public ChunkMeshWorker(WorldInterface world, BlockingQueue<CachedSubchunk> targetQueue) {
-		this.world = world;
+	public ChunkMeshWorker(BlockingQueue<CachedSubchunk> targetQueue) {
 		this.cachedSubchunks = targetQueue;
 	}
 

@@ -2,26 +2,28 @@ package com.terrain.world;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.msg.MessageManager;
-import com.blockhalde.render.CameraSystem;
+import com.badlogic.msg.Telegram;
+import com.badlogic.msg.Telegraph;
 import com.messaging.MessageIdConstants;
 import com.messaging.message.ChunkMessage;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
+import com.terrain.chunk.ChunkUtil;
 import com.terrain.chunk.TerrainChunk;
 import com.terrain.generators.PerlinTerrainGenerator;
-import com.terrain.generators.PurePerlinTerrainGenerator;
 import com.terrain.generators.SimplePerlinTerrainGenerator;
-import com.terrain.generators.TerrainGenerator;
 import com.util.FlagUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class WorldManagementSystem extends EntitySystem implements WorldInterface {
     // All loaded chunks are placed in this map
@@ -33,16 +35,9 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     // Defines how many chunks are drawn around the player
     private int drawDistance = 11;
 
-    // TODO: Add player position and generate chunks based on it.
-    private Camera camera;
-    
     // TODO: Change so that Seed is not fix implemented here
     private PerlinTerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
 //       private TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
-
-    // for testing purposes
-    private Chunk currentPlayerChunk;
-    private Vector3 playerPosition = new Vector3(0 * Chunk.X_MAX, 0, 3 * Chunk.Z_MAX);
 
      /**
      * Creates a new blank chunk at the specified position in the world
@@ -62,54 +57,38 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     /**
      * Removes the chunk that is located at the specified position in the world
      */
-    protected void destroyChunk(int xPosition, int zPosition) {
-        final ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
+    protected void destroyChunk(ChunkPosition chunkPosition) {
         if (worldChunks.containsKey(chunkPosition)) {
             worldChunks.remove(chunkPosition);
             MessageManager.getInstance().dispatchMessage(0, null, null, MessageIdConstants.CHUNK_DELETED_MSG_ID, new ChunkMessage(chunkPosition));
         }
     }
-
-    /**
-     * calculates the visible chunks based on the player position and the draw
-     * distance
-     */
-    protected void calculateVisibleChunks(Vector3 playerPosition, int drawDistance) {
-        visibleChunks.clear();
-        Chunk newPlayerChunk = getChunk((int) playerPosition.x, (int) playerPosition.z);
-        if(newPlayerChunk != currentPlayerChunk && newPlayerChunk!=null){
-            currentPlayerChunk = newPlayerChunk;
-            ChunkPosition origin = currentPlayerChunk.getRelativeChunkPosition();
-            for (int x = -drawDistance + origin.getXPosition(); x <= drawDistance + origin.getXPosition(); x++) {
-                for (int z = -drawDistance + origin.getZPosition(); z <= drawDistance + origin.getZPosition(); z++) {
-                    Chunk chunk = getChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
-                    
-                    if (chunk != null) {
-                        visibleChunks.add(chunk);
-                    }
-                }
-            }
-        }
+    
+    protected void deleteAllChunks() {
+    	final Set<ChunkPosition> keys = worldChunks.keySet();
+    	for (ChunkPosition c : keys) {
+    		Gdx.app.postRunnable(new Runnable() {
+				@Override
+				public void run() {
+					destroyChunk(c);
+				}
+			});
+    	}
     }
     
-    public void generateNearChunks() {
-    	visibleChunks.clear();
-        Chunk newPlayerChunk = getChunk((int) playerPosition.x, (int) playerPosition.z);
-        if(newPlayerChunk!=null){
-            ChunkPosition origin = currentPlayerChunk.getRelativeChunkPosition();
-            for (int x = -drawDistance + origin.getXPosition(); x <= drawDistance + origin.getXPosition(); x++) {
-                for (int z = -drawDistance + origin.getZPosition(); z <= drawDistance + origin.getZPosition(); z++) {
-                    Chunk chunk = getChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
-                    
-                    if (chunk == null) {
-                    	createChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
-                    	chunk = getChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
-                    }
-                    
-                    visibleChunks.add(chunk);
-                }
-            }
-        }
+    public void generateChunksAroundPlayer(ChunkPosition position) {
+    	Objects.nonNull(position);
+    	
+    	final ChunkPosition origin = ChunkUtil.getRelativeChunkPosition(position);
+    	for (int x = -drawDistance + origin.getXPosition(); x <= drawDistance + origin.getXPosition(); x++) {
+    		for (int z = -drawDistance + origin.getZPosition(); z <= drawDistance + origin.getZPosition(); z++) {
+    			Chunk chunk = getChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
+
+    			if (chunk == null) {
+    				createChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
+    			}
+    		}
+    	}
     }
    
     @Override
@@ -135,12 +114,18 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
 	@Override
     public Chunk getChunk(int xPosition, int zPosition) {
-        ChunkPosition chunkPosition = new ChunkPosition(xPosition / Chunk.X_MAX * Chunk.X_MAX, zPosition / Chunk.Z_MAX * Chunk.Z_MAX);
-        if (worldChunks.containsKey(chunkPosition)) {
-            return worldChunks.get(chunkPosition);
-        }
+        final ChunkPosition chunkPosition = ChunkUtil.getChunkPositionFor(xPosition, zPosition);
+        getChunk(chunkPosition);
         return null;
     }
+	
+	@Override
+	public Chunk getChunk(ChunkPosition chunkPosition) {
+		if (worldChunks.containsKey(chunkPosition)) {
+            return worldChunks.get(chunkPosition);
+        }
+		return null;
+	}
 
     @Override
     public short getBlock(int x, int y, int z) {
@@ -171,27 +156,23 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
     @Override
     public void addedToEngine(Engine engine) {
-        CameraSystem cameraSystem = engine.getSystem(CameraSystem.class);
-        if(cameraSystem!=null){
-            camera = cameraSystem.getCam();
-        }
-
-        // temporary solution to test the system
-        for (int x = -5; x < 5; x++) {
-            for (int z = -5; z < 5; z++) {
-                createChunk(x * Chunk.X_MAX, z * Chunk.Z_MAX);
-            }
-        }
-
-        //TODO: change later
-        calculateVisibleChunks(camera.position, drawDistance);
-        ////calculateVisibleChunks(playerPosition, drawDistance);
+        MessageManager.getInstance().addListener(new Telegraph() {
+			@Override
+			public boolean handleMessage(Telegram msg) {
+				final ChunkPosition position = ((ChunkMessage) msg.extraInfo).getChunkPosition();
+				// TODO: Delete old chunks ==
+				// TODO: Generate new chunks around the player (drawDistance, chunkPosition)
+				
+				// TODO: Don't delete all chunks, only the difference between new and old chunks
+				deleteAllChunks();
+				generateChunksAroundPlayer(position);
+				System.out.println("Chunk update blabla");
+				return true;
+			}
+		}, MessageIdConstants.PLAYER_CHANGED_CHUNK_POSITION_MSG_ID);
     }
 
     @Override
     public void update(float deltaTime) {
-        //TODO: change later
-        calculateVisibleChunks(camera.position, drawDistance);
-        //calculateVisibleChunks(playerPosition, drawDistance);
     }
 }
