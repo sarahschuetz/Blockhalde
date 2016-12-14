@@ -26,19 +26,25 @@ public class Blockhalde extends ApplicationAdapter {
 
 	@Override
 	public void create() {
-//		MessageManager.getInstance().setDebugEnabled(true);
+		MessageManager.getInstance().setDebugEnabled(true);
 		// !!!!!Add message listener before world system creation!!!!!
-//		MessageManager.getInstance().addListener(new Telegraph() {
-//			
-//			@Override
-//			public boolean handleMessage(Telegram msg) {
-//				final ChunkMessage chunkMessage = (ChunkMessage) msg.extraInfo;
-//				System.out.print("Chunk created: ");
-//				System.out.println("X: " + chunkMessage.getChunkPosition().getXPosition());
-//				System.out.println("Z: " + chunkMessage.getChunkPosition().getZPosition());
-//				return true;
-//			}
-//		}, MessageIdConstants.CHUNK_CREATED_MSG_ID);
+		MessageManager.getInstance().addListener(new Telegraph() {
+			
+			@Override
+			public boolean handleMessage(Telegram msg) {
+				final ChunkMessage chunkMessage = (ChunkMessage) msg.extraInfo;
+
+				// this ensures both rendersystem and world are loaded
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run() {
+						engine.getSystem(RenderSystem.class).loadChunk(chunkMessage);
+					}
+				});
+				
+				return true;
+			}
+		}, MessageIdConstants.CHUNK_CREATED_MSG_ID);
 		
 		engine = new Engine();
 		

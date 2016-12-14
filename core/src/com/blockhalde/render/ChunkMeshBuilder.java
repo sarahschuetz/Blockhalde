@@ -1,198 +1,323 @@
 package com.blockhalde.render;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import java.util.concurrent.Callable;
+
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g3d.utils.MeshBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Pool.Poolable;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
+import com.terrain.chunk.ChunkPosition;
+import com.terrain.chunk.UniformChunk;
+import com.terrain.world.WorldInterface;
 
-public class ChunkMeshBuilder {
+public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 
-    private VertexInfo leftBottom = new VertexInfo();
-    private VertexInfo leftTop = new VertexInfo();
-    private VertexInfo rightBottom = new VertexInfo();
-    private VertexInfo rightTop = new VertexInfo();
+	private static final ChunkPosition NULL_POSITION = new ChunkPosition(Integer.MIN_VALUE, Integer.MIN_VALUE);
+	private static final byte AIR_ID = BlockType.AIR.getBlockId();
+	
+	private VertexInfo leftBottom = new VertexInfo();
+	private VertexInfo leftTop = new VertexInfo();
+	private VertexInfo rightBottom = new VertexInfo();
+	private VertexInfo rightTop = new VertexInfo();
+	
+	private Vector3 center = new Vector3();
+	private Vector3 bottomLeft = new Vector3();
+	private Vector3 bottomRight = new Vector3();
+	private Vector3 topRight = new Vector3();
+	private Vector3 topLeft = new Vector3();
+	private Vector3 normal = new Vector3();
+	private Vector2 uvBottomLeft = new Vector2();
+	private Vector2 uvTopRight = new Vector2();
 
-    private TextureAtlas atlas;
+	private TextureAtlas atlas;
+	private WorldInterface world;
 
-    public ChunkMeshBuilder() {
-        atlas = new TextureAtlas(Gdx.files.internal("textures/blocks.atlas"));
-    }
+	/**
+	 * Holds a chunk that is optionally used as the <code>posZChunk</code> if no
+	 * such chunk is yet available for generation.
+	 */
+	private UniformChunk posZNullChunk = new UniformChunk(NULL_POSITION, BlockType.AIR);
+	/**
+	 * Holds a chunk that is optionally used as the <code>negZChunk</code> if no
+	 * such chunk is yet available for generation.
+	 */
+	private UniformChunk negZNullChunk = new UniformChunk(NULL_POSITION, BlockType.AIR);
+	/**
+	 * Holds a chunk that is optionally used as the <code>posXChunk</code> if no
+	 * such chunk is yet available for generation.
+	 */
+	private UniformChunk posXNullChunk = new UniformChunk(NULL_POSITION, BlockType.AIR);
+	/**
+	 * Holds a chunk that is optionally used as the <code>negXChunk</code> if no
+	 * such chunk is yet available for generation.
+	 */
+	private UniformChunk negXNullChunk = new UniformChunk(NULL_POSITION, BlockType.AIR);
 
-    public void updateMesh(Chunk chunk, Mesh mesh, int subchunkIdx) {
-        Vector3 center = new Vector3();
-        Vector3 bottomLeft = new Vector3();
-        Vector3 bottomRight = new Vector3();
-        Vector3 topRight = new Vector3();
-        Vector3 topLeft = new Vector3();
-        Vector3 normal = new Vector3();
-        Vector2 uvBottomLeft = new Vector2();
-        Vector2 uvTopRight = new Vector2();
+	/**
+	 * During mesh updates, temporarily holds the chunk at the specified chunk
+	 * position.
+	 */
+	private Chunk centerChunk;
+	/**
+	 * During mesh updates, temporarily holds the chunk in front of the chunk at
+	 * the specified chunk position.
+	 */
+	private Chunk posZChunk;
+	/**
+	 * During mesh updates, temporarily holds the chunk behind the chunk at the
+	 * specified chunk position.
+	 */
+	private Chunk negZChunk;
+	/**
+	 * During mesh updates, temporarily holds the chunk right of the chunk at
+	 * the specified chunk position.
+	 */
+	private Chunk posXChunk;
+	/**
+	 * During mesh updates, temporarily holds the chunk left of the chunk at the
+	 * specified chunk position.
+	 */
+	private Chunk negXChunk;
+	private int subchunkIdx;
+	private ChunkPosition pos;
+	private Mesh mesh;
 
-        float blockSize = 1.0f;
-        float blockSizeHalved = blockSize * 0.5f;
+	public ChunkMeshBuilder(WorldInterface world, TextureAtlas atlas) {
+		this.world = world;
+		this.atlas = atlas;
+	}
 
-        int chunkWidth = chunk.getWidth();
-        int chunkDepth = chunk.getDepth();
+	private Chunk fetchChunk(ChunkPosition pos, int offsetX, int offsetZ, UniformChunk fallbackChunk) {
+		int posX = pos.getXPosition() + offsetX * Chunk.X_MAX;
+		int posZ = pos.getZPosition() + offsetZ * Chunk.Z_MAX;
 
-        // X coordinate of the leftmost blocks so that the mesh is symmetrical
-        float firstX = blockSizeHalved + chunk.getChunkPosition().getXPosition();
-        float firstY = blockSizeHalved;
-        float firstZ = blockSizeHalved + chunk.getChunkPosition().getZPosition();
+		Chunk chunk = world.getChunk(posX, posZ);
 
-        MeshBuilder builder = new MeshBuilder();
-        //get attributes from mesh - otherwise only leads to compatibilty problems when new attributes are introduced
-        builder.begin(mesh.getVertexAttributes(), GL20.GL_TRIANGLES);
+		if (chunk == null) {
+			fallbackChunk.setChunkPosition(posX, posZ);
+			chunk = fallbackChunk;
+		}
 
-        for (int x = 0; x < chunkWidth; ++x) {
-            for (int y = subchunkIdx * 16; y < (subchunkIdx + 1) * 16; ++y) {
-                for (int z = 0; z < chunkDepth; ++z) {
+		return chunk;
+	}
 
-                    short blockTypeIdx = chunk.getBlockAt(x, y, z);
+	private Chunk fetchChunk(ChunkPosition pos) {
+		return world.getChunk(pos.getXPosition(), pos.getZPosition());
+	}
 
-                    if (blockTypeIdx != BlockType.AIR.getBlockId()) {
-                        BlockType blockType = BlockType.fromBlockId(blockTypeIdx);
+	byte blockTypeAt(int relativeX, int relativeY, int relativeZ) {
+		if (relativeX < 0) {
+			return negXChunk.getBlockTypeAt(Chunk.X_MAX + relativeX, relativeY, relativeZ);
+		} else if (relativeX >= Chunk.X_MAX) {
+			return posXChunk.getBlockTypeAt(relativeX - Chunk.X_MAX, relativeY, relativeZ);
+		} else if (relativeZ < 0) {
+			return negZChunk.getBlockTypeAt(relativeX, relativeY, Chunk.Z_MAX + relativeZ);
+		} else if (relativeZ >= Chunk.Z_MAX) {
+			return posZChunk.getBlockTypeAt(relativeX, relativeY, relativeZ - Chunk.Z_MAX);
+		} else {
+			return centerChunk.getBlockTypeAt(relativeX, relativeY, relativeZ);
+		}
+	}
+	
+	public void init(ChunkPosition pos, int subchunkIdx) {
+		this.mesh = null;
+		this.pos = pos;
+		this.subchunkIdx = subchunkIdx;
+		centerChunk = fetchChunk(pos);
 
-                        center.set(firstX + x * blockSize,
-                        		   firstY + y * blockSize,
-                        		   firstZ + z * blockSize);
+		if (centerChunk == null) {
+			throw new RuntimeException("Expected specified position to be already loaded in ChunkMeshBuilder update");
+		} else {
+			posZChunk = fetchChunk(pos, 0, 1, posZNullChunk);
+			negZChunk = fetchChunk(pos, 0, -1, negZNullChunk);
+			posXChunk = fetchChunk(pos, 1, 0, posXNullChunk);
+			negXChunk = fetchChunk(pos, -1, 0, negXNullChunk);
+		}
+	}
+	
+	@Override
+	public MeshBuilder call() throws Exception {
+		float blockSizeHalved = 0.5f;
 
-                        AtlasRegion region = atlas.findRegion(blockType.getSideTextureName());
+		final MeshBuilder builder = new MeshBuilder();
+		// get attributes from mesh - otherwise only leads to compatibilty
+		// problems when new attributes are introduced
+		builder.begin(ChunkMeshCache.BLOCK_MESH_ATTRS, GL20.GL_TRIANGLES);
 
-                        // Counterintuively, (u,v) seems to be the bottom right and (u2,u2)
-                        // the top left in an AtlasRegion
-                        // That sure sounds like something that should be documented in libgdx
-                        uvBottomLeft.set(region.getU(), region.getV2());
-                        uvTopRight.set(region.getU2(), region.getV());
+		for (int x = 0; x < Chunk.X_MAX; ++x) {
+			for (int y = subchunkIdx * 16; y < (subchunkIdx + 1) * 16; ++y) {
+				for (int z = 0; z < Chunk.Z_MAX; ++z) {
 
-                        // ao values for the block
-                        int bottomLeftFront = getVertexAO(chunk.getBlockAt(x-1, y, z+1), chunk.getBlockAt(x, y-1, z+1),chunk.getBlockAt(x-1, y-1, z+1));
-                        int bottomRightFront = getVertexAO(chunk.getBlockAt(x+1, y, z+1), chunk.getBlockAt(x, y-1, z+1),chunk.getBlockAt(x+1, y-1, z+1));
-                        int topLeftFront = getVertexAO(chunk.getBlockAt(x-1, y, z+1), chunk.getBlockAt(x, y+1, z+1),chunk.getBlockAt(x-1, y+1, z+1));
-                        int topRightFront = getVertexAO(chunk.getBlockAt(x+1, y, z+1), chunk.getBlockAt(x, y+1, z+1),chunk.getBlockAt(x+1, y+1, z+1));
-                        int bottomLeftBack = getVertexAO(chunk.getBlockAt(x-1, y, z-1), chunk.getBlockAt(x, y-1, z-1),chunk.getBlockAt(x-1, y-1, z-1));
-                        int bottomRightBack = getVertexAO(chunk.getBlockAt(x+1, y, z-1), chunk.getBlockAt(x, y-1, z-1),chunk.getBlockAt(x+1, y-1, z-1));
-                        int topLeftBack = getVertexAO(chunk.getBlockAt(x-1, y, z-1), chunk.getBlockAt(x, y+1, z-1),chunk.getBlockAt(x-1, y+1, z-1));
-                        int topRightBack = getVertexAO(chunk.getBlockAt(x+1, y, z-1), chunk.getBlockAt(x, y+1, z-1),chunk.getBlockAt(x+1, y+1, z-1));
+					byte blockId = blockTypeAt(x, y, z);
 
-                        if ((z + 1) == chunk.getDepth()
-                                || chunk.getBlockAt(x, y, z + 1) == BlockType.AIR.getBlockId()) {
-                            // Front plane
-                            bottomLeft.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-                            bottomRight.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-                            topRight.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
-                            topLeft.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
-                            normal.set(0, 0, 1);
-                            addCubePlane(builder, center, bottomLeft, bottomLeftFront, bottomRight, bottomRightFront, topRight, topRightFront, topLeft, topLeftFront, normal, uvBottomLeft, uvTopRight);
-                        }
+					if (blockId != BlockType.AIR.getBlockId()) {
+						BlockType blockType = BlockType.fromBlockId(blockId);
 
-                        if (z == 0 || chunk.getBlockAt(x, y, z - 1) == BlockType.AIR.getBlockId()) {
-                            // Back plane
-                            bottomLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-                            bottomRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-                            topRight.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-                            topLeft.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-                            normal.set(0, 0, -1);
-                            addCubePlane(builder, center, bottomLeft, bottomRightBack, bottomRight, bottomLeftBack, topRight, topLeftBack, topLeft, topRightBack, normal, uvBottomLeft, uvTopRight);
-                        }
+						center.set(x + blockSizeHalved + pos.getXPosition(), y + blockSizeHalved,
+								z + pos.getZPosition() + blockSizeHalved);
 
-                        if ((x + 1) == chunk.getWidth()
-                                || chunk.getBlockAt(x + 1, y, z) == BlockType.AIR.getBlockId()) {
-                            // Right plane
-                            bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-                            bottomRight.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-                            topRight.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-                            topLeft.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
-                            normal.set(1, 0, 0);
-                            addCubePlane(builder, center, bottomLeft, bottomRightFront, bottomRight, bottomRightBack, topRight, topRightBack, topLeft, topRightFront, normal, uvBottomLeft, uvTopRight);
-                        }
+						AtlasRegion region = atlas.findRegion(blockType.getSideTextureName());
 
-                        if (x == 0 || chunk.getBlockAt(x - 1, y, z) == BlockType.AIR.getBlockId()) {
-                            // Left plane
-                            bottomLeft.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-                            bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-                            topRight.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
-                            topLeft.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-                            normal.set(-1, 0, 0);
-                            addCubePlane(builder, center, bottomLeft, bottomLeftBack, bottomRight, bottomLeftFront, topRight, topLeftFront, topLeft, topLeftBack, normal, uvBottomLeft, uvTopRight);
-                        }
+						// Counterintuively, (u,v) seems to be the bottom
+						// right and (u2,u2)
+						// the top left in an AtlasRegion
+						// That sure sounds like something that should be
+						// documented in libgdx
+						uvBottomLeft.set(region.getU(), region.getV2());
+						uvTopRight.set(region.getU2(), region.getV());
 
-                        if ((y + 1) == chunk.getHeight()
-                                || chunk.getBlockAt(x, y + 1, z) == BlockType.AIR.getBlockId()) {
+						// ao values for the block
+						int bottomLeftFront = getVertexAO(blockTypeAt(x - 1, y, z + 1),
+								blockTypeAt(x, y - 1, z + 1), blockTypeAt(x - 1, y - 1, z + 1));
+						int bottomRightFront = getVertexAO(blockTypeAt(x + 1, y, z + 1),
+								blockTypeAt(x, y - 1, z + 1), blockTypeAt(x + 1, y - 1, z + 1));
+						int topLeftFront = getVertexAO(blockTypeAt(x - 1, y, z + 1),
+								blockTypeAt(x, y + 1, z + 1), blockTypeAt(x - 1, y + 1, z + 1));
+						int topRightFront = getVertexAO(blockTypeAt(x + 1, y, z + 1),
+								blockTypeAt(x, y + 1, z + 1), blockTypeAt(x + 1, y + 1, z + 1));
+						int bottomLeftBack = getVertexAO(blockTypeAt(x - 1, y, z - 1),
+								blockTypeAt(x, y - 1, z - 1), blockTypeAt(x - 1, y - 1, z - 1));
+						int bottomRightBack = getVertexAO(blockTypeAt(x + 1, y, z - 1),
+								blockTypeAt(x, y - 1, z - 1), blockTypeAt(x + 1, y - 1, z - 1));
+						int topLeftBack = getVertexAO(blockTypeAt(x - 1, y, z - 1),
+								blockTypeAt(x, y + 1, z - 1), blockTypeAt(x - 1, y + 1, z - 1));
+						int topRightBack = getVertexAO(blockTypeAt(x + 1, y, z - 1),
+								blockTypeAt(x, y + 1, z - 1), blockTypeAt(x + 1, y + 1, z - 1));
 
-                            region = atlas.findRegion(blockType.getTopTextureName());
-                            uvBottomLeft.set(region.getU(), region.getV());
-                            uvTopRight.set(region.getU2(), region.getV2());
+						if (blockTypeAt(x, y, z + 1) == AIR_ID) {
+							// Front plane
+							bottomLeft.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							bottomRight.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							topRight.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							topLeft.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							normal.set(0, 0, 1);
+							addCubePlane(builder, center, bottomLeft, bottomLeftFront, bottomRight, bottomRightFront,
+									topRight, topRightFront, topLeft, topLeftFront, normal, uvBottomLeft, uvTopRight);
+						}
 
-                            // Top plane
-                            bottomLeft.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
-                            bottomRight.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
-                            topRight.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-                            topLeft.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
-                            normal.set(0, 1, 0);
-                            addCubePlane(builder, center, bottomLeft, topLeftFront, bottomRight, topRightFront, topRight, topRightBack, topLeft, topLeftBack, normal, uvBottomLeft, uvTopRight);
-                        }
+						if (blockTypeAt(x, y, z - 1) == AIR_ID) {
+							// Back plane
+							bottomLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							bottomRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							topRight.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							topLeft.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							normal.set(0, 0, -1);
+							addCubePlane(builder, center, bottomLeft, bottomRightBack, bottomRight, bottomLeftBack,
+									topRight, topLeftBack, topLeft, topRightBack, normal, uvBottomLeft, uvTopRight);
+						}
 
-                        if (y == 0 || chunk.getBlockAt(x, y - 1, z) == BlockType.AIR.getBlockId()) {
+						if (blockTypeAt(x + 1, y, z) == AIR_ID) {
+							// Right plane
+							bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							bottomRight.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							topRight.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							topLeft.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							normal.set(1, 0, 0);
+							addCubePlane(builder, center, bottomLeft, bottomRightFront, bottomRight, bottomRightBack,
+									topRight, topRightBack, topLeft, topRightFront, normal, uvBottomLeft, uvTopRight);
+						}
 
-                            region = atlas.findRegion(blockType.getBottomTextureName());
-                            uvBottomLeft.set(region.getU(), region.getV());
-                            uvTopRight.set(region.getU2(), region.getV2());
+						if (blockTypeAt(x - 1, y, z) == AIR_ID) {
+							// Left plane
+							bottomLeft.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							topRight.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							topLeft.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							normal.set(-1, 0, 0);
+							addCubePlane(builder, center, bottomLeft, bottomLeftBack, bottomRight, bottomLeftFront,
+									topRight, topLeftFront, topLeft, topLeftBack, normal, uvBottomLeft, uvTopRight);
+						}
 
-                            // Bottom plane
-                            bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-                            bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
-                            topRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-                            topLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
-                            normal.set(0, -1, 0);
-                            addCubePlane(builder, center, bottomLeft, bottomLeftFront, bottomRight, bottomRightFront, topRight, bottomRightBack, topLeft, bottomLeftBack, normal, uvBottomLeft, uvTopRight);
-                        }
-                    }
-                }
+						if (blockTypeAt(x, y + 1, z) == AIR_ID) {
 
-                if (builder.getNumVertices() > 30000) {
-                    throw new RuntimeException("Too many vertices");
-                }
-            }
-        }
+							region = atlas.findRegion(blockType.getTopTextureName());
+							uvBottomLeft.set(region.getU(), region.getV());
+							uvTopRight.set(region.getU2(), region.getV2());
 
-        builder.end(mesh);
-    }
+							// Top plane
+							bottomLeft.set(-blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							bottomRight.set(blockSizeHalved, blockSizeHalved, blockSizeHalved);
+							topRight.set(blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							topLeft.set(-blockSizeHalved, blockSizeHalved, -blockSizeHalved);
+							normal.set(0, 1, 0);
+							addCubePlane(builder, center, bottomLeft, topLeftFront, bottomRight, topRightFront,
+									topRight, topRightBack, topLeft, topLeftBack, normal, uvBottomLeft, uvTopRight);
+						}
 
-    public void addCubePlane(MeshBuilder builder, Vector3 center, Vector3 bottomLeftOffset, int bottomLeftAO, Vector3 bottomRightOffset,
-                             int bottomRightAO, Vector3 topRightOffset, int topRightAO, Vector3 topLeftOffset, int topLeftAO, Vector3 normal, Vector2 uvBottomLeft, Vector2 uvTopRight) {
+						if (blockTypeAt(x, y - 1, z) == AIR_ID) {
 
-        Vector3 position = new Vector3(center.x + bottomLeftOffset.x, center.y + bottomLeftOffset.y,
-                center.z + bottomLeftOffset.z);
-        leftBottom.setPos(position).setNor(normal).setCol(bottomLeftAO,0,0,0).setUV(uvBottomLeft.x, uvBottomLeft.y);
+							region = atlas.findRegion(blockType.getBottomTextureName());
+							uvBottomLeft.set(region.getU(), region.getV());
+							uvTopRight.set(region.getU2(), region.getV2());
 
-        position.set(center.x + bottomRightOffset.x, center.y + bottomRightOffset.y, center.z + bottomRightOffset.z);
-        rightBottom.setPos(position).setNor(normal).setCol(bottomRightAO,0,0,0).setUV(uvTopRight.x, uvBottomLeft.y);
+							// Bottom plane
+							bottomLeft.set(blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							bottomRight.set(-blockSizeHalved, -blockSizeHalved, blockSizeHalved);
+							topRight.set(-blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							topLeft.set(blockSizeHalved, -blockSizeHalved, -blockSizeHalved);
+							normal.set(0, -1, 0);
+							addCubePlane(builder, center, bottomLeft, bottomLeftFront, bottomRight, bottomRightFront,
+									topRight, bottomRightBack, topLeft, bottomLeftBack, normal, uvBottomLeft,
+									uvTopRight);
+						}
+					}
+				}
 
-        position.set(center.x + topRightOffset.x, center.y + topRightOffset.y, center.z + topRightOffset.z);
-        rightTop.setPos(position).setNor(normal).setCol(topRightAO,0,0,0).setUV(uvTopRight.x, uvTopRight.y);
+				if (builder.getNumVertices() > 30000) {
+					throw new RuntimeException("Too many vertices");
+				}
+			}
+		}
+		
+		if (builder.getNumVertices() == 0) {
+			return null;
+		} else {
+			return builder;
+		}
+	}
 
-        position.set(center.x + topLeftOffset.x, center.y + topLeftOffset.y, center.z + topLeftOffset.z);
-        leftTop.setPos(position).setNor(normal).setCol(topLeftAO,0,0,0).setUV(uvBottomLeft.x, uvTopRight.y);
+	public void addCubePlane(MeshBuilder builder, Vector3 center, Vector3 bottomLeftOffset, int bottomLeftAO,
+			Vector3 bottomRightOffset, int bottomRightAO, Vector3 topRightOffset, int topRightAO, Vector3 topLeftOffset,
+			int topLeftAO, Vector3 normal, Vector2 uvBottomLeft, Vector2 uvTopRight) {
 
-        builder.rect(leftBottom, rightBottom, rightTop, leftTop);
-    }
+		Vector3 position = new Vector3(center.x + bottomLeftOffset.x, center.y + bottomLeftOffset.y,
+				center.z + bottomLeftOffset.z);
+		leftBottom.setPos(position).setNor(normal).setCol(bottomLeftAO, 0, 0, 0).setUV(uvBottomLeft.x, uvBottomLeft.y);
 
-    public int getVertexAO(short neighborSide1, short neighborSide2, short neighborCorner) {
-        if(neighborSide1 != BlockType.AIR.getBlockId() && neighborSide2 != BlockType.AIR.getBlockId())
-            return 0;
-        int ao = 0;
-        if(neighborSide1 != BlockType.AIR.getBlockId()) ao++;
-        if(neighborSide2 != BlockType.AIR.getBlockId()) ao++;
-        if(neighborCorner != BlockType.AIR.getBlockId()) ao++;
-        return 2 - ao;
-    }
+		position.set(center.x + bottomRightOffset.x, center.y + bottomRightOffset.y, center.z + bottomRightOffset.z);
+		rightBottom.setPos(position).setNor(normal).setCol(bottomRightAO, 0, 0, 0).setUV(uvTopRight.x, uvBottomLeft.y);
+
+		position.set(center.x + topRightOffset.x, center.y + topRightOffset.y, center.z + topRightOffset.z);
+		rightTop.setPos(position).setNor(normal).setCol(topRightAO, 0, 0, 0).setUV(uvTopRight.x, uvTopRight.y);
+
+		position.set(center.x + topLeftOffset.x, center.y + topLeftOffset.y, center.z + topLeftOffset.z);
+		leftTop.setPos(position).setNor(normal).setCol(topLeftAO, 0, 0, 0).setUV(uvBottomLeft.x, uvTopRight.y);
+
+		builder.rect(leftBottom, rightBottom, rightTop, leftTop);
+	}
+
+	public int getVertexAO(short neighborSide1, short neighborSide2, short neighborCorner) {
+		if (neighborSide1 != BlockType.AIR.getBlockId() && neighborSide2 != BlockType.AIR.getBlockId())
+			return 0;
+		int ao = 0;
+		if (neighborSide1 != BlockType.AIR.getBlockId())
+			ao++;
+		if (neighborSide2 != BlockType.AIR.getBlockId())
+			ao++;
+		if (neighborCorner != BlockType.AIR.getBlockId())
+			ao++;
+		return 2 - ao;
+	}
+
+	@Override
+	public void reset() {
+		mesh = null;
+	}
 }

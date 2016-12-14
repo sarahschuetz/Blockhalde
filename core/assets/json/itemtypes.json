@@ -1,67 +1,75 @@
 {
-    "itemtypes" : {
-        "stoneblock" : {
-            "category": "block",
+    "itemtypes" : [
+        {    
+        	"id" : "stone", 	
             "name": "Stone Block",
-            "maxStackHeight": 64,
+            "category": "block",
+            "maxStackSize": 64,
             "hasWear": false,
             "image": "gui_textures/stone.png"
         },
 
-        "woodblock" : {
+        {
+       		"id" : "wood",
             "name": "Wood Block",
             "category": "block",
-            "maxStackHeight": 64,
+            "maxStackSize": 64,
             "hasWear": false,
             "image": "gui_textures/wood.png"
         },
         
-        "cobblestoneblock" : {
+        {
+        	"id" : "cobblestone",
         	"name": "CobbleStone Block",
             "category": "block",
-            "maxStackHeight": 64,
+            "maxStackSize": 64,
             "hasWear": false,
             "image": "gui_textures/cobblestone.png"
         },
         
-        "glasblock" : {
+        {
+        	"id" : "glas",
         	"name": "Glas Block",
             "category": "block",
-            "maxStackHeight": 64,
+            "maxStackSize": 64,
             "hasWear": false,
             "image": "gui_textures/glass.png"
         },
         
-        "brickblock" : {
-        	"name": "Bricks Block",
+        {
+        	"id" : "brick",
+            "name": "Bricks Block",
             "category": "block",
-            "maxStackHeight": 64,
+            "maxStackSize": 64,
             "hasWear": false,
             "image": "gui_textures/bricks.png"
         },
         
-        "diamond" : {
+        {
+        	"id" : "diamond",
         	"name": "Diamond",
             "category": "ingredient",
-            "maxStackHeight": 64,
+            "maxStackSize": 64,
             "hasWear": false,
             "image": "gui_textures/diamond.png"
         },
         
-        "coal" : {
+        {
+        	"id" : "coal",
         	"name": "Coal",
             "category": "ingredient",
-            "maxStackHeight": 64,
+            "maxStackSize": 64,
             "hasWear": false,
             "image": "gui_textures/coal.png"
         },
 
-        "lasergun" : {
+        {
+        	"id" : "laser",
             "name": "Laser Gun",
             "category": "tool",
-            "maxStackHeight": 1,
+            "maxStackSize": 1,
             "hasWear": true,
             "image": "gui_textures/lasergun.png"
         }
-    }
+    ]
 }
