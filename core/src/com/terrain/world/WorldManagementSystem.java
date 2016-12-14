@@ -144,6 +144,8 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
     @Override
     public short getBlock(int x, int y, int z) {
+    	if (x < 0) x = x - Chunk.X_MAX;
+    	if (z < 0) z = z - Chunk.Z_MAX;
         Chunk chunk = getChunk(x, z);
         if (chunk != null) {
         	int relativeX = x < 0 ? Chunk.X_MAX + (x % Chunk.X_MAX) - 1 : x % Chunk.X_MAX;

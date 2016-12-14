@@ -76,7 +76,8 @@ public class VirtualGameController extends VirtualAbstractController {
 			PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
 			if(pms != null){
 				pms.setActive(true);
-				inputSystem.getCameraController().setActive(false);
+				VirtualController vpcc = inputSystem.getController(VirtualPlayerCameraController.class);
+				if (vpcc != null) vpcc.setActive(false);
 			}
 		}
 	}
@@ -87,7 +88,8 @@ public class VirtualGameController extends VirtualAbstractController {
 			PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
 			if(pms != null){
 				pms.setActive(false);
-				inputSystem.getCameraController().setActive(true);
+				VirtualController vpcc = inputSystem.getController(VirtualPlayerCameraController.class);
+				if (vpcc != null) vpcc.setActive(true);
 			}
 		}
 	}

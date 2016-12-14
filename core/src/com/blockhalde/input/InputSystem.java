@@ -1,7 +1,5 @@
 package com.blockhalde.input;
 
-import java.util.List;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.Gdx;
@@ -57,13 +55,12 @@ public class InputSystem extends EntitySystem {
 	
 	/**
 	 * Is mostly called by {@link VirtualController}s which need access to other {@link VirtualController}s.
-	 * @return A {@link List} containing all registered {@link VirtualController}s
+	 * @return The desired {@link VirtualController} if it is registered, null otherwise
 	 */
-	public List<VirtualController> getControllers() {
-		return inputProcessor.getControllers();
-	}
-
-	public VirtualController getCameraController() {
-		return cameraController;
+	public <T extends VirtualController> VirtualController getController(Class<T> controllerClass) {
+		for (VirtualController controller : inputProcessor.getControllers()) {
+			if (controller.getClass().equals(controllerClass)) return controller;
+		}
+		return null;
 	}
 }

@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.blockhalde.player.CameraComponent;
 import com.blockhalde.player.DebugComponent;
+import com.blockhalde.player.Player;
 import com.blockhalde.player.PlayerDataComponent;
 import com.blockhalde.player.PositionComponent;
 import com.terrain.block.BlockType;
-import com.terrain.chunk.Chunk;
 import com.terrain.world.WorldManagementSystem;
 import com.util.PauseListener;
 
@@ -20,13 +20,14 @@ import com.util.PauseListener;
  */
 public class VirtualPlayerMovementController extends VirtualAbstractController {
 	private static final float GRAVITY = 0.98f;
-	private static final float MAX_FALL_SPEED = -4f;
+	private static final float MAX_FALL_SPEED = 4f;
 	private static final float FLY_SPEED = 6f;
 	private static final float WALK_SPEED = 2f;
 	private static final float JUMP_STRENGTH = 0.3f;
-	private static final float PLAYER_HEIGHT = 2f;
+	private static final float PLAYER_HEIGHT = 1.8f;
 	private static final float COLLISION_DISTANCE = 0.01f;
 	private static final float VERTICAL_PEEK_DISTANCE = 0.5f;
+	private static final float MAX_MOVEMENT_PER_FRAME = 0.8f;
 
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 
@@ -75,65 +76,96 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 			ImmutableArray<Entity> query = inputSystem.getEngine().getEntitiesFor(Family.all(PlayerDataComponent.class, CameraComponent.class).get());
 			if (query.size() != 0) {
 				Entity player = query.first();
+				Vector3 oldPosition = player.getComponent(PositionComponent.class).getPosition().cpy();
+				applyMovementDown(player, deltaTime);
+				applyMovementFwrd(player, deltaTime);
+				applyMovementSide(player, deltaTime);
+				correctPosition(player, oldPosition);
+				
 				Camera camera = player.getComponent(CameraComponent.class).getCamera();
-				Vector3 position = player.getComponent(PositionComponent.class).getPosition();
-				boolean flying = player.getComponent(DebugComponent.class).isFlying();
-				Vector3 oldPosition = position.cpy();
-				position.add(prepareMovementVectorFwrd(camera, flying, deltaTime));
-				position.add(prepareMovementVectorSide(camera, flying, deltaTime));
-				position.add(prepareMovementVectorDown(oldPosition, flying, deltaTime));
-				correctPosition(oldPosition, position, flying);
-				camera.position.set(position.x, position.y + PLAYER_HEIGHT, position.z);
+				camera.position.set(player.getComponent(PositionComponent.class).getPosition());
+				camera.position.y += PLAYER_HEIGHT;
 				camera.update();
 			}
 		}
 	}
-
-	private Vector3 prepareMovementVectorFwrd(Camera camera, boolean flying, float deltaTime) {
-		if (flying) {
-			float balancedMovementFwrd = deltaTime * FLY_SPEED * movementFwrd / (movementSide != 0 ? 2 : 1);
-			return movementVectorFwrd.set(camera.direction.x * balancedMovementFwrd, camera.direction.y * balancedMovementFwrd, camera.direction.z * balancedMovementFwrd);
-		} else {
-			float balancedMovementFwrd = deltaTime * WALK_SPEED * movementFwrd / (movementSide != 0 ? 2 : 1);
-			return movementVectorFwrd.set(camera.direction).rotate(camera.up, 90f).rotate(Vector3.Y, -90f).set(movementVectorFwrd.x * balancedMovementFwrd, movementVectorFwrd.y * balancedMovementFwrd, movementVectorFwrd.z * balancedMovementFwrd);
-		}
-	}
-
-	private Vector3 prepareMovementVectorSide(Camera camera, boolean flying, float deltaTime) {
-		if (flying){
-			float balancedMovementSide = deltaTime * FLY_SPEED * movementSide / (movementFwrd != 0 ? 2 : 1);			
-			return movementVectorSide.set(camera.direction).rotate(camera.up, 90f).set(movementVectorSide.x * balancedMovementSide, movementVectorSide.y * balancedMovementSide, movementVectorSide.z * balancedMovementSide);
-		} else {
-			float balancedMovementSide = deltaTime * WALK_SPEED * movementSide / (movementFwrd != 0 ? 2 : 1);			
-			return movementVectorSide.set(camera.direction).rotate(camera.up, 90f).set(movementVectorSide.x * balancedMovementSide, movementVectorSide.y * balancedMovementSide, movementVectorSide.z * balancedMovementSide);
-		}
-	}
-
-	private Vector3 prepareMovementVectorDown(Vector3 position, boolean flying, float deltaTime) {
-		if (!flying){
-			if (!isBlockAt(position.x, position.y - VERTICAL_PEEK_DISTANCE, position.z)) {
+	
+	/**
+	 * Applies the {@link Player}s downward movement to his {@link PositionComponent} and causes gravity.
+	 * @param player The {@link Player} {@link Entity}
+	 * @param deltaTime The basic update deltaTime
+	 */
+	private void applyMovementDown(Entity player, float deltaTime) {
+		Vector3 position = player.getComponent(PositionComponent.class).getPosition();
+		if (!player.getComponent(DebugComponent.class).isFlying()){
+			if (!blockAt(position.x, position.y - VERTICAL_PEEK_DISTANCE, position.z)) {
 				movementDown -= GRAVITY * deltaTime;
-				if (movementDown < MAX_FALL_SPEED) movementDown = MAX_FALL_SPEED;
+				if (movementDown < -MAX_FALL_SPEED) movementDown = -MAX_FALL_SPEED;
 			} else {
 				if (jumping) movementDown = JUMP_STRENGTH;
 				else if (movementDown < 0) movementDown = 0;
 			}
-			return movementVectorDown.set(0, movementDown, 0);
+			movementVectorDown.set(0, movementDown, 0);
 		} else {
 			movementDown = 0;
-			return movementVectorDown.set(0, 0, 0);
+			movementVectorDown.set(0, 0, 0);
 		}
+		position.add(movementVectorDown);
 	}
 
-	private void correctPosition(Vector3 oldPosition, Vector3 position, boolean flying) {
-		if (!flying){
+	/**
+	 * Applies the {@link Player}s forward movement to his {@link PositionComponent}.
+	 * @param player The {@link Player} {@link Entity}
+	 * @param deltaTime The basic update deltaTime
+	 */
+	private void applyMovementFwrd(Entity player, float deltaTime) {
+		Vector3 position = player.getComponent(PositionComponent.class).getPosition();
+		Camera camera = player.getComponent(CameraComponent.class).getCamera();
+		if (player.getComponent(DebugComponent.class).isFlying()) {
+			float balancedMovementFwrd = deltaTime * FLY_SPEED * movementFwrd / (movementSide != 0 ? 2 : 1);
+			movementVectorFwrd.set(camera.direction.x * balancedMovementFwrd, camera.direction.y * balancedMovementFwrd, camera.direction.z * balancedMovementFwrd);
+		} else {
+			float balancedMovementFwrd = deltaTime * WALK_SPEED * movementFwrd / (movementSide != 0 ? 2 : 1);
+			if (balancedMovementFwrd > MAX_MOVEMENT_PER_FRAME) balancedMovementFwrd = MAX_MOVEMENT_PER_FRAME;
+			movementVectorFwrd.set(camera.direction).rotate(camera.up, 90f).rotate(Vector3.Y, -90f).set(movementVectorFwrd.x * balancedMovementFwrd, movementVectorFwrd.y * balancedMovementFwrd, movementVectorFwrd.z * balancedMovementFwrd);
+		}
+		position.add(movementVectorFwrd);
+	}
+
+	/**
+	 * Applies the {@link Player}s side movement to his {@link PositionComponent}.
+	 * @param player The {@link Player} {@link Entity}
+	 * @param deltaTime The basic update deltaTime
+	 */
+	private void applyMovementSide(Entity player, float deltaTime) {
+		Vector3 position = player.getComponent(PositionComponent.class).getPosition();
+		Camera camera = player.getComponent(CameraComponent.class).getCamera();
+		if (player.getComponent(DebugComponent.class).isFlying()){
+			float balancedMovementSide = deltaTime * FLY_SPEED * movementSide / (movementFwrd != 0 ? 2 : 1);			
+			movementVectorSide.set(camera.direction).rotate(camera.up, 90f).set(movementVectorSide.x * balancedMovementSide, movementVectorSide.y * balancedMovementSide, movementVectorSide.z * balancedMovementSide);
+		} else {
+			float balancedMovementSide = deltaTime * WALK_SPEED * movementSide / (movementFwrd != 0 ? 2 : 1);
+			if (balancedMovementSide > MAX_MOVEMENT_PER_FRAME) balancedMovementSide = MAX_MOVEMENT_PER_FRAME;		
+			movementVectorSide.set(camera.direction).rotate(camera.up, 90f).set(movementVectorSide.x * balancedMovementSide, movementVectorSide.y * balancedMovementSide, movementVectorSide.z * balancedMovementSide);
+		}
+		position.add(movementVectorSide);
+	}
+
+	/**
+	 * Corrects the modified {@link PositionComponent} of the {@link Player} to enable collision with blocks.
+	 * @param player The {@link Player} {@link Entity}
+	 * @param oldPosition The {@link PositionComponent} the {@link Player} had before his movement
+	 */
+	private void correctPosition(Entity player, Vector3 oldPosition) {
+		Vector3 position = player.getComponent(PositionComponent.class).getPosition();
+		if (!player.getComponent(DebugComponent.class).isFlying()){
 			if (movementDown == 0.0) position.y = (int) position.y + COLLISION_DISTANCE;
 
 			int xMoved = (int) oldPosition.x - (int) position.x;
 			int zMoved = (int) oldPosition.z - (int) position.z;
-			boolean blocked = isBlockAt(position.x, position.y, position.z) || isBlockAt(position.x, position.y + 1, position.z);
-			boolean blockedX = isBlockAt(oldPosition.x - xMoved,  position.y,  oldPosition.z) || isBlockAt(oldPosition.x - xMoved,  position.y + 1,  oldPosition.z);
-			boolean blockedZ = isBlockAt(oldPosition.x,  position.y,  oldPosition.z - zMoved) || isBlockAt(oldPosition.x,  position.y + 1,  oldPosition.z - zMoved);
+			boolean blocked = blockAt(position.x, position.y, position.z) || blockAt(position.x, position.y + 1, position.z);
+			boolean blockedX = blockAt(oldPosition.x - xMoved,  position.y,  oldPosition.z) || blockAt(oldPosition.x - xMoved,  position.y + 1,  oldPosition.z);
+			boolean blockedZ = blockAt(oldPosition.x,  position.y,  oldPosition.z - zMoved) || blockAt(oldPosition.x,  position.y + 1,  oldPosition.z - zMoved);
 
 			if (blocked) {
 				if (xMoved != 0 && (blockedX || zMoved != 0 && !blockedZ)) {
@@ -151,9 +183,14 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 		}
 	}
 
-	private boolean isBlockAt(float x, float y, float z) {
-		x = x < 0 ? x - Chunk.X_MAX : x;
-		z = z < 0 ? z - Chunk.Z_MAX : z;
+	/**
+	 * Queries the {@link WorldManagementSystem} for the {@link BlockType} at the given coordinates.
+	 * @param x The x coordinate of the block
+	 * @param y The y coordinate of the block
+	 * @param z The z coordinate of the block
+	 * @return True if the block at the position is not of {@link BlockType}.AIR
+	 */
+	private boolean blockAt(float x, float y, float z) {
 		return inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlockType((int) x, (int) y, (int) z) != BlockType.AIR.getBlockId();
 	}
 }
