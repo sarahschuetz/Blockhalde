@@ -2,7 +2,6 @@ package com.terrain.world;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.msg.MessageManager;
 import com.badlogic.msg.Telegram;
 import com.badlogic.msg.Telegraph;
@@ -19,11 +18,9 @@ import com.util.FlagUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class WorldManagementSystem extends EntitySystem implements WorldInterface {
     // All loaded chunks are placed in this map
@@ -33,7 +30,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     private final List<Chunk> visibleChunks = new ArrayList<Chunk>();
 
     // Defines how many chunks are drawn around the player
-    private int drawDistance = 11;
+    private int drawDistance = 6;
 
     // TODO: Change so that Seed is not fix implemented here
     private PerlinTerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
@@ -65,15 +62,8 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     }
     
     protected void deleteAllChunks() {
-    	final Set<ChunkPosition> keys = worldChunks.keySet();
-    	for (ChunkPosition c : keys) {
-    		Gdx.app.postRunnable(new Runnable() {
-				@Override
-				public void run() {
-					destroyChunk(c);
-				}
-			});
-    	}
+    	// TODO: Delete!
+    	// TODO: Copy data which should be deleted into a buffer for data persistence.
     }
     
     public void generateChunksAroundPlayer(ChunkPosition position) {
@@ -115,8 +105,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 	@Override
     public Chunk getChunk(int xPosition, int zPosition) {
         final ChunkPosition chunkPosition = ChunkUtil.getChunkPositionFor(xPosition, zPosition);
-        getChunk(chunkPosition);
-        return null;
+        return getChunk(chunkPosition);
     }
 	
 	@Override
@@ -160,13 +149,8 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 			@Override
 			public boolean handleMessage(Telegram msg) {
 				final ChunkPosition position = ((ChunkMessage) msg.extraInfo).getChunkPosition();
-				// TODO: Delete old chunks ==
-				// TODO: Generate new chunks around the player (drawDistance, chunkPosition)
-				
-				// TODO: Don't delete all chunks, only the difference between new and old chunks
 				deleteAllChunks();
 				generateChunksAroundPlayer(position);
-				System.out.println("Chunk update blabla");
 				return true;
 			}
 		}, MessageIdConstants.PLAYER_CHANGED_CHUNK_POSITION_MSG_ID);
