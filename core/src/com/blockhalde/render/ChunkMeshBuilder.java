@@ -37,64 +37,15 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 	private Vector2 uvTopRight = new Vector2();
 
 	private TextureAtlas atlas;
-	private WorldInterface world;
+	private ChunkMeshRequest req;
 
-	/**
-	 * Holds a chunk that is optionally used as the <code>posZChunk</code> if no
-	 * such chunk is yet available for generation.
-	 */
-	private UniformChunk posZNullChunk = new UniformChunk(NULL_POSITION, BlockType.AIR);
-	/**
-	 * Holds a chunk that is optionally used as the <code>negZChunk</code> if no
-	 * such chunk is yet available for generation.
-	 */
-	private UniformChunk negZNullChunk = new UniformChunk(NULL_POSITION, BlockType.AIR);
-	/**
-	 * Holds a chunk that is optionally used as the <code>posXChunk</code> if no
-	 * such chunk is yet available for generation.
-	 */
-	private UniformChunk posXNullChunk = new UniformChunk(NULL_POSITION, BlockType.AIR);
-	/**
-	 * Holds a chunk that is optionally used as the <code>negXChunk</code> if no
-	 * such chunk is yet available for generation.
-	 */
-	private UniformChunk negXNullChunk = new UniformChunk(NULL_POSITION, BlockType.AIR);
-
-	/**
-	 * During mesh updates, temporarily holds the chunk at the specified chunk
-	 * position.
-	 */
-	private Chunk centerChunk;
-	/**
-	 * During mesh updates, temporarily holds the chunk in front of the chunk at
-	 * the specified chunk position.
-	 */
-	private Chunk posZChunk;
-	/**
-	 * During mesh updates, temporarily holds the chunk behind the chunk at the
-	 * specified chunk position.
-	 */
-	private Chunk negZChunk;
-	/**
-	 * During mesh updates, temporarily holds the chunk right of the chunk at
-	 * the specified chunk position.
-	 */
-	private Chunk posXChunk;
-	/**
-	 * During mesh updates, temporarily holds the chunk left of the chunk at the
-	 * specified chunk position.
-	 */
-	private Chunk negXChunk;
-	private int subchunkIdx;
-	private ChunkPosition pos;
 	private Mesh mesh;
 
-	public ChunkMeshBuilder(WorldInterface world, TextureAtlas atlas) {
-		this.world = world;
+	public ChunkMeshBuilder(TextureAtlas atlas) {
 		this.atlas = atlas;
 	}
 
-	private Chunk fetchChunk(ChunkPosition pos, int offsetX, int offsetZ, UniformChunk fallbackChunk) {
+	/*private Chunk fetchChunk(ChunkPosition pos, int offsetX, int offsetZ, UniformChunk fallbackChunk) {
 		int posX = pos.getXPosition() + offsetX * Chunk.X_MAX;
 		int posZ = pos.getZPosition() + offsetZ * Chunk.Z_MAX;
 
@@ -110,36 +61,25 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 
 	private Chunk fetchChunk(ChunkPosition pos) {
 		return world.getChunk(pos.getXPosition(), pos.getZPosition());
-	}
+	}*/
 
 	byte blockTypeAt(int relativeX, int relativeY, int relativeZ) {
 		if (relativeX < 0) {
-			return negXChunk.getBlockTypeAt(Chunk.X_MAX + relativeX, relativeY, relativeZ);
+			return req.negXChunk.getBlockTypeAt(Chunk.X_MAX + relativeX, relativeY, relativeZ);
 		} else if (relativeX >= Chunk.X_MAX) {
-			return posXChunk.getBlockTypeAt(relativeX - Chunk.X_MAX, relativeY, relativeZ);
+			return req.posXChunk.getBlockTypeAt(relativeX - Chunk.X_MAX, relativeY, relativeZ);
 		} else if (relativeZ < 0) {
-			return negZChunk.getBlockTypeAt(relativeX, relativeY, Chunk.Z_MAX + relativeZ);
+			return req.negZChunk.getBlockTypeAt(relativeX, relativeY, Chunk.Z_MAX + relativeZ);
 		} else if (relativeZ >= Chunk.Z_MAX) {
-			return posZChunk.getBlockTypeAt(relativeX, relativeY, relativeZ - Chunk.Z_MAX);
+			return req.posZChunk.getBlockTypeAt(relativeX, relativeY, relativeZ - Chunk.Z_MAX);
 		} else {
-			return centerChunk.getBlockTypeAt(relativeX, relativeY, relativeZ);
+			return req.centerChunk.getBlockTypeAt(relativeX, relativeY, relativeZ);
 		}
 	}
 	
-	public void init(ChunkPosition pos, int subchunkIdx) {
+	public void init(ChunkMeshRequest req) {
 		this.mesh = null;
-		this.pos = pos;
-		this.subchunkIdx = subchunkIdx;
-		centerChunk = fetchChunk(pos);
-
-		if (centerChunk == null) {
-			throw new RuntimeException("Expected specified position to be already loaded in ChunkMeshBuilder update");
-		} else {
-			posZChunk = fetchChunk(pos, 0, 1, posZNullChunk);
-			negZChunk = fetchChunk(pos, 0, -1, negZNullChunk);
-			posXChunk = fetchChunk(pos, 1, 0, posXNullChunk);
-			negXChunk = fetchChunk(pos, -1, 0, negXNullChunk);
-		}
+		this.req = req;
 	}
 	
 	@Override
@@ -152,7 +92,7 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 		builder.begin(ChunkMeshCache.BLOCK_MESH_ATTRS, GL20.GL_TRIANGLES);
 
 		for (int x = 0; x < Chunk.X_MAX; ++x) {
-			for (int y = subchunkIdx * 16; y < (subchunkIdx + 1) * 16; ++y) {
+			for (int y = req.subchunkIdx * 16; y < (req.subchunkIdx + 1) * 16; ++y) {
 				for (int z = 0; z < Chunk.Z_MAX; ++z) {
 
 					byte blockId = blockTypeAt(x, y, z);
@@ -160,8 +100,8 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 					if (blockId != BlockType.AIR.getBlockId()) {
 						BlockType blockType = BlockType.fromBlockId(blockId);
 
-						center.set(x + blockSizeHalved + pos.getXPosition(), y + blockSizeHalved,
-								z + pos.getZPosition() + blockSizeHalved);
+						center.set(x + blockSizeHalved + req.getPosition().getXPosition(), y + blockSizeHalved,
+								z + req.getPosition().getZPosition() + blockSizeHalved);
 
 						AtlasRegion region = atlas.findRegion(blockType.getSideTextureName());
 

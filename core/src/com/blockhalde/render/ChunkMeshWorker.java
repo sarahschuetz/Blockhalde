@@ -7,6 +7,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -16,17 +17,11 @@ import com.terrain.world.WorldInterface;
 
 public class ChunkMeshWorker implements Runnable {
 
-	/**
-	 * If this many chunk mesh requests have been enqueued, start processing in
-	 * the worker thread.
-	 */
-	public static final int NOTIFY_WORKER_THRESHOLD = 6;
-
 	private ForkJoinPool taskPool = ForkJoinPool.commonPool();
 	/**
 	 * Blocks if more than 128 subchunks are pending for mesh generation
 	 **/
-	private BlockingQueue<ChunkMeshRequest> pendingRequests = new ArrayBlockingQueue<>(128);
+	private BlockingQueue<ChunkMeshRequest> pendingRequests = new LinkedBlockingDeque<>();
 	private BlockingQueue<CachedSubchunk> cachedSubchunks;
 	
 	private TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("textures/blocks.atlas"));
@@ -34,7 +29,7 @@ public class ChunkMeshWorker implements Runnable {
 	private Pool<ChunkMeshBuilder> builderPool = new Pool<ChunkMeshBuilder>() {
 		@Override
 		protected ChunkMeshBuilder newObject() {
-			return new ChunkMeshBuilder(world, atlas);
+			return new ChunkMeshBuilder(atlas);
 		}
 
 	};
@@ -48,10 +43,12 @@ public class ChunkMeshWorker implements Runnable {
 	@Override
 	public void run() {
 		running = true;
+		
+		final List<ChunkMeshRequest> runRequests = new ArrayList<>();
 		while(running) {
-			final List<ChunkMeshRequest> runRequests = new ArrayList<>();
 			final List<Future<MeshBuilder>> futureMeshes;
 			final List<ChunkMeshBuilder> inUseBuilders = new ArrayList<>();
+			runRequests.clear();
 
 			pendingRequests.drainTo(runRequests);
 			
@@ -59,7 +56,7 @@ public class ChunkMeshWorker implements Runnable {
 				// Start a future for each subchunk mesh generation
 				for(ChunkMeshRequest req: runRequests) {
 					ChunkMeshBuilder builder = builderPool.obtain();
-					builder.init(req.position, req.subchunkIdx);
+					builder.init(req);
 					inUseBuilders.add(builder);
 				}
 				
@@ -80,7 +77,7 @@ public class ChunkMeshWorker implements Runnable {
 								@Override
 								public void run() {
 									try {
-										cachedSubchunks.put(new CachedSubchunk(meshBuilder.end(), req.position, req.subchunkIdx, System.nanoTime()));
+										cachedSubchunks.put(new CachedSubchunk(meshBuilder.end(), req.getPosition(), req.subchunkIdx, System.nanoTime()));
 									} catch (InterruptedException e) {
 										throw new RuntimeException(e);
 									}
@@ -93,13 +90,33 @@ public class ChunkMeshWorker implements Runnable {
 					
 					builderPool.free(builder);
 				}
+			} else {
+				try {
+					Thread.sleep(1);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
 	}
 
 	public void enqueue(ChunkMeshRequest request) {
 		try {
-			pendingRequests.put(request);
+			synchronized(pendingRequests) {
+				boolean notInQueueYet = true;
+				
+				for(ChunkMeshRequest pendingReq: pendingRequests) {
+					if(pendingReq.equals(request)) {
+						notInQueueYet = false;
+						break;
+					}
+				}
+				
+				if(notInQueueYet) {
+					pendingRequests.put(request);
+				}
+				
+			}
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
