@@ -2,6 +2,7 @@ package com.terrain.world;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.msg.MessageManager;
 import com.badlogic.msg.Telegram;
 import com.badlogic.msg.Telegraph;
@@ -14,11 +15,11 @@ import com.terrain.chunk.ChunkUtil;
 import com.terrain.chunk.TerrainChunk;
 import com.terrain.generators.PerlinTerrainGenerator;
 import com.terrain.generators.SimplePerlinTerrainGenerator;
-import com.terrain.generators.TerrainGenerator;
 import com.util.FlagUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,9 +38,6 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     // TODO: Change so that Seed is not fix implemented here
     private PerlinTerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
 //       private TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
-
-    // for testing purposes
-    private Chunk currentPlayerChunk;
 
      /**
      * Creates a new blank chunk at the specified position in the world
@@ -68,8 +66,13 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     
     protected void deleteAllChunks() {
     	final Set<ChunkPosition> keys = worldChunks.keySet();
-    	for(ChunkPosition c : keys) {
-    		destroyChunk(c);
+    	for (ChunkPosition c : keys) {
+    		Gdx.app.postRunnable(new Runnable() {
+				@Override
+				public void run() {
+					destroyChunk(c);
+				}
+			});
     	}
     }
     
