@@ -12,6 +12,7 @@ import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
 import com.terrain.chunk.ChunkUtil;
 import com.terrain.chunk.TerrainChunk;
+import com.terrain.generators.PerlinTerrainGenerator;
 import com.terrain.generators.SimplePerlinTerrainGenerator;
 import com.terrain.generators.TerrainGenerator;
 import com.util.FlagUtils;
