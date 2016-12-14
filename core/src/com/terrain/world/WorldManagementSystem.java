@@ -15,6 +15,7 @@ import com.terrain.chunk.TerrainChunk;
 import com.terrain.generators.PurePerlinTerrainGenerator;
 import com.terrain.generators.SimplePerlinTerrainGenerator;
 import com.terrain.generators.TerrainGenerator;
+import com.util.FlagUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -133,7 +134,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
 	@Override
     public Chunk getChunk(int xPosition, int zPosition) {
-        ChunkPosition chunkPosition = new ChunkPosition(xPosition/Chunk.X_MAX* Chunk.X_MAX, zPosition/Chunk.Z_MAX*Chunk.Z_MAX);
+        ChunkPosition chunkPosition = new ChunkPosition(xPosition / Chunk.X_MAX * Chunk.X_MAX, zPosition / Chunk.Z_MAX * Chunk.Z_MAX);
         if (worldChunks.containsKey(chunkPosition)) {
             return worldChunks.get(chunkPosition);
         }
@@ -144,18 +145,16 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     public short getBlock(int x, int y, int z) {
         Chunk chunk = getChunk(x, z);
         if (chunk != null) {
-            return chunk.getBlockAt(x % Chunk.X_MAX, y % Chunk.Y_MAX, z % Chunk.Z_MAX);
+        	int relativeX = x < 0 ? Chunk.X_MAX + (x % Chunk.X_MAX) - 1 : x % Chunk.X_MAX;
+        	int relativeZ = z < 0 ? Chunk.Z_MAX + (z % Chunk.Z_MAX) - 1 : z % Chunk.Z_MAX;
+        	return chunk.getBlockAt(relativeX, y, relativeZ);
         }
         return BlockType.AIR.getBlockId();
     }
 
     @Override
     public byte getBlockType(int x, int y, int z) {
-        Chunk chunk = getChunk(x, z);
-        if (chunk != null) {
-            return chunk.getBlockTypeAt(x % Chunk.X_MAX, y % Chunk.Y_MAX, z % Chunk.Z_MAX);
-        }
-        return BlockType.AIR.getBlockId();
+    	return FlagUtils.getByteOf(getBlock(x, y, z), 0);
     }
 
     @Override
