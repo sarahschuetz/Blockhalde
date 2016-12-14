@@ -4,7 +4,7 @@ import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.util.noise.PerlinNoise3D;
 
-public class PurePerlinTerrainGenerator extends BaseTerrainGenerator {
+public class PurePerlinTerrainGenerator extends BasePerlinTerrainGenerator {
 	
 //	private int minimumDirtHeight = 120;
 //    private int minimumGrassHeight = 160;
@@ -26,7 +26,6 @@ public class PurePerlinTerrainGenerator extends BaseTerrainGenerator {
 	@Override
 	public void generate(Chunk chunk) {
 		PerlinNoise3D perlinNoise = getPerlinNoise();
-		double smoothness = Math.random() * 10.0 + 120.0; // random between 20 & 30
 		
 		for(int x = 0; x < Chunk.X_MAX; x++ ) {
 			for(int z = 0; z < Chunk.Z_MAX; z++) {

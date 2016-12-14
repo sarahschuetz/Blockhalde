@@ -5,7 +5,7 @@ import com.terrain.chunk.Chunk;
 import com.util.noise.PerlinNoise3D;
 
 
-public class SimplePerlinTerrainGenerator extends BaseTerrainGenerator {
+public class SimplePerlinTerrainGenerator extends BasePerlinTerrainGenerator {
     private int minimumDirtHeight = 120;
     private int minimumGrassHeight = 160;
     private int minimumTNTHeight = 206;

@@ -10,6 +10,7 @@ import com.blockhalde.player.DebugComponent;
 import com.blockhalde.player.PlayerDataComponent;
 import com.blockhalde.player.PositionComponent;
 import com.terrain.block.BlockType;
+import com.terrain.chunk.Chunk;
 import com.terrain.world.WorldManagementSystem;
 import com.util.PauseListener;
 
@@ -23,8 +24,8 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 	private static final float FLY_SPEED = 6f;
 	private static final float WALK_SPEED = 2f;
 	private static final float JUMP_STRENGTH = 0.3f;
-	private static final float PLAYER_HEIGHT = 2.3f;
-	private static final float COLLISION_DISTANCE = 0.001f;
+	private static final float PLAYER_HEIGHT = 2f;
+	private static final float COLLISION_DISTANCE = 0.01f;
 	private static final float VERTICAL_PEEK_DISTANCE = 0.5f;
 
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
@@ -110,8 +111,7 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 
 	private Vector3 prepareMovementVectorDown(Vector3 position, boolean flying, float deltaTime) {
 		if (!flying){
-			boolean blockedY = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int)position.x, (int) (position.y - VERTICAL_PEEK_DISTANCE), (int)position.z)).getBlockId() != BlockType.AIR.getBlockId();
-			if (!blockedY) {
+			if (!isBlockAt(position.x, position.y - VERTICAL_PEEK_DISTANCE, position.z)) {
 				movementDown -= GRAVITY * deltaTime;
 				if (movementDown < MAX_FALL_SPEED) movementDown = MAX_FALL_SPEED;
 			} else {
@@ -127,16 +127,13 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 
 	private void correctPosition(Vector3 oldPosition, Vector3 position, boolean flying) {
 		if (!flying){
+			if (movementDown == 0.0) position.y = (int) position.y + COLLISION_DISTANCE;
+
 			int xMoved = (int) oldPosition.x - (int) position.x;
 			int zMoved = (int) oldPosition.z - (int) position.z;
-			boolean blocked = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) position.x, (int) position.y, (int) position.z)).getBlockId() != BlockType.AIR.getBlockId() 
-					|| BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) position.x, (int) position.y + 1, (int) position.z)).getBlockId() != BlockType.AIR.getBlockId();
-			boolean blockedX = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x - xMoved, (int) position.y, (int) oldPosition.z)).getBlockId() != BlockType.AIR.getBlockId()
-					|| BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x - xMoved, (int) position.y + 1, (int) oldPosition.z)).getBlockId() != BlockType.AIR.getBlockId();
-			boolean blockedZ = BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x, (int) position.y, (int) oldPosition.z - zMoved)).getBlockId() != BlockType.AIR.getBlockId()
-					|| BlockType.fromBlockId(inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlock((int) oldPosition.x, (int) position.y + 1, (int) oldPosition.z - zMoved)).getBlockId() != BlockType.AIR.getBlockId();
-
-			if (movementDown == 0.0) position.y = (int) position.y + COLLISION_DISTANCE;
+			boolean blocked = isBlockAt(position.x, position.y, position.z) || isBlockAt(position.x, position.y + 1, position.z);
+			boolean blockedX = isBlockAt(oldPosition.x - xMoved,  position.y,  oldPosition.z) || isBlockAt(oldPosition.x - xMoved,  position.y + 1,  oldPosition.z);
+			boolean blockedZ = isBlockAt(oldPosition.x,  position.y,  oldPosition.z - zMoved) || isBlockAt(oldPosition.x,  position.y + 1,  oldPosition.z - zMoved);
 
 			if (blocked) {
 				if (xMoved != 0 && (blockedX || zMoved != 0 && !blockedZ)) {
@@ -152,5 +149,11 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 				}
 			}
 		}
+	}
+
+	private boolean isBlockAt(float x, float y, float z) {
+		x = x < 0 ? x - Chunk.X_MAX : x;
+		z = z < 0 ? z - Chunk.Z_MAX : z;
+		return inputSystem.getEngine().getSystem(WorldManagementSystem.class).getBlockType((int) x, (int) y, (int) z) != BlockType.AIR.getBlockId();
 	}
 }

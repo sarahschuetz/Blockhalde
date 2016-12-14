@@ -14,7 +14,7 @@ public class CameraSystem extends EntitySystem {
 		cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		cam.position.set(-34f, 210f, 62f);
 		cam.position.set(-34f, 210f, 60f);
-		cam.near = 1f;
+		cam.near = 0.01f;
 		cam.far = 300f;
 		cam.update();
 	}
