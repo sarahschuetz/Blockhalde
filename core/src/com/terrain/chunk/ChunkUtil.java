@@ -11,4 +11,8 @@ public class ChunkUtil {
 	public static ChunkPosition getRelativeChunkPosition(ChunkPosition absoluteChunkPosition) {
 		return new ChunkPosition(absoluteChunkPosition.getXPosition() / Chunk.X_MAX, absoluteChunkPosition.getZPosition() / Chunk.Z_MAX);
 	}
+	
+    public ChunkPosition calculateDirection(ChunkPosition oldChunk, ChunkPosition newChunk) {
+    	return new ChunkPosition(newChunk.getXPosition() - oldChunk.getXPosition(), newChunk.getZPosition() - oldChunk.getZPosition());
+    }
 }

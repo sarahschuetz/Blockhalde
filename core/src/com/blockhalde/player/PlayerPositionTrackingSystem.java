@@ -8,7 +8,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.msg.MessageManager;
 import com.messaging.MessageIdConstants;
-import com.messaging.message.ChunkMessage;
+import com.messaging.message.PlayerChangedChunkMessage;
 import com.terrain.chunk.ChunkPosition;
 import com.terrain.chunk.ChunkUtil;
 
@@ -20,7 +20,7 @@ public class PlayerPositionTrackingSystem extends EntitySystem {
 	@Override
 	public void addedToEngine(Engine engine) {
 		setupPlayerData(engine);
-		sendPlayerChangedChunkMessage();
+		sendPlayerChangedChunkMessage(currentChunkPosition);
 		
 		if(playerPosition == null) {
 			logger.error("No player position component found.");
@@ -32,8 +32,9 @@ public class PlayerPositionTrackingSystem extends EntitySystem {
 		final ChunkPosition newChunkPosition = ChunkUtil.getChunkPositionFor((int) playerPosition.getPosition().x, (int) playerPosition.getPosition().z);
 		
 		if(!currentChunkPosition.equals(newChunkPosition)) {
+			final ChunkPosition lastChunkPosition = new ChunkPosition(currentChunkPosition);
 			currentChunkPosition = newChunkPosition;
-			sendPlayerChangedChunkMessage();
+			sendPlayerChangedChunkMessage(lastChunkPosition);
 		}
 	}
 	
@@ -44,7 +45,9 @@ public class PlayerPositionTrackingSystem extends EntitySystem {
 		currentChunkPosition = ChunkUtil.getChunkPositionFor((int) playerPosition.getPosition().x, (int) playerPosition.getPosition().z);
 	}
 	
-	private void sendPlayerChangedChunkMessage() {
-		MessageManager.getInstance().dispatchMessage(0f, null, null, MessageIdConstants.PLAYER_CHANGED_CHUNK_POSITION_MSG_ID, new ChunkMessage(currentChunkPosition));
+	private void sendPlayerChangedChunkMessage(final ChunkPosition lastChunkPosition) {
+		MessageManager.getInstance().dispatchMessage(0f, null, null,
+				MessageIdConstants.PLAYER_CHANGED_CHUNK_POSITION_MSG_ID,
+				new PlayerChangedChunkMessage(currentChunkPosition, lastChunkPosition));
 	}
 }

@@ -10,6 +10,11 @@ public class ChunkPosition {
         this.xPosition = xPosition;
         this.zPosition = zPosition;
     }
+    
+    public ChunkPosition(ChunkPosition copy) {
+    	this.zPosition = copy.getZPosition();
+    	this.xPosition = copy.getXPosition();
+    }
 
     public int getXPosition() {
         return xPosition;
@@ -26,7 +31,7 @@ public class ChunkPosition {
     public void setZPosition(int zPosition) {
 		this.zPosition = zPosition;
 	}
-
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

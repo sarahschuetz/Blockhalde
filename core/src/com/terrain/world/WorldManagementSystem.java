@@ -62,6 +62,16 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     }
     
     protected void deleteAllChunks() {
+//    	Chunk[] chunks = null;
+//    	chunks = worldChunks.values().toArray(new Chunk[] {});
+//    	
+//    	for(int i = 0; i < chunks.length; i++) {
+//    		destroyChunk(chunks[i].getChunkPosition());
+//    		chunks[i] = null;
+//    	}
+    	
+    	//worldChunks.clear();
+    	
     	// TODO: Delete!
     	// TODO: Copy data which should be deleted into a buffer for data persistence.
     }
