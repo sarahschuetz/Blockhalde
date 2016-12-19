@@ -1,10 +1,15 @@
 package com.blockhalde.player;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.blockhalde.input.InputSystem;
 
+/**
+ * An extension of the {@link Entity} class that contains {@link Component}s which make up a Blockhalde {@link Player}.
+ * @author shaendro
+ */
 public class Player extends Entity {
 	/**
 	 * Creates a {@link Player} and attaches the given {@link Camera} to it.
