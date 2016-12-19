@@ -168,16 +168,19 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 			boolean blockedZ = blockAt(oldPosition.x,  position.y,  oldPosition.z - zMoved) || blockAt(oldPosition.x,  position.y + 1,  oldPosition.z - zMoved);
 
 			if (blocked) {
+				boolean resolved = false;
 				if (xMoved != 0 && (blockedX || zMoved != 0 && !blockedZ)) {
 					if (xMoved > 0) position.x = (int) position.x + (oldPosition.x > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
 					else position.x = (int) position.x + (oldPosition.x > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
+					resolved = true;
 				}
 				if (zMoved != 0 && blockedZ) {
 					if (zMoved > 0) position.z = (int) position.z + (oldPosition.z > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
 					else position.z = (int) position.z + (oldPosition.z > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
+					resolved = true;
 				}
-				if (xMoved == 0 && zMoved == 0) {
-					position.y = (int) position.y + 1;
+				if (!resolved) {
+					position.y = position.y + 1;
 				}
 			}
 		}
