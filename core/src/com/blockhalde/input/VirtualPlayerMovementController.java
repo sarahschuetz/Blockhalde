@@ -26,7 +26,7 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 	private static final float FLY_SPEED = WALK_SPEED * 3f;
 	private static final float PLAYER_HEIGHT = 1.8f;
 	private static final float COLLISION_DISTANCE = 0.01f;
-	private static final float VERTICAL_PEEK_DISTANCE = 0.5f;
+	private static final float VERTICAL_PEEK_DISTANCE = 0.3f;
 	private static final float MAX_MOVEMENT_PER_FRAME = 0.8f;
 
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
@@ -168,19 +168,16 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 			boolean blockedZ = blockAt(oldPosition.x,  position.y,  oldPosition.z - zMoved) || blockAt(oldPosition.x,  position.y + 1,  oldPosition.z - zMoved);
 
 			if (blocked) {
-				boolean resolved = false;
 				if (xMoved != 0 && (blockedX || zMoved != 0 && !blockedZ)) {
 					if (xMoved > 0) position.x = (int) position.x + (oldPosition.x > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
 					else position.x = (int) position.x + (oldPosition.x > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
-					resolved = true;
 				}
 				if (zMoved != 0 && blockedZ) {
 					if (zMoved > 0) position.z = (int) position.z + (oldPosition.z > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
 					else position.z = (int) position.z + (oldPosition.z > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
-					resolved = true;
 				}
-				if (!resolved) {
-					position.y = position.y + 1;
+				while (blockAt(position.x, position.y, position.z) || blockAt(position.x, position.y + 1, position.z)) {
+					position.y++;
 				}
 			}
 		}
