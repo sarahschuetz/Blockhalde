@@ -7,6 +7,7 @@ import com.badlogic.msg.Telegram;
 import com.badlogic.msg.Telegraph;
 import com.messaging.MessageIdConstants;
 import com.messaging.message.ChunkMessage;
+import com.messaging.message.ChunkUpdateMessage;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
@@ -100,6 +101,12 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
         	int relativeX = x < 0 ? Chunk.X_MAX + (x % Chunk.X_MAX) - 1 : x % Chunk.X_MAX;
         	int relativeZ = z < 0 ? Chunk.Z_MAX + (z % Chunk.Z_MAX) - 1 : z % Chunk.Z_MAX;
             chunk.setBlockAt(relativeX, y, relativeZ, blockType);
+            
+            // Send update message (TODO: eventually do this in Chunk implementation)
+            MessageManager.getInstance().dispatchMessage(0f, null, null,
+    				MessageIdConstants.BLOCK_UPDATED_MSG_ID,
+    				new ChunkUpdateMessage(chunk.getChunkPosition(),
+    						x, y, z));
         }
     }
 
