@@ -10,7 +10,8 @@ public enum BlockType {
 	DIRT((byte) 2, 0.1f, "dirt", "dirt", "dirt"),
 	STONE((byte) 3, 0.5f, "stone", "stone", "stone"),
 	GRASS((byte) 4, 0.1f, "grass_top", "grass_side", "dirt"),
-	TNT((byte) 5, 0.05f, "tnt_top", "tnt_side", "tnt_bottom");
+	TNT((byte) 5, 0.05f, "tnt_top", "tnt_side", "tnt_bottom"),
+	SNOW((byte) 6, 0.1f, "snow", "grass_side_snowed", "dirt");
 	
 	public static BlockType fromBlockId(short id) {
 		return BlockType.values()[id];
