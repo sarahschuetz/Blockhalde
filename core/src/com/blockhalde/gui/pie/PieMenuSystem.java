@@ -1,5 +1,8 @@
 package com.blockhalde.gui.pie;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
@@ -46,43 +49,22 @@ public class PieMenuSystem extends EntitySystem{
 				RendererGUI.instance().toggleMenu();
 			}
 		};
-	
-		Command cmdCraft = new Command(){
-			public void execute() {
-				System.out.println("Craft");
-			}
-		};
 		
-		Command cmdCall = new Command(){
+		Command cmdFullscreen = new Command(){
+			Dimension windowSize = new Dimension(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 			public void execute() {
-				System.out.println("Heinzibert: Hi, here's Heinzibert!");
+				if(Gdx.graphics.isFullscreen()){
+					Gdx.graphics.setDisplayMode(windowSize.width, windowSize.height, false);
+				}else{
+					Gdx.graphics.setDisplayMode(screenSize.width, screenSize.height, true);
+				}
 				
-				new java.util.Timer().schedule( 
-				        new java.util.TimerTask() {
-				            @Override
-				            public void run() {
-				            	System.out.println("Heinzibert: What do you want?");
-				            }
-				        }, 
-				        2000 
-				);
-				
-				new java.util.Timer().schedule( 
-				        new java.util.TimerTask() {
-				            @Override
-				            public void run() {
-				            	System.out.println("Heinzibert: Hello??");
-				            }
-				        }, 
-				        8000 
-				);
-
 			}
 		};
 		
 		slices.add(new PieSlice("Inventory").setCommand(cmdInventory));
-		slices.add(new PieSlice("Craft").setCommand(cmdCraft));
-		slices.add(new PieSlice("Call Heinzi").setCommand(cmdCall));
+		slices.add(new PieSlice("Fullscreen").setCommand(cmdFullscreen));
 		// -------------------
 		
 		for(PieSlice p : slices){
