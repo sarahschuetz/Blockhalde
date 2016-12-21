@@ -53,6 +53,7 @@ public class Skybox{
 		mesh.render(shader, GL20.GL_TRIANGLES);
 
 		shader.end();
+		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 	}
 
