@@ -63,8 +63,35 @@ public class PieMenuSystem extends EntitySystem{
 			}
 		};
 		
+		Command cmdHeinzi = new Command() {
+			public void execute() {
+				System.out.println("Calling Heinzi ...");
+				new java.util.Timer().schedule(
+					new java.util.TimerTask() {
+						@Override
+						public void run() {
+							System.out.println("Too weak signal for calling Heinzi.");
+							System.out.println("Search for a better place to do business.");
+						}
+					},
+				2000);
+			}
+
+		};
+		
+		Command cmdEat = new Command(){
+			String[] food = {"an apple","a shoe","Heinzi","nothing"};
+			public void execute() {
+				int index = (int) (System.currentTimeMillis() % food.length);
+				System.out.println("You eat " + food[index] + ".");
+			}
+		};
+	   
+		
 		slices.add(new PieSlice("Inventory").setCommand(cmdInventory));
 		slices.add(new PieSlice("Fullscreen").setCommand(cmdFullscreen));
+		slices.add(new PieSlice("Call Heinzi").setCommand(cmdHeinzi));
+		slices.add(new PieSlice("Eat").setCommand(cmdEat));
 		// -------------------
 		
 		for(PieSlice p : slices){
