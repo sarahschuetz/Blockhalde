@@ -47,10 +47,7 @@ public class Skybox{
 		shader.begin();
 		cubemap.bind(0);
 	    shader.setUniformi("u_cubeTexture", 0);
-	    Matrix4 v = camera.view;
-	    Vector3 inv = camera.position;
-	    v.translate(inv.scl(-1));
-	    shader.setUniformMatrix("u_view", v);
+	    shader.setUniformMatrix("u_view", camera.view);
 		shader.setUniformMatrix("u_projection", camera.projection);
 	    //shader.setUniformMatrix("u_view", new Matrix4().idt());
 		mesh.render(shader, GL20.GL_TRIANGLES);
