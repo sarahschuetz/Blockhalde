@@ -33,11 +33,13 @@ public class Skybox{
 			throw new GdxRuntimeException(shader.getLog());
 		
 		// load texture
-		FileHandle f = Gdx.files.internal("textures/starrynight.png");
-		cubemap = new Cubemap(f, f, f, f, f, f);
+		//FileHandle f = Gdx.files.internal("textures/starrynight.png");
+		//cubemap = new Cubemap(f, f, f, f, f, f);
+		cubemap = new Cubemap(Gdx.files.internal("textures/Citadella2/posx.jpg"), Gdx.files.internal("textures/Citadella2/negx.jpg"), 
+							  Gdx.files.internal("textures/Citadella2/posy.jpg"), Gdx.files.internal("textures/Citadella2/negy.jpg"), 
+							  Gdx.files.internal("textures/Citadella2/posz.jpg"), Gdx.files.internal("textures/Citadella2/negz.jpg"));
 		
 		// create cube
-		//mesh = createQuad();
 		mesh = genCube();
 	}
 
@@ -55,16 +57,6 @@ public class Skybox{
 		shader.end();
 		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-	}
-
-	public Mesh createQuad() {
-		Mesh mesh = new Mesh(true, 4, 6, VertexAttribute.Position(),
-				VertexAttribute.ColorUnpacked(), VertexAttribute.TexCoords(0));
-		mesh.setVertices(new float[] { -1f, -1f, 0, 1, 1, 1, 1, 0, 1, 1f, -1f,
-				0, 1, 1, 1, 1, 1, 1, 1f, 1f, 0, 1, 1, 1, 1, 1, 0, -1f, 1f, 0,
-				1, 1, 1, 1, 0, 0 });
-		mesh.setIndices(new short[] { 0, 1, 2, 2, 3, 0 });
-		return mesh;
 	}
 	
 	public static Mesh genCube() {
@@ -121,58 +113,5 @@ public class Skybox{
 
 		return mesh;
 	}
-	
-	Mesh anotherCube(){
-		float points[] = {
-				  -10.0f,  10.0f, -10.0f,
-				  -10.0f, -10.0f, -10.0f,
-				   10.0f, -10.0f, -10.0f,
-				   10.0f, -10.0f, -10.0f,
-				   10.0f,  10.0f, -10.0f,
-				  -10.0f,  10.0f, -10.0f,
-				  
-				  -10.0f, -10.0f,  10.0f,
-				  -10.0f, -10.0f, -10.0f,
-				  -10.0f,  10.0f, -10.0f,
-				  -10.0f,  10.0f, -10.0f,
-				  -10.0f,  10.0f,  10.0f,
-				  -10.0f, -10.0f,  10.0f,
-				  
-				   10.0f, -10.0f, -10.0f,
-				   10.0f, -10.0f,  10.0f,
-				   10.0f,  10.0f,  10.0f,
-				   10.0f,  10.0f,  10.0f,
-				   10.0f,  10.0f, -10.0f,
-				   10.0f, -10.0f, -10.0f,
-				   
-				  -10.0f, -10.0f,  10.0f,
-				  -10.0f,  10.0f,  10.0f,
-				   10.0f,  10.0f,  10.0f,
-				   10.0f,  10.0f,  10.0f,
-				   10.0f, -10.0f,  10.0f,
-				  -10.0f, -10.0f,  10.0f,
-				  
-				  -10.0f,  10.0f, -10.0f,
-				   10.0f,  10.0f, -10.0f,
-				   10.0f,  10.0f,  10.0f,
-				   10.0f,  10.0f,  10.0f,
-				  -10.0f,  10.0f,  10.0f,
-				  -10.0f,  10.0f, -10.0f,
-				  
-				  -10.0f, -10.0f, -10.0f,
-				  -10.0f, -10.0f,  10.0f,
-				   10.0f, -10.0f, -10.0f,
-				   10.0f, -10.0f, -10.0f,
-				  -10.0f, -10.0f,  10.0f,
-				   10.0f, -10.0f,  10.0f
-				};
-		
-		Mesh mesh = new Mesh(true, 36, 36, new VertexAttribute(Usage.Position,
-				3, "a_position"));
-		
-		mesh.setVertices(points);
-		//mesh.setIndices(indices);
-		
-		return mesh;
-	}
+
 }
