@@ -35,9 +35,9 @@ public class Skybox{
 		// load texture
 		//FileHandle f = Gdx.files.internal("textures/starrynight.png");
 		//cubemap = new Cubemap(f, f, f, f, f, f);
-		cubemap = new Cubemap(Gdx.files.internal("textures/Citadella2/posx.jpg"), Gdx.files.internal("textures/Citadella2/negx.jpg"), 
-							  Gdx.files.internal("textures/Citadella2/posy.jpg"), Gdx.files.internal("textures/Citadella2/negy.jpg"), 
-							  Gdx.files.internal("textures/Citadella2/posz.jpg"), Gdx.files.internal("textures/Citadella2/negz.jpg"));
+		cubemap = new Cubemap(Gdx.files.internal("textures/front.png"), Gdx.files.internal("textures/lrb.png"),
+							  Gdx.files.internal("textures/top.png"), Gdx.files.internal("textures/bottom.png"),
+							  Gdx.files.internal("textures/lrb.png"), Gdx.files.internal("textures/lrb.png"));
 		
 		// create cube
 		mesh = genCube();
@@ -51,6 +51,7 @@ public class Skybox{
 	    shader.setUniformi("u_cubeTexture", 0);
 	    shader.setUniformMatrix("u_view", camera.view);
 		shader.setUniformMatrix("u_projection", camera.projection);
+		shader.setUniformf("u_camPosition", camera.position);
 	    //shader.setUniformMatrix("u_view", new Matrix4().idt());
 		mesh.render(shader, GL20.GL_TRIANGLES);
 
