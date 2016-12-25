@@ -1,4 +1,4 @@
-package com.blockhalde.gui;
+package com.blockhalde.gui.grid;
 
 public class GridBuilder {
 	

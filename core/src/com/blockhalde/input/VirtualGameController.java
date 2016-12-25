@@ -75,6 +75,7 @@ public class VirtualGameController extends VirtualAbstractController {
 		if(button == 1){
 			PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
 			if(pms != null){
+				RendererGUI.instance().setBlurActive();
 				pms.setActive(true);
 				VirtualController vpcc = inputSystem.getController(VirtualPlayerCameraController.class);
 				if (vpcc != null) vpcc.setActive(false);
@@ -87,6 +88,7 @@ public class VirtualGameController extends VirtualAbstractController {
 		if(button == 1){
 			PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
 			if(pms != null){
+				RendererGUI.instance().setBlurInactive();
 				pms.setActive(false);
 				VirtualController vpcc = inputSystem.getController(VirtualPlayerCameraController.class);
 				if (vpcc != null) vpcc.setActive(true);

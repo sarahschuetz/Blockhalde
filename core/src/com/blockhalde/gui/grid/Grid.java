@@ -1,4 +1,4 @@
-package com.blockhalde.gui;
+package com.blockhalde.gui.grid;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -27,6 +27,10 @@ public class Grid extends Actor {
 	
 	private final int MAX_ITEM_COUNT = 10;
 	protected int width = 0;
+	protected int height = 0;
+	
+	protected float relativeHeightX = 1.0f;
+	protected float relativeHeightY = 1.0f;
 
 	public Grid(int columns, int rows) {
 		
@@ -40,6 +44,7 @@ public class Grid extends Actor {
 		this.columns = columns;
 		
 		this.width = Gdx.graphics.getWidth();
+		this.height = Gdx.graphics.getHeight();
 
 		if (Gdx.graphics.getHeight() < Gdx.graphics.getWidth()) {
 			this.gridSize = Gdx.graphics.getHeight() / MAX_ITEM_COUNT;
@@ -62,14 +67,16 @@ public class Grid extends Actor {
 		}
 
 		shapeRenderer = new ShapeRenderer();
-		this.items = new String[columns][rows];
 
 		if (itemCount <= 10) {
-			this.columns = 10;
+			this.columns = itemCount;
+			this.rows = 1;
 		} else {
 			this.columns = 10;
 			this.rows = itemCount / 10;
 		}
+		
+		this.items = new String[columns][rows];
 
 		if (Gdx.graphics.getHeight() < Gdx.graphics.getWidth()) {
 			this.gridSize = Gdx.graphics.getHeight() / MAX_ITEM_COUNT;

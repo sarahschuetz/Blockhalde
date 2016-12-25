@@ -1,4 +1,4 @@
-package com.blockhalde.gui;
+package com.blockhalde.gui.grid;
 
 import java.util.HashMap;
 
@@ -8,11 +8,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.blockhalde.gui.RendererGUI;
 
-public class BottomGrid extends Grid {
+public class InventoryGrid extends Grid {
 	
-	public static BottomGrid instance;
+	boolean menu = false;
+	
+	public static InventoryGrid instance;
 	
 	protected HashMap<String, Texture> itemsForBottomGrid;
 		
@@ -22,49 +24,37 @@ public class BottomGrid extends Grid {
 	
 	private final int BORDER_SIZE = 3;
 	private final int BOTTOM_GRID_OFFSET = 0;
-	private final static int MENU_ROWS = 1;
 	
 	GlyphLayout layout;
 	BitmapFont font;
 	
-	private Texture on;
-	private Texture off;
+	Texture blurredBackground;
 	
-	public static BottomGrid getInstance () {
-	    if (BottomGrid.instance == null) {
-	    	BottomGrid.instance = new BottomGrid ();
+	public static InventoryGrid getInstance () {
+	    if (InventoryGrid.instance == null) {
+	    	InventoryGrid.instance = new InventoryGrid ();
 	    }
-	    return BottomGrid.instance;
+	    return InventoryGrid.instance;
 	  }
 	
-	private BottomGrid() {
+	private InventoryGrid() {
 		
-		super (10,MENU_ROWS);
+		super (7);
 		
-		stickToSide(Side.BOTTOM, Side.CENTERX).addCoordinates(BORDER_SIZE, BORDER_SIZE);
-		setVisible(false);
+		stickToSide(Side.CENTERY, Side.CENTERX).addCoordinates(BORDER_SIZE, BORDER_SIZE);
 				
 		font = new BitmapFont();
         font.setColor(Color.WHITE);
         layout = new GlyphLayout();
         
         setHelperMaterials();
+        setVisible(false);
         
 	}
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		layout.setText(font, items[selectedItemColumn][selectedItemRow]);
-		font.draw(batch, items[selectedItemColumn][selectedItemRow], width/2 - layout.width/2, offsetY + gridSize * rows + layout.height + BORDER_SIZE + gapSize + BOTTOM_GRID_OFFSET);
-
-		batch.end();
-		
-		drawItemName(batch);
-		
-		batch.begin();
-		
 		drawGrid(batch);
-		
 	}
 	
 	public void setSelectedItem (int number) {
@@ -95,10 +85,11 @@ public class BottomGrid extends Grid {
 	}
 	
 	private void drawGrid(Batch batch) {
+						
 		for (int i = 0; i < columns; i++) {
 			for (int j = 0; j < rows; j++) {
 				if (i != selectedItemColumn || j != selectedItemRow) {
-					batch.draw(off, offsetX + gridSize * i , offsetY + BOTTOM_GRID_OFFSET + gridSize * (rows - j - 1), gridSize, gridSize);
+					//batch.draw(off, offsetX + gridSize * i , offsetY + BOTTOM_GRID_OFFSET + gridSize * (rows - j - 1), gridSize, gridSize);
 				
 					if (itemsForBottomGrid.containsKey((items[i][j]))) {
 						batch.draw(itemsForBottomGrid.get(items[i][j]), offsetX + gridSize * i + 13, offsetY + BOTTOM_GRID_OFFSET + gridSize * (rows - j - 1) + 13, gridSize - 26, gridSize - 26);
@@ -107,31 +98,15 @@ public class BottomGrid extends Grid {
 			}
 		}
 		
-		batch.draw(on, gridSize * selectedItemColumn + offsetX - BORDER_SIZE, gridSize * (rows - selectedItemRow - 1) + offsetY - BORDER_SIZE + BOTTOM_GRID_OFFSET, gridSize + BORDER_SIZE * 2, gridSize + BORDER_SIZE * 2);
+		//batch.draw(on, gridSize * selectedItemColumn + offsetX - BORDER_SIZE, gridSize * (rows - selectedItemRow - 1) + offsetY - BORDER_SIZE + BOTTOM_GRID_OFFSET, gridSize + BORDER_SIZE * 2, gridSize + BORDER_SIZE * 2);
 		
 		if (itemsForBottomGrid.containsKey((items[selectedItemColumn][selectedItemRow]))) {
 			batch.draw(itemsForBottomGrid.get(items[selectedItemColumn][selectedItemRow]), offsetX + gridSize * selectedItemColumn + 8, offsetY + BOTTOM_GRID_OFFSET + gridSize * (rows - selectedItemRow - 1) + 8, gridSize - 16, gridSize - 16);
 		}
 	}
 	
-	private void drawItemName(Batch batch) {
-		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
-		shapeRenderer.begin(ShapeType.Filled);
-		shapeRenderer.setColor(Color.BLACK);
-		
-		shapeRenderer.rect(offsetX - BORDER_SIZE, offsetY - BORDER_SIZE + BOTTOM_GRID_OFFSET, gridSize * columns + BORDER_SIZE * 2, BORDER_SIZE);
-		shapeRenderer.rect(offsetX - BORDER_SIZE, offsetY + gridSize * rows + BOTTOM_GRID_OFFSET, gridSize * columns + BORDER_SIZE * 2, BORDER_SIZE);
-		shapeRenderer.rect(offsetX - BORDER_SIZE, offsetY - BORDER_SIZE + BOTTOM_GRID_OFFSET, BORDER_SIZE, gridSize * rows + BORDER_SIZE * 2);
-		shapeRenderer.rect(offsetX + gridSize * columns, offsetY - BORDER_SIZE + BOTTOM_GRID_OFFSET, BORDER_SIZE, gridSize * rows + BORDER_SIZE * 2);
-
-		shapeRenderer.end();
-	}
-	
 	private void setHelperMaterials() {
-		
-		on = new Texture(Gdx.files.internal("textures/gui_textures/on.png"));
-        off = new Texture(Gdx.files.internal("textures/gui_textures/off.png"));
-		
+
 		itemsForBottomGrid = new HashMap<String, Texture>();
 		itemsForBottomGrid.put("Imaginary Stone", new Texture(Gdx.files.internal("textures/gui_textures/stone.png")));
 		itemsForBottomGrid.put("Imaginary Wood", new Texture(Gdx.files.internal("textures/gui_textures/wood.png")));
@@ -147,7 +122,28 @@ public class BottomGrid extends Grid {
 		items[3][0] = "Imaginary Glass";
 		items[4][0] = "Imaginary Diamond";
 		items[5][0] = "Imaginary Coal";
-		items[6][0] = "Imaginary Bricks";
-		
+		items[6][0] = "Imaginary Bricks";	
+					
 	}
+	
+	public int getTotalHeight() {
+		return (int) (offsetY + gridSize * rows + layout.height + BORDER_SIZE + gapSize + BOTTOM_GRID_OFFSET);
+	}
+	
+	public int getTotalWidth() {
+		return (int) gridSize * columns;
+	}
+	
+	@Override
+	public void setVisible(boolean visible) {
+		
+		/*if (visible) {
+			RendererGUI.instance().menusActive += 1;
+		} else {
+			RendererGUI.instance().menusActive -= 1;
+		}*/
+		
+		super.setVisible(visible);
+	}
+	
 }
