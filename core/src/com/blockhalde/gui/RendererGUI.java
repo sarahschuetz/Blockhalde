@@ -11,15 +11,22 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.blockhalde.gui.grid.BlurActor;
+import com.blockhalde.gui.grid.BottomGrid;
+import com.blockhalde.gui.grid.InventoryGrid;
 
 public class RendererGUI {
 	private static RendererGUI instance;
+	
+	public int menusActive = 0;
 
 	Stage stage;
 	Label debugLabel ;
 	LabelStyle labelStyle;
 	BottomGrid bottomGrid;
+	InventoryGrid inventoryGrid;
 	BitmapFont debugFont;
+	BlurActor blurActor;
 	
 	public static RendererGUI instance(){
 		if(instance == null){
@@ -40,8 +47,16 @@ public class RendererGUI {
 		// setting up bottom grid
 		bottomGrid = BottomGrid.getInstance();
 		
+		// setting up inventory grid
+		inventoryGrid = InventoryGrid.getInstance();
+		
+		blurActor = new BlurActor();
+		
+		stage.addActor(blurActor);
 		stage.addActor(debugLabel);
 		stage.addActor(bottomGrid);
+		stage.addActor(inventoryGrid);
+		
 	}
 	
 	public Stage getStage(){
@@ -72,7 +87,7 @@ public class RendererGUI {
 	}
 
 	public void toggleMenu() {
-		bottomGrid.setVisible(!bottomGrid.isVisible());
+		inventoryGrid.setVisible(!inventoryGrid.isVisible());
 	}
 	
 	public void scrollItems(int value) {
@@ -85,5 +100,15 @@ public class RendererGUI {
 				bottomGrid.decreaseSelectedItem();
 			}
 		}
+	}
+	
+	public void setBlurActive() {
+		menusActive++;
+		blurActor.setVisible(true);
+	}
+	
+	public void setBlurInactive() {
+		menusActive--;
+		blurActor.setVisible(false);
 	}
 }
