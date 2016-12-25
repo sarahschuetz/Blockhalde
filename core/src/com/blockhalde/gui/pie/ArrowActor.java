@@ -30,10 +30,11 @@ public class ArrowActor extends Actor {
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
 		batch.end();
+		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 		shapeRenderer.begin(ShapeType.Filled);
 		shapeRenderer.setColor(1, 1, 1, 1);
 		//shapeRenderer.line(this.getX(), this.getY(), this.getX() + vector.x, this.getY() + vector.y);
-		shapeRenderer.circle(this.getX() + vector.x, this.getY() + vector.y, 5);
+		shapeRenderer.circle(this.getX() + vector.x, this.getY() + vector.y, 5, 16);
         shapeRenderer.end();
 		batch.begin();
 	}

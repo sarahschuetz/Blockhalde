@@ -29,15 +29,22 @@ public class PieSlice extends Actor {
 	static final Color inactiveColor = new Color(1,1,1,1);;
 	
 	static{		
-		// load font
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Montserrat/Montserrat-Bold.ttf"));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = 16;
+		parameter.size = 18;
 		BitmapFont bitmapFont = generator.generateFont(parameter); // font size 12 pixels
 		generator.dispose(); // don't forget to dispose to avoid memory leaks!
-
 		labelStyle = new LabelStyle(bitmapFont, new Color(0.9f,0.9f,0.9f,1.0f));
 		shapeRenderer = new ShapeRenderer();
+	}
+	
+	public static void loadFonts(){
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/Montserrat/Montserrat-Bold.ttf"));
+		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+		parameter.size = 32;
+		BitmapFont bitmapFont = generator.generateFont(parameter); // font size 12 pixels
+		generator.dispose(); // don't forget to dispose to avoid memory leaks!
+		labelStyle = new LabelStyle(bitmapFont, new Color(0.9f,0.9f,0.9f,1.0f));
 	}
 	
 	public PieSlice(String name){
@@ -112,12 +119,14 @@ public class PieSlice extends Actor {
 		batch.end();
 		
 		Gdx.gl.glEnable(GL20.GL_BLEND);
+		shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());
 		shapeRenderer.begin(ShapeType.Filled);
 		shapeRenderer.setColor(getColor());
-		shapeRenderer.circle(this.getX(), this.getY(), DOTRADIUS*this.getScaleX());
+		shapeRenderer.circle(this.getX(), this.getY(), DOTRADIUS*this.getScaleX(), 32);
         shapeRenderer.end();
         
 		batch.begin();
+		
 		label.getStyle().fontColor = getColor();
 		label.draw(batch, getColor().a);
 	}

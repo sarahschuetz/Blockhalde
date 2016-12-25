@@ -46,7 +46,7 @@ public class SimplePerlinTerrainGenerator extends BasePerlinTerrainGenerator {
                             
                         } else {
                             if(y <= minimumTNTHeight){
-                                chunk.setBlockAt(x, y, z, BlockType.GRASS);
+                                chunk.setBlockAt(x, y, z, BlockType.SNOW);
                             }else{
                                 chunk.setBlockAt(x, y, z, BlockType.TNT);
                             }

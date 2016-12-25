@@ -6,5 +6,5 @@ varying vec3 v_position;
 uniform samplerCube u_cubeTexture;
 
 void main() {
-  gl_FragColor = texture(cube_texture, v_position);
+  gl_FragColor = textureCube(u_cubeTexture, v_position);
 }

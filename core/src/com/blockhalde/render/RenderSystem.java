@@ -28,6 +28,7 @@ public class RenderSystem extends EntitySystem {
 	private ChunkMeshWorker worker;
 	private BlockingQueue<CachedSubchunk> workerQueue = new ArrayBlockingQueue<>(1024);
 	private List<CachedSubchunk> cache = new ArrayList<>();
+	private Skybox skybox;
 	
 	@Override
 	public void addedToEngine(Engine engine) {
@@ -41,12 +42,14 @@ public class RenderSystem extends EntitySystem {
 		shader = new ShaderProgram(Gdx.files.internal("shaders/blocks.vs.glsl"),
 				                   Gdx.files.internal("shaders/blocks.fs.glsl"));
 		
+		skybox = new Skybox();
+		
 		if(!shader.isCompiled()) {
 			System.out.println("Something went wrong during shader compilation, have a look at the log:");
 			System.out.println(shader.getLog());
 		}
 		
-		Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		Gdx.gl.glClearColor(0.76f, 0.92f, 1f, 1.0f);
 		Gdx.gl.glEnable(GL20.GL_TEXTURE_2D);
 		
 		worker = new ChunkMeshWorker(workerQueue);
@@ -117,10 +120,12 @@ public class RenderSystem extends EntitySystem {
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		
-		shader.begin();
-		
 		Camera cam = engine.getSystem(CameraSystem.class).getCam();
 		
+		skybox.render(cam);
+		
+		shader.begin();
+
 		// No model matrix necessary, position is encoded in mesh data
 		shader.setUniformMatrix("u_view", cam.view);
 		shader.setUniformMatrix("u_projection", cam.projection);
@@ -135,6 +140,7 @@ public class RenderSystem extends EntitySystem {
 		}
 		
 		shader.end();
+		
 	}
 	
 	private CachedSubchunk findCachedSubchunk(int x, int subchunkIdx, int z) {

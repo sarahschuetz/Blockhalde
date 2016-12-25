@@ -9,11 +9,17 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+<<<<<<< HEAD
 import com.blockhalde.gui.grid.BlurActor;
 import com.blockhalde.gui.grid.BottomGrid;
 import com.blockhalde.gui.grid.InventoryGrid;
+=======
+import com.blockhalde.gui.pie.PieSlice;
+>>>>>>> e7328e50e11fa369b5a3f12bfb615a8d8226e0a3
 
 public class RendererGUI {
 	private static RendererGUI instance;
@@ -36,7 +42,7 @@ public class RendererGUI {
 	}
 
 	RendererGUI(){
-		Viewport viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera());
+		Viewport viewport = new ExtendViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera());
 		stage = new Stage(viewport);
 		
 		// setting up debug text
@@ -65,7 +71,7 @@ public class RendererGUI {
 
 	public void setDebugText(String text){
 		debugLabel.setPosition(5, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 5, Align.topRight);
-
+		
 		debugLabel.setText(text);
 	}
 	
@@ -77,6 +83,8 @@ public class RendererGUI {
 	public void resize (int width, int height) {
 		// Passing true when updating the viewport changes camera pos making 0,0 the bottom left corner.
 		stage.getViewport().update(width, height, true);
+		debugLabel.setPosition(5, Gdx.graphics.getHeight() - debugLabel.getPrefHeight()/2 - 5, Align.topRight);
+		PieSlice.loadFonts();
 	}
 
 	public void render() {
