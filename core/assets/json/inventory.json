@@ -1,0 +1,11 @@
+{ 
+inventory: [ 
+{
+id: stone
+name: Stone Block
+category: block
+image: gui_textures/stone.png
+maxStackSize: 64
+}
+]
+}
