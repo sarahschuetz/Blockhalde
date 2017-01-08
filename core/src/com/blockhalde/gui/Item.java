@@ -1,8 +1,9 @@
 package com.blockhalde.gui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 
-public class Item implements UIItem {
+public class Item {
 	
 	public enum Category{
 		block,
@@ -11,57 +12,37 @@ public class Item implements UIItem {
 		armor
 	}
 	
-	private String name = "";
-	private Texture img = null;
-	private Category category = null;
-	private int stackSize = 0;
-	private int maxStackSize = 0;
+	public String id = "";
+	public String name = "";
+	public String category = "";
+	public String hasWear = "";
+	public String image = "";
+	public int maxStackSize = 0;
+	
+	private Category cat = null;
+	private int currentStackSize = 0;
+	
 	
 	public Item(){
 	}
+
 	
-	public void setName(String name) {
-		this.name = name;
+	public Category getCat() {
+		return Category.valueOf(Category.class, category);
 	}
-
-	public void setImg(Texture img) {
-		this.img = img;
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
-	}
-
+	
 	public void setStackSize(int stackSize) {
-		this.stackSize = stackSize;
+		this.currentStackSize = stackSize;
 	}
-
-	public void setMaxStackSize(int maxStackSize) {
-		this.maxStackSize = maxStackSize;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public Texture getImg() {
-		return img;
-	}
-
+	
 	public int getStackSize() {
-		return stackSize;
+		return currentStackSize;
 	}
 
-	public int getMaxStackSize() {
-		return maxStackSize;
+	public Texture getImage() {
+		return new Texture(Gdx.files.internal(image));
 	}
-
-	@Override
-	public Category getCategory() {
-		return category;
-	}
-
-	@Override
+	
 	public int[] getInventoryPosition() {
 		// TODO Auto-generated method stub
 		return null;
@@ -69,7 +50,7 @@ public class Item implements UIItem {
 
 	@Override
 	public String toString() {
-		return "Item [name=" + name + ", img=" + img + ", category=" + category + ", stackSize=" + stackSize
+		return "Item [name=" + name + ", category=" + cat + ", stackSize=" + currentStackSize
 				+ ", maxStackSize=" + maxStackSize + "]";
 	}
 }

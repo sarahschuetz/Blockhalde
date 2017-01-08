@@ -6,26 +6,44 @@ import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
-import com.badlogic.gdx.utils.JsonWriter;
 
 public class ItemtypeSerializer {
+	
+	public static void saveJsonItems(List<Item> inventory){
+			Json json = new Json();
+			FileHandle file = Gdx.files.local("json/inventory.json");
+			
+			file.writeString("{ \n", false);
+			file.writeString("inventory: [ \n", true);
+			
+			for (Item item : inventory) {
+				String it = json.prettyPrint(item);			
+				file.writeString(it, true);
+			}
+			
+			file.writeString("\n]\n", true);
+			file.writeString("}", true);
+	}
 
-	public static List<Item> loadJsonAndItems(){   
-		 
+	public static List<Item> loadJsonItems(){   		 
 	        FileHandle handle = Gdx.files.internal("json/itemtypes.json");
-	        Json json = new Json();
-	        ArrayList<Item> itemData = new ArrayList<>();
-	     
+	        Json json = new Json();	        
+	        ItemWrapper dataTest = json.fromJson(ItemWrapper.class, handle);
 	        
-	    /*    for (JsonValue v : list) {
-	        	itemData.add(json.readValue(Item.class, v));
-	        	System.out.println(v.toString());
-	        }
- */
+	        ArrayList<Item> itemData = new ArrayList<>();
+	        
+	        for (Item it : dataTest.itemtypes) {
+	        	itemData.add(it);
+			}
+ 
 			return itemData; 
-	   }   
+	} 
+	
+	public static List<Item> loadInventoryJsonItems(FileHandle inventory){
+		Json json = new Json();
+		return json.fromJson(ItemWrapper.class, inventory).inventory;
+	}
+	
 	
 }
 
