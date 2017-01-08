@@ -21,6 +21,7 @@ public class NoiseImg extends Actor {
 	private Texture textureScreen;
 	private Texture textureChunk;
 	
+	private double smoothness;
 	private int octaves;
 	private double persistence;
 	private double frequency;
@@ -31,6 +32,7 @@ public class NoiseImg extends Actor {
 		this.octaves = generator.getOctaves();
 		this.persistence = generator.getPersistence();
 		this.frequency = generator.getFrequency();
+		this.smoothness = generator.getSmoothness();
 		
 		generateNoiseTextures();
 	}
@@ -41,7 +43,7 @@ public class NoiseImg extends Actor {
 		
 		for(int x = 0; x < width; x++) {
 			for(int z = 0; z < height; z++) {
-				float perlinValue = (float) perlin.calcPerlinAt(x / width, y, z / height, octaves, persistence);
+				float perlinValue = (float) perlin.calcPerlinAt(x / smoothness, y, z / smoothness, octaves, persistence);
 				pixmapScreen.setColor(perlinValue, perlinValue, perlinValue, 1f);
 				pixmapScreen.drawPixel(x, z);
 			}

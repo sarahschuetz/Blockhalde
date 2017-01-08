@@ -14,6 +14,7 @@ import com.terrain.chunk.ChunkPosition;
 import com.terrain.chunk.ChunkUtil;
 import com.terrain.chunk.TerrainChunk;
 import com.terrain.generators.PerlinTerrainGenerator;
+import com.terrain.generators.PurePerlinTerrainGenerator;
 import com.terrain.generators.SimplePerlinTerrainGenerator;
 import com.util.FlagUtils;
 
@@ -34,8 +35,8 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
     private int drawDistance = 6;
 
     // TODO: Change so that Seed is not fix implemented here
-    private PerlinTerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
-//       private TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
+//    private PerlinTerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
+    private PerlinTerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
 
      /**
      * Creates a new blank chunk at the specified position in the world

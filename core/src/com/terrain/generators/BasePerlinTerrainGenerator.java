@@ -6,8 +6,8 @@ public abstract class BasePerlinTerrainGenerator extends BaseTerrainGenerator im
 	
 	protected PerlinNoise3D perlinNoise;
 
-	protected double smoothness = 1.0;
-	protected int octaves = 2;
+	protected double smoothness = 150.0;
+	protected int octaves = 3;
 	protected double persistence = 5.0;
 	protected double frequency = 1.0;
 	
