@@ -91,6 +91,8 @@ public class RendererGUI {
 		Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
 		stage.draw();
 		debugLabel.setText("");
+		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
+		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 	}
 
 	public void toggleMenu() {
