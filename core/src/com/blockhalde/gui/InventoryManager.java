@@ -10,7 +10,6 @@ import com.badlogic.gdx.maps.Map;
 public class InventoryManager {
 	
 	private List<Item> items;
-	private List<Item> allItems;
 	
 	private FileHandle inventory;
 	
@@ -18,7 +17,6 @@ public class InventoryManager {
 	
 	private InventoryManager(){
 		this.items = new ArrayList<Item>();
-		this.allItems = ItemtypeSerializer.loadJsonItems();
 		this.inventory =  Gdx.files.internal("json/inventory.json");
 	}
 	
@@ -28,7 +26,6 @@ public class InventoryManager {
 	      }
 	      return theInstance;
 	}
-
 	
 	public void addItem(Item item){
 		this.items.add(item);		
@@ -48,7 +45,7 @@ public class InventoryManager {
 	}
 	
 	public void updateItem(Item item){
-		// still to think about
+		
 	}
 	
 	public void deleteItem(Item item){
