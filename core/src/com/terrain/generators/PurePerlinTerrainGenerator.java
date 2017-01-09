@@ -10,6 +10,7 @@ public class PurePerlinTerrainGenerator extends BasePerlinTerrainGenerator {
     private int maxBaseDirtHeight = 30; // base height for dirt
     private int maxBaseAirHeight = 100; // base height for air
     private int maxMaxTerrainHeight = 200; // only air from here
+    private int maxBaseSnowHeight = 150;
 
 	public PurePerlinTerrainGenerator() {
 		super();
@@ -21,6 +22,21 @@ public class PurePerlinTerrainGenerator extends BasePerlinTerrainGenerator {
 
 	public PurePerlinTerrainGenerator(String seed) {
 		super(seed);
+	}
+	
+	private void correctSnow(Chunk chunk) {
+		for(int x = 0; x < Chunk.X_MAX; x++ ) {
+			for(int z = 0; z < Chunk.Z_MAX; z++) {
+				for(int y = 0; y < Chunk.Y_MAX - 1; y++) {
+					
+					if(chunk.getBlockAt(x, y, z) == BlockType.SNOW.getBlockId()) {
+						if(chunk.getBlockAt(x, y + 1, z) != BlockType.AIR.getBlockId()) {
+							chunk.setBlockAt(x, y, z, BlockType.DIRT);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -41,6 +57,7 @@ public class PurePerlinTerrainGenerator extends BasePerlinTerrainGenerator {
 				int minDirtHeight = maxBaseDirtHeight - (int) Math.ceil(20 * heightMap);
 				int minAirHeight = (int) Math.ceil(maxBaseAirHeight * heightMap);
 				int maxTerrainHeight = maxMaxTerrainHeight - (int) Math.ceil(20 * heightMap); // between maxMaxTerrainHeight and (maxMaxTerrainHeight - 20)
+				int snowHeight = maxBaseSnowHeight - (int) Math.ceil(50 * heightMap);
 				
 				for(int y = 0; y < (heightMap * Chunk.Y_MAX); y++) {
 //				for(int y = 0; y < Chunk.Y_MAX; y++) {
@@ -69,10 +86,12 @@ public class PurePerlinTerrainGenerator extends BasePerlinTerrainGenerator {
                 			} else { // generate stone, dirt and air
                 				if(density < 0.4) {
                 					chunk.setBlockAt(x, y, z, BlockType.AIR);
-                				} else if(density < 0.55) {
-                					chunk.setBlockAt(x, y, z, BlockType.SNOW);
                 				} else if(density < 0.6) {
-                					chunk.setBlockAt(x, y, z, BlockType.DIRT);
+                					if(y > snowHeight) {
+                						chunk.setBlockAt(x, y, z, BlockType.SNOW);
+                					} else {
+                						chunk.setBlockAt(x, y, z, BlockType.DIRT);
+                					}
                 				} else {
                 					chunk.setBlockAt(x, y, z, BlockType.STONE);
                 				}
@@ -82,5 +101,7 @@ public class PurePerlinTerrainGenerator extends BasePerlinTerrainGenerator {
                 }
             }
 		}
+		
+		correctSnow(chunk);
 	}
 }
