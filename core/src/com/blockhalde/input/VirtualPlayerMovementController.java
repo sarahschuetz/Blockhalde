@@ -25,18 +25,18 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 	private static final float WALK_SPEED = 2f;
 	private static final float FLY_SPEED = WALK_SPEED * 3f;
 	private static final float PLAYER_HEIGHT = 1.8f;
-	private static final float COLLISION_DISTANCE = 0.01f;
-	private static final float VERTICAL_PEEK_DISTANCE = 0.3f;
+	private static final float COLLISION_DISTANCE = 0.2f;
 	private static final float MAX_MOVEMENT_PER_FRAME = 0.8f;
 
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
 
 	private float movementFwrd = 0;
 	private float movementSide = 0;
-	private float movementDown = 0;
+	private float movementUp = 0;
 	private Vector3 movementVectorFwrd = new Vector3();
 	private Vector3 movementVectorSide = new Vector3();
-	private Vector3 movementVectorDown = new Vector3();
+	private Vector3 movementVectorUp = new Vector3();
+	private boolean canJump = false;
 	private boolean jumping = false;
 
 	/**
@@ -77,9 +77,9 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 			if (query.size() != 0) {
 				Entity player = query.first();
 				Vector3 oldPosition = player.getComponent(PositionComponent.class).getPosition().cpy();
-				applyMovementDown(player, deltaTime);
 				applyMovementFwrd(player, deltaTime);
 				applyMovementSide(player, deltaTime);
+				applyMovementUp(player, deltaTime);
 				correctPosition(player, oldPosition);
 				
 				Camera camera = player.getComponent(CameraComponent.class).getCamera();
@@ -88,29 +88,6 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 				camera.update();
 			}
 		}
-	}
-	
-	/**
-	 * Applies the {@link Player}s downward movement to his {@link PositionComponent} and causes gravity.
-	 * @param player The {@link Player} {@link Entity}
-	 * @param deltaTime The basic update deltaTime
-	 */
-	private void applyMovementDown(Entity player, float deltaTime) {
-		Vector3 position = player.getComponent(PositionComponent.class).getPosition();
-		if (!player.getComponent(DebugComponent.class).isFlying()){
-			if (!blockAt(position.x, position.y - VERTICAL_PEEK_DISTANCE, position.z)) {
-				movementDown -= GRAVITY * deltaTime * 5f;
-				if (movementDown < -MAX_FALL_SPEED) movementDown = -MAX_FALL_SPEED;
-			} else {
-				if (jumping) movementDown = JUMP_STRENGTH;
-				else if (movementDown < 0) movementDown = 0;
-			}
-			movementVectorDown.set(0, movementDown * deltaTime, 0);
-		} else {
-			movementDown = 0;
-			movementVectorDown.set(0, 0, 0);
-		}
-		position.add(movementVectorDown);
 	}
 
 	/**
@@ -150,6 +127,29 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 		}
 		position.add(movementVectorSide);
 	}
+	
+	/**
+	 * Applies the {@link Player}s downward movement to his {@link PositionComponent} and causes gravity.
+	 * @param player The {@link Player} {@link Entity}
+	 * @param deltaTime The basic update deltaTime
+	 */
+	private void applyMovementUp(Entity player, float deltaTime) {
+		Vector3 position = player.getComponent(PositionComponent.class).getPosition();
+		if (!player.getComponent(DebugComponent.class).isFlying()){
+			if (!canJump) {
+				movementUp -= GRAVITY * deltaTime * 5f;
+				if (movementUp < -MAX_FALL_SPEED) movementUp = -MAX_FALL_SPEED;
+			} else if (jumping) {
+				movementUp = JUMP_STRENGTH;
+				canJump = false;
+			}
+			movementVectorUp.set(0, movementUp * deltaTime, 0);
+		} else {
+			movementUp = 0;
+			movementVectorUp.set(0, 0, 0);
+		}
+		position.add(movementVectorUp);
+	}
 
 	/**
 	 * Corrects the modified {@link PositionComponent} of the {@link Player} to enable collision with blocks.
@@ -159,27 +159,54 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 	private void correctPosition(Entity player, Vector3 oldPosition) {
 		Vector3 position = player.getComponent(PositionComponent.class).getPosition();
 		if (!player.getComponent(DebugComponent.class).isFlying()){
-			if (movementDown == 0.0) position.y = (int) position.y + COLLISION_DISTANCE;
-
-			int xMoved = (int) oldPosition.x - (int) position.x;
-			int zMoved = (int) oldPosition.z - (int) position.z;
-			boolean blocked = blockAt(position.x, position.y, position.z) || blockAt(position.x, position.y + 1, position.z);
-			boolean blockedX = blockAt(oldPosition.x - xMoved,  position.y,  oldPosition.z) || blockAt(oldPosition.x - xMoved,  position.y + 1,  oldPosition.z);
-			boolean blockedZ = blockAt(oldPosition.x,  position.y,  oldPosition.z - zMoved) || blockAt(oldPosition.x,  position.y + 1,  oldPosition.z - zMoved);
-
-			if (blocked) {
-				if (xMoved != 0 && (blockedX || zMoved != 0 && !blockedZ)) {
-					if (xMoved > 0) position.x = (int) position.x + (oldPosition.x > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
-					else position.x = (int) position.x + (oldPosition.x > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
+			float xMoved = position.x - oldPosition.x;
+			float yMoved = position.y - oldPosition.y;
+			float zMoved = position.z - oldPosition.z;
+			
+			//Y Collision
+			canJump = false;
+			if (yMoved > 0 && blockAt(position.x, position.y + COLLISION_DISTANCE + PLAYER_HEIGHT, position.z)) {
+				movementUp = 0;
+				position.y = (int) (position.y + COLLISION_DISTANCE + PLAYER_HEIGHT) - COLLISION_DISTANCE;
+			}
+			else if (yMoved < 0 && blockAt(position.x, position.y - COLLISION_DISTANCE, position.z)) {
+				movementUp = 0;
+				canJump = true;
+				position.y = (int) (position.y - COLLISION_DISTANCE) + COLLISION_DISTANCE + 1;
+			}
+			
+			//XZ Collision
+			for (int heightModifier = 0; heightModifier < PLAYER_HEIGHT; heightModifier++) {
+				float moddedY = position.y + heightModifier;
+				boolean blockX = blockAt(position.x + COLLISION_DISTANCE * Math.signum(xMoved), moddedY, position.z);
+				boolean blockZ = blockAt(position.x, moddedY, position.z + COLLISION_DISTANCE * Math.signum(zMoved));
+				if (blockX) {
+					if (xMoved > 0) position.x = (int) oldPosition.x + (oldPosition.x > 0 ? 1 - COLLISION_DISTANCE : -COLLISION_DISTANCE);
+					else position.x = (int) oldPosition.x + (oldPosition.x > 0 ? COLLISION_DISTANCE : -1 + COLLISION_DISTANCE);
 				}
-				if (zMoved != 0 && blockedZ) {
-					if (zMoved > 0) position.z = (int) position.z + (oldPosition.z > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
-					else position.z = (int) position.z + (oldPosition.z > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
+				if (blockZ) {
+					if (zMoved > 0) position.z = (int) oldPosition.z + (oldPosition.z > 0 ? 1 - COLLISION_DISTANCE : -COLLISION_DISTANCE);
+					else position.z = (int) oldPosition.z + (oldPosition.z > 0 ? COLLISION_DISTANCE : -1 + COLLISION_DISTANCE);
 				}
-				while (blockAt(position.x, position.y, position.z) || blockAt(position.x, position.y + 1, position.z)) {
+				while (blockAt(position.x, moddedY, position.z)) {
 					position.y++;
+					moddedY = position.y + heightModifier;
 				}
 			}
+			
+//			if (blocked) {
+//				if (xMoved != 0 && (blockedX || zMoved != 0 && !blockedZ)) {
+//					if (xMoved > 0) position.x = (int) position.x + (oldPosition.x > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
+//					else position.x = (int) position.x + (oldPosition.x > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
+//				}
+//				if (zMoved != 0 && blockedZ) {
+//					if (zMoved > 0) position.z = (int) position.z + (oldPosition.z > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
+//					else position.z = (int) position.z + (oldPosition.z > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
+//				}
+//				while (blockAt(position.x, position.y, position.z) || blockAt(position.x, position.y + 1, position.z)) {
+//					position.y++;
+//				}
+//			}
 		}
 	}
 
