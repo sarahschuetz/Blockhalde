@@ -35,9 +35,9 @@ public class Skybox{
 		// load texture
 		//FileHandle f = Gdx.files.internal("textures/starrynight.png");
 		//cubemap = new Cubemap(f, f, f, f, f, f);
-		cubemap = new Cubemap(Gdx.files.internal("textures/front.png"), Gdx.files.internal("textures/lrb.png"),
-							  Gdx.files.internal("textures/top.png"), Gdx.files.internal("textures/bottom.png"),
-							  Gdx.files.internal("textures/lrb.png"), Gdx.files.internal("textures/lrb.png"));
+		cubemap = new Cubemap(Gdx.files.internal("textures/skyboxes/minecraft/front.png"), Gdx.files.internal("textures/skyboxes/minecraft/lrb.png"),
+							  Gdx.files.internal("textures/skyboxes/minecraft/top.png"), Gdx.files.internal("textures/skyboxes/minecraft/bottom.png"),
+							  Gdx.files.internal("textures/skyboxes/minecraft/lrb.png"), Gdx.files.internal("textures/skyboxes/minecraft/lrb.png"));
 		
 		// create cube
 		mesh = genCube();
