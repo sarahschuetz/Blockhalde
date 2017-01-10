@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector3;
 import com.messaging.message.ChunkMessage;
 import com.messaging.message.ChunkUpdateMessage;
 import com.terrain.chunk.Chunk;
@@ -144,6 +145,8 @@ public class RenderSystem extends EntitySystem {
 //		world.generateNearChunks();
 		
 		drainWorkerQueue();
+		freeExcessCacheSpace();
+		
 		Gdx.gl.glEnable(GL20.GL_CULL_FACE);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -171,6 +174,21 @@ public class RenderSystem extends EntitySystem {
 		
 	}
 	
+	private void freeExcessCacheSpace() {
+		int cachedCount = cache.size();
+		int excessCount = cachedCount - MAX_CACHED_SUBCHUNKS;
+		
+		if(excessCount > 0) {
+			Vector3 camPosition = engine.getSystem(CameraSystem.class).getCam().position;
+			distComp.setReferencePosition(camPosition);
+			Collections.sort(cache, distComp);
+			
+			for(int i = 0; i < excessCount; ++i) {
+				cache.remove(cache.size() - 1);
+			}
+		}
+	}
+
 	private CachedSubchunk findCachedSubchunk(int x, int subchunkIdx, int z) {
 		for(CachedSubchunk subchunk: cache) {
 			if(!subchunk.isUnused() && subchunk.subchunkIdx == subchunkIdx &&
@@ -191,37 +209,12 @@ public class RenderSystem extends EntitySystem {
 		CachedSubchunk cached;
 		
 		while((cached = workerQueue.poll()) != null) {
-			// We need to check for enough space repeatedly because more elements
-			// might be enqueued while storing an element in the cache
-			// + 1 accounts for the currently polled element called cached
-			int requiredCacheSpace = cache.size() + workerQueue.size() + 1;
-			int availableCacheSpace = MAX_CACHED_SUBCHUNKS - cache.size();
-			
-			if(availableCacheSpace < requiredCacheSpace) {
-				int deleteCount = requiredCacheSpace - availableCacheSpace;
-				deleteFarthestAwayInCache(deleteCount);
-			}
-			
 			CachedSubchunk alreadyCached = findCachedSubchunk(cached.chunkPos, cached.subchunkIdx);
 			if(alreadyCached != null) {
 				cache.remove(alreadyCached);
 			}
 			
 			cache.add(cached);
-		}
-	}
-
-	private void deleteFarthestAwayInCache(int deleteCount) {
-		System.out.println("Deleting " + deleteCount + " from " + cache.size() + " in cache");
-		
-		Camera cam = engine.getSystem(CameraSystem.class).getCam();
-		distComp.setReferencePosition(cam.position);
-		Collections.sort(cache, distComp);
-		
-		for(int deletionIdx = 0; deletionIdx < deleteCount; ++deleteCount) {
-			System.out.println("Removing subchunk from cache: " + cache.get(cache.size()-1).chunkPos.getXPosition() + "/" + cache.get(cache.size()-1).subchunkIdx + "/" + cache.get(cache.size()-1).chunkPos.getZPosition());
-			
-			cache.remove(cache.size() - 1);
 		}
 	}
 	
