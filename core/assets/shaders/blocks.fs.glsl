@@ -15,7 +15,7 @@ void main() {
     float dist = abs(v_viewPosition.z/20);
     float fogFactor = 0.0;
 
-    fogFactor = 1.0 /exp(dist * 1);
+    fogFactor = 1.0 /exp(dist * 1.0);
     fogFactor = clamp( fogFactor, 0.0, 1.0 );
 
     vec4 fogColor = texture2D(u_fogGradient, vec2(fogFactor, 0.5));
