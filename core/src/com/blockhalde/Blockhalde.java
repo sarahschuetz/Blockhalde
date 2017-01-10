@@ -1,5 +1,7 @@
 package com.blockhalde;
 
+import java.util.Random;
+
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -17,6 +19,8 @@ import com.blockhalde.render.CameraSystem;
 import com.blockhalde.render.RenderSystem;
 import com.messaging.MessageIdConstants;
 import com.messaging.message.ChunkMessage;
+import com.messaging.message.ChunkUpdateMessage;
+import com.terrain.block.BlockType;
 import com.terrain.world.WorldManagementSystem;
 import com.util.noise.debug.DebugPerlinNoiseSystem;
 
@@ -29,8 +33,9 @@ public class Blockhalde extends ApplicationAdapter {
 	public void create() {
 //		MessageManager.getInstance().setDebugEnabled(true);
 		// !!!!!Add message listener before world system creation!!!!!
-		MessageManager.getInstance().addListener(new Telegraph() {
-			
+		MessageManager msgManager = MessageManager.getInstance();
+		
+		msgManager.addListener(new Telegraph() {
 			@Override
 			public boolean handleMessage(Telegram msg) {
 				final ChunkMessage chunkMessage = (ChunkMessage) msg.extraInfo;
@@ -46,6 +51,24 @@ public class Blockhalde extends ApplicationAdapter {
 				return true;
 			}
 		}, MessageIdConstants.CHUNK_CREATED_MSG_ID);
+		
+		msgManager.addListener(new Telegraph() {
+			@Override
+			public boolean handleMessage(Telegram msg) {
+				final ChunkUpdateMessage chunkMessage = (ChunkUpdateMessage) msg.extraInfo;
+
+				// this ensures both rendersystem and world are loaded
+				Gdx.app.postRunnable(new Runnable() {
+					@Override
+					public void run() {
+						RenderSystem sys = engine.getSystem(RenderSystem.class);
+						sys.updateBlock(chunkMessage.getxPosition(), chunkMessage.getyPosition(), chunkMessage.getzPosition());
+					}
+				});
+				
+				return true;
+			}
+		}, MessageIdConstants.BLOCK_UPDATED_MSG_ID);
 		
 		engine = new Engine();
 		
@@ -70,6 +93,8 @@ public class Blockhalde extends ApplicationAdapter {
 
 	@Override
 	public void render() {
+		testBlockUpdates();
+		
 		engine.update(Gdx.graphics.getRawDeltaTime());
 		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
 		MessageManager.getInstance().update();
@@ -78,5 +103,21 @@ public class Blockhalde extends ApplicationAdapter {
 				"\nN: toggle Perlin Noise Debug View (use V and B to go up and down the Z axis)" + 
 				"\nright click for pie menu");
 		RendererGUI.instance().render();
+	}
+
+	private void testBlockUpdates() {
+		final int minX = -100;
+		final int maxX = 100;
+		final int minY = 50;
+		final int maxY = 150;
+		final int minZ = -100;
+		final int maxZ = 100;
+		
+		Random rnd = new Random();
+		int x = minX + rnd.nextInt(maxX - minX);
+		int y = minY + rnd.nextInt(maxY - minY);
+		int z = minZ + rnd.nextInt(maxZ - minZ);
+
+		engine.getSystem(WorldManagementSystem.class).setBlock(x, y, z, BlockType.TNT);
 	}
 }
