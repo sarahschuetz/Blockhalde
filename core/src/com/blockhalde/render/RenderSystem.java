@@ -33,6 +33,7 @@ public class RenderSystem extends EntitySystem {
 	public static final int SUBCHUNK_CACHE_INCLUSION_CHUNK_SIZE = 16; 
 	
 	private Texture texture;
+	private Texture fogGradient;
 	private ShaderProgram shader;
 	private Engine engine;
 	private WorldManagementSystem world;
@@ -46,6 +47,9 @@ public class RenderSystem extends EntitySystem {
 	public void addedToEngine(Engine engine) {
 		texture = new Texture(Gdx.files.internal("textures/blocks.png"), true);
 		texture.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
+
+		fogGradient = new Texture(Gdx.files.internal("textures/fog-gradient.png"), true);
+		fogGradient.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
 		
 		this.engine = engine;
 
@@ -167,8 +171,14 @@ public class RenderSystem extends EntitySystem {
 		shader.setUniformMatrix("u_view", cam.view);
 		shader.setUniformMatrix("u_projection", cam.projection);
 
-		texture.bind();
+
+		texture.bind(0);
 		shader.setUniformi("u_texture", 0);
+
+		fogGradient.bind(1);
+		shader.setUniformi("u_fogGradient", 1);
+
+		texture.bind(0);
 
 		for(CachedSubchunk cached: cache) {
 			if(!cached.isUnused()) {
