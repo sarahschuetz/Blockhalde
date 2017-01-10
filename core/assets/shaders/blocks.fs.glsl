@@ -5,7 +5,7 @@ precision mediump float;
 const float fogGradientWorldLength = 20.0;
 const float fogDensity = 1.0;
 
-const float aoFactor = 0.5;
+const float aoFactor = 1.0;
 
 varying vec4 v_viewPosition;
 varying vec3 v_normal;
