@@ -30,7 +30,7 @@ public class RenderSystem extends EntitySystem {
 	 * The maximum amount of cached subchunks received from the worker thread
 	 * in a single frame. This serves to limit load lag.
 	 */
-	public static final int SUBCHUNK_CACHE_INCLUSION_CHUNK_SIZE = 16; 
+	public static final int SUBCHUNK_CACHE_INCLUSION_CHUNK_SIZE = 4096;
 	
 	private Texture texture;
 	private Texture fogGradient;
