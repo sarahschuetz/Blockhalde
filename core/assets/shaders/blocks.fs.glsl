@@ -2,6 +2,9 @@
 precision mediump float;
 #endif
 
+const float fogGradientWorldLength = 20.0;
+const float fogDensity = 1.0;
+
 varying vec4 v_viewPosition;
 varying vec3 v_normal;
 varying vec2 v_texCoords;
@@ -12,10 +15,10 @@ uniform sampler2D u_texture;
 uniform sampler2D u_fogGradient;
 
 void main() {
-    float dist = abs(v_viewPosition.z/20);
+    float dist = abs(v_viewPosition.z / fogGradientWorldLength);
     float fogFactor = 0.0;
 
-    fogFactor = 1.0 /exp(dist * 1.0);
+    fogFactor = 1.0 /exp(dist * fogDensity);
     fogFactor = clamp( fogFactor, 0.0, 1.0 );
 
     vec4 fogColor = texture2D(u_fogGradient, vec2(fogFactor, 0.5));
