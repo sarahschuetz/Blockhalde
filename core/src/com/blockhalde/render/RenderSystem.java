@@ -26,6 +26,12 @@ public class RenderSystem extends EntitySystem {
 	
 	public static final int SUBCHUNK_HEIGHT = 16;
 	
+	/**
+	 * The maximum amount of cached subchunks received from the worker thread
+	 * in a single frame. This serves to limit load lag.
+	 */
+	public static final int SUBCHUNK_CACHE_INCLUSION_CHUNK_SIZE = 16; 
+	
 	private Texture texture;
 	private ShaderProgram shader;
 	private Engine engine;
@@ -207,14 +213,16 @@ public class RenderSystem extends EntitySystem {
 
 	private void drainWorkerQueue() {
 		CachedSubchunk cached;
+		int cacheInsertions = 0;
 		
-		while((cached = workerQueue.poll()) != null) {
+		while(cacheInsertions <= SUBCHUNK_CACHE_INCLUSION_CHUNK_SIZE && (cached = workerQueue.poll()) != null) {
 			CachedSubchunk alreadyCached = findCachedSubchunk(cached.chunkPos, cached.subchunkIdx);
 			if(alreadyCached != null) {
 				cache.remove(alreadyCached);
 			}
 			
 			cache.add(cached);
+			++cacheInsertions;
 		}
 	}
 	
