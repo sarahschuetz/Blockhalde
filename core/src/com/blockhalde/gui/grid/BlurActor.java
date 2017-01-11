@@ -13,6 +13,10 @@ import com.blockhalde.gui.RendererGUI;
 public class BlurActor extends Actor {
 	
 	Texture blurredBackground;
+	/**
+	 * Is set to true once blurredBackground contains a meaningful value.
+	 */
+	private boolean bgInitialized = false;
 	
 	public BlurActor() {
 		Pixmap orig = getScreenshot(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
@@ -23,12 +27,13 @@ public class BlurActor extends Actor {
 	
 	@Override
 	public void draw(Batch batch, float parentAlpha) {
-		batch.draw(blurredBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true);		
+		if(bgInitialized) {
+			batch.draw(blurredBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true);
+		}
 	}
 	
 	@Override
 	public void setVisible(boolean visible) {
-		
 		if (RendererGUI.instance().menusActive == 1 && visible) {
     		Pixmap orig = getScreenshot(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
 			Pixmap blurred = BlurUtils.blur(orig, 4, 2, false);
@@ -36,6 +41,10 @@ public class BlurActor extends Actor {
 			blurred.dispose();
 			
 			super.setVisible(visible);
+			
+			if(visible) {
+				bgInitialized = true;
+			}
     	}
 		
 		if (RendererGUI.instance().menusActive == 0 && !visible) {
