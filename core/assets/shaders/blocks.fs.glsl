@@ -2,7 +2,7 @@
 precision mediump float;
 #endif
 
-const float fogGradientWorldLength = 20.0;
+const float fogGradientWorldLength = 40.0;
 const float fogDensity = 1.0;
 
 const float aoFactor = 1.0;
@@ -29,5 +29,5 @@ void main() {
 
     vec4 color = mix(vec4(0.0, 0.0, 0.0, 1.0), texture2D(u_texture, v_texCoords), ao);
 
-    gl_FragColor = mix(fogColor, color, fogFactor);
+    gl_FragColor = mix(vec4(fogColor.rgb, 1.0), color, fogColor.a);
 }
