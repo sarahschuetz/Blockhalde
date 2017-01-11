@@ -24,8 +24,8 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 	private static final float JUMP_STRENGTH = 13f;
 	private static final float WALK_SPEED = 2f;
 	private static final float FLY_SPEED = WALK_SPEED * 3f;
-	private static final float PLAYER_HEIGHT = 1.8f;
-	private static final float COLLISION_DISTANCE = 0.2f;
+	private static final float PLAYER_HEIGHT = 1.6f;
+	private static final float COLLISION_DISTANCE = 0.1f;
 	private static final float MAX_MOVEMENT_PER_FRAME = 0.8f;
 
 	private Keybindings keybindings = new Keybindings("util/keybindings.properties");
@@ -165,21 +165,24 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 			
 			//Y Collision
 			canJump = false;
-			if (yMoved > 0 && blockAt(position.x, position.y + COLLISION_DISTANCE + PLAYER_HEIGHT, position.z)) {
+			if (yMoved > 0 && blockAt(oldPosition.x, position.y + COLLISION_DISTANCE + PLAYER_HEIGHT, oldPosition.z)) {
 				movementUp = 0;
-				position.y = (int) (position.y + COLLISION_DISTANCE + PLAYER_HEIGHT) - COLLISION_DISTANCE;
+				position.y = (int) (position.y + COLLISION_DISTANCE + PLAYER_HEIGHT) - COLLISION_DISTANCE - PLAYER_HEIGHT;
 			}
-			else if (yMoved < 0 && blockAt(position.x, position.y - COLLISION_DISTANCE, position.z)) {
+			else if (yMoved < 0 && blockAt(oldPosition.x, position.y - COLLISION_DISTANCE, oldPosition.z)) {
 				movementUp = 0;
 				canJump = true;
 				position.y = (int) (position.y - COLLISION_DISTANCE) + COLLISION_DISTANCE + 1;
 			}
-			
+
 			//XZ Collision
 			for (int heightModifier = 0; heightModifier < PLAYER_HEIGHT; heightModifier++) {
+				float newPositionX = oldPosition.x + xMoved + COLLISION_DISTANCE * Math.signum(xMoved);
+				float newPositionZ = oldPosition.z + zMoved + COLLISION_DISTANCE * Math.signum(zMoved);
 				float moddedY = position.y + heightModifier;
-				boolean blockX = blockAt(position.x + COLLISION_DISTANCE * Math.signum(xMoved), moddedY, position.z);
-				boolean blockZ = blockAt(position.x, moddedY, position.z + COLLISION_DISTANCE * Math.signum(zMoved));
+				boolean blockX = xMoved != 0 && blockAt(newPositionX, moddedY, oldPosition.z);
+				boolean blockZ = zMoved != 0 && blockAt(oldPosition.x, moddedY, newPositionZ);
+				boolean blockXZ = !blockX && !blockZ && blockAt(newPositionX, moddedY, newPositionZ);
 				if (blockX) {
 					if (xMoved > 0) position.x = (int) oldPosition.x + (oldPosition.x > 0 ? 1 - COLLISION_DISTANCE : -COLLISION_DISTANCE);
 					else position.x = (int) oldPosition.x + (oldPosition.x > 0 ? COLLISION_DISTANCE : -1 + COLLISION_DISTANCE);
@@ -188,25 +191,17 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 					if (zMoved > 0) position.z = (int) oldPosition.z + (oldPosition.z > 0 ? 1 - COLLISION_DISTANCE : -COLLISION_DISTANCE);
 					else position.z = (int) oldPosition.z + (oldPosition.z > 0 ? COLLISION_DISTANCE : -1 + COLLISION_DISTANCE);
 				}
+				if (blockXZ) {
+					boolean fallbackX = !blockAt(oldPosition.x + xMoved + Math.signum(xMoved), moddedY, oldPosition.z + zMoved);
+					boolean fallbackZ = !blockAt(oldPosition.x + xMoved, moddedY, oldPosition.z + zMoved + Math.signum(zMoved));
+					if (fallbackX) position.x += COLLISION_DISTANCE * Math.signum(xMoved);
+					else if (fallbackZ) position.z += COLLISION_DISTANCE * Math.signum(zMoved);
+				}
 				while (blockAt(position.x, moddedY, position.z)) {
 					position.y++;
 					moddedY = position.y + heightModifier;
 				}
 			}
-			
-//			if (blocked) {
-//				if (xMoved != 0 && (blockedX || zMoved != 0 && !blockedZ)) {
-//					if (xMoved > 0) position.x = (int) position.x + (oldPosition.x > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
-//					else position.x = (int) position.x + (oldPosition.x > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
-//				}
-//				if (zMoved != 0 && blockedZ) {
-//					if (zMoved > 0) position.z = (int) position.z + (oldPosition.z > 0 ? 1 + COLLISION_DISTANCE : COLLISION_DISTANCE);
-//					else position.z = (int) position.z + (oldPosition.z > 0 ? -COLLISION_DISTANCE : -1 - COLLISION_DISTANCE);
-//				}
-//				while (blockAt(position.x, position.y, position.z) || blockAt(position.x, position.y + 1, position.z)) {
-//					position.y++;
-//				}
-//			}
 		}
 	}
 
