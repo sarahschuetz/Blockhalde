@@ -25,12 +25,8 @@ public class RenderSystem extends EntitySystem {
 	public static final int MAX_CACHED_SUBCHUNKS = 13 * 13 * 16;
 	
 	public static final int SUBCHUNK_HEIGHT = 16;
-	
-	/**
-	 * The maximum amount of cached subchunks received from the worker thread
-	 * in a single frame. This serves to limit load lag.
-	 */
-	public static final int SUBCHUNK_CACHE_INCLUSION_CHUNK_SIZE = 4096;
+
+	private static final int SUBCHUNK_CACHE_INCLUSION_CHUNK_SIZE = 128;
 	
 	private Texture texture;
 	private Texture fogGradient;
@@ -38,7 +34,7 @@ public class RenderSystem extends EntitySystem {
 	private Engine engine;
 	private WorldManagementSystem world;
 	private ChunkMeshWorker worker;
-	private BlockingQueue<CachedSubchunk> workerQueue = new ArrayBlockingQueue<>(1024);
+	private BlockingQueue<CachedSubchunk> workerQueue = new ArrayBlockingQueue<>(128);
 	private List<CachedSubchunk> cache = new ArrayList<>();
 	private Skybox skybox;
 	private SubchunkDistanceComparator distComp = new SubchunkDistanceComparator();
@@ -48,7 +44,7 @@ public class RenderSystem extends EntitySystem {
 		texture = new Texture(Gdx.files.internal("textures/blocks.png"), true);
 		texture.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
 
-		fogGradient = new Texture(Gdx.files.internal("textures/fog-gradient.png"), true);
+		fogGradient = new Texture(Gdx.files.internal("textures/alpha-gradient.png"), true);
 		fogGradient.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
 		
 		this.engine = engine;
@@ -182,7 +178,7 @@ public class RenderSystem extends EntitySystem {
 
 		for(CachedSubchunk cached: cache) {
 			if(!cached.isUnused()) {
-				cached.mesh.render(shader, GL20.GL_TRIANGLES);
+				cached.getMesh().render(shader, GL20.GL_TRIANGLES);
 			}
 		}
 		

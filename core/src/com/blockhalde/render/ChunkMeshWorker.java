@@ -17,7 +17,7 @@ public class ChunkMeshWorker implements Runnable {
 
 	private ForkJoinPool taskPool = ForkJoinPool.commonPool();
 	private BlockingQueue<ChunkMeshRequest> pendingRequests = new LinkedBlockingDeque<>();
-	private BlockingQueue<CachedSubchunk> cachedSubchunks;
+	private BlockingQueue<CachedSubchunk> cacheInsertions;
 	
 	private TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("textures/blocks.atlas"));
 	private Pool<ChunkMeshBuilder> builderPool = new Pool<ChunkMeshBuilder>() {
@@ -30,7 +30,7 @@ public class ChunkMeshWorker implements Runnable {
 	private boolean running = false;
 
 	public ChunkMeshWorker(BlockingQueue<CachedSubchunk> targetQueue) {
-		this.cachedSubchunks = targetQueue;
+		this.cacheInsertions = targetQueue;
 	}
 
 	@Override
@@ -65,17 +65,7 @@ public class ChunkMeshWorker implements Runnable {
 						final MeshBuilder meshBuilder = fut.get();
 						
 						if(meshBuilder != null) {
-							Gdx.app.postRunnable(new Runnable() {
-								
-								@Override
-								public void run() {
-									try {
-										cachedSubchunks.put(new CachedSubchunk(meshBuilder.end(), req.getPosition(), req.subchunkIdx, System.nanoTime()));
-									} catch (InterruptedException e) {
-										throw new RuntimeException(e);
-									}
-								}
-							});
+							cacheInsertions.put(new CachedSubchunk(meshBuilder, req.getPosition(), req.subchunkIdx, System.nanoTime()));
 						}
 					} catch (InterruptedException | ExecutionException e) {
 						throw new RuntimeException(e);
@@ -113,10 +103,6 @@ public class ChunkMeshWorker implements Runnable {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	public BlockingQueue<CachedSubchunk> getCachedSubchunks() {
-		return cachedSubchunks;
 	}
 	
 	public void shutdown() {
