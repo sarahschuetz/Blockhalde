@@ -2,7 +2,7 @@
 precision mediump float;
 #endif
 
-const float fogGradientWorldLength = 20.0;
+const float fogGradientWorldLength = 40.0;
 const float fogDensity = 1.0;
 
 const float aoFactor = 1.0;
