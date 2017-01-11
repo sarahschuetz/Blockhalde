@@ -179,11 +179,11 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 			for (int heightModifier = 0; heightModifier < PLAYER_HEIGHT; heightModifier++) {
 				float newPositionX = oldPosition.x + xMoved + COLLISION_DISTANCE * Math.signum(xMoved);
 				float newPositionZ = oldPosition.z + zMoved + COLLISION_DISTANCE * Math.signum(zMoved);
-				float moddedY = position.y + heightModifier;
-				boolean blockX = xMoved != 0 && blockAt(newPositionX, moddedY, oldPosition.z);
-				boolean blockZ = zMoved != 0 && blockAt(oldPosition.x, moddedY, newPositionZ);
-				boolean blockXZ = !blockX && !blockZ && blockAt(newPositionX, moddedY, newPositionZ);
-				if (blockX) {
+				float heightModifiedY = position.y + heightModifier;
+				boolean blockX = xMoved != 0 && blockAt(newPositionX, heightModifiedY, oldPosition.z);
+				boolean blockZ = zMoved != 0 && blockAt(oldPosition.x, heightModifiedY, newPositionZ);
+				boolean blockXZ = !blockX && !blockZ && blockAt(newPositionX, heightModifiedY, newPositionZ);
+				if (blockX || blockXZ) {
 					if (xMoved > 0) position.x = (int) oldPosition.x + (oldPosition.x > 0 ? 1 - COLLISION_DISTANCE : -COLLISION_DISTANCE);
 					else position.x = (int) oldPosition.x + (oldPosition.x > 0 ? COLLISION_DISTANCE : -1 + COLLISION_DISTANCE);
 				}
@@ -191,15 +191,9 @@ public class VirtualPlayerMovementController extends VirtualAbstractController {
 					if (zMoved > 0) position.z = (int) oldPosition.z + (oldPosition.z > 0 ? 1 - COLLISION_DISTANCE : -COLLISION_DISTANCE);
 					else position.z = (int) oldPosition.z + (oldPosition.z > 0 ? COLLISION_DISTANCE : -1 + COLLISION_DISTANCE);
 				}
-				if (blockXZ) {
-					boolean fallbackX = !blockAt(oldPosition.x + xMoved + Math.signum(xMoved), moddedY, oldPosition.z + zMoved);
-					boolean fallbackZ = !blockAt(oldPosition.x + xMoved, moddedY, oldPosition.z + zMoved + Math.signum(zMoved));
-					if (fallbackX) position.x += COLLISION_DISTANCE * Math.signum(xMoved);
-					else if (fallbackZ) position.z += COLLISION_DISTANCE * Math.signum(zMoved);
-				}
-				while (blockAt(position.x, moddedY, position.z)) {
+				while (blockAt(position.x, heightModifiedY, position.z)) {
 					position.y++;
-					moddedY = position.y + heightModifier;
+					heightModifiedY = position.y + heightModifier;
 				}
 			}
 		}

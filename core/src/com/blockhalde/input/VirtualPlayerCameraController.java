@@ -27,6 +27,7 @@ public class VirtualPlayerCameraController extends VirtualAbstractController {
 	private float rotationX = 0;
 	private float rotationY = 0;
 	
+	private boolean digging = false;
 	private Vector3 blockPosition = null;
 	
 	/**
@@ -37,10 +38,30 @@ public class VirtualPlayerCameraController extends VirtualAbstractController {
 		super(inputSystem);
 		PauseListener.init();
 	}
-
+	
+	@Override
+	public void touchDown(int screenX, int screenY, int button) {
+		digging = true;
+	}
+	
+	@Override
+	public void touchUp(int screenX, int screenY, int button) {
+		digging = false;
+	}
+	
 	@Override
 	public void touchDragged(int screenX, int screenY) {
 		mouseMoved(screenX, screenY);
+	}
+	
+	@Override
+	public void update(float deltaTime) {
+		if (!PauseListener.isPaused() && active) {
+			if (digging && blockPosition != null) {
+				WorldManagementSystem wms = inputSystem.getEngine().getSystem(WorldManagementSystem.class);
+				wms.setBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z, BlockType.AIR);
+			}
+		}
 	}
 
 	@Override
