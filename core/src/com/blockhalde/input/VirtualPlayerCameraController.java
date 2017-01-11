@@ -6,6 +6,7 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
+import com.blockhalde.gui.InventoryManager;
 import com.blockhalde.player.CameraComponent;
 import com.blockhalde.player.Player;
 import com.blockhalde.player.PlayerDataComponent;
@@ -59,7 +60,9 @@ public class VirtualPlayerCameraController extends VirtualAbstractController {
 		if (!PauseListener.isPaused() && active) {
 			if (digging && blockPosition != null) {
 				WorldManagementSystem wms = inputSystem.getEngine().getSystem(WorldManagementSystem.class);
+				InventoryManager.getInstance().addItem(BlockType.fromBlockId(wms.getBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z)));
 				wms.setBlock((int) blockPosition.x, (int) blockPosition.y, (int) blockPosition.z, BlockType.AIR);
+				updateSelectedBlock();
 			}
 		}
 	}
