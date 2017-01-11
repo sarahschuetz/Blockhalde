@@ -1,7 +1,7 @@
 { 
 inventory: [ 
 {
-id: stone
+id: 1
 name: Stone Block
 category: block
 image: gui_textures/stone.png

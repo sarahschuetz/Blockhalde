@@ -1,16 +1,63 @@
 {
     "itemtypes" : [
+    	{    
+        	"id" : 0, 	
+            "name": "Air Block",
+            "category": "block",
+            "maxStackSize": 1,
+            "hasWear": false,
+            "image": "gui_textures/air.png"
+        },
         {    
-        	"id" : "stone", 	
+        	"id" : 1, 	
+            "name": "Water Block",
+            "category": "block",
+            "maxStackSize": 1,
+            "hasWear": false,
+            "image": "gui_textures/water.png"
+        },
+        {    
+        	"id" : 2, 	
+            "name": "Dirt Block",
+            "category": "block",
+            "maxStackSize": 64,
+            "hasWear": false,
+            "image": "gui_textures/dirt.png"
+        },
+        {    
+        	"id" : 3, 	
             "name": "Stone Block",
             "category": "block",
             "maxStackSize": 64,
             "hasWear": false,
             "image": "gui_textures/stone.png"
         },
-
+		{    
+        	"id" : 5, 	
+            "name": "Grass Block",
+            "category": "block",
+            "maxStackSize": 64,
+            "hasWear": false,
+            "image": "gui_textures/grass.png"
+        },
+        {    
+        	"id" : 6, 	
+            "name": "TNT Block",
+            "category": "block",
+            "maxStackSize": 64,
+            "hasWear": false,
+            "image": "gui_textures/tnt.png"
+        },
+        {    
+        	"id" : 7, 	
+            "name": "Snow Block",
+            "category": "block",
+            "maxStackSize": 64,
+            "hasWear": false,
+            "image": "gui_textures/snow.png"
+        },
         {
-       		"id" : "wood",
+       		"id" : 8,
             "name": "Wood Block",
             "category": "block",
             "maxStackSize": 64,
@@ -19,7 +66,7 @@
         },
         
         {
-        	"id" : "cobblestone",
+        	"id" : 9,
         	"name": "CobbleStone Block",
             "category": "block",
             "maxStackSize": 64,
@@ -28,7 +75,7 @@
         },
         
         {
-        	"id" : "glas",
+        	"id" : 10,
         	"name": "Glas Block",
             "category": "block",
             "maxStackSize": 64,
@@ -37,7 +84,7 @@
         },
         
         {
-        	"id" : "brick",
+        	"id" : 11,
             "name": "Bricks Block",
             "category": "block",
             "maxStackSize": 64,
@@ -46,7 +93,7 @@
         },
         
         {
-        	"id" : "diamond",
+        	"id" : 12,
         	"name": "Diamond",
             "category": "ingredient",
             "maxStackSize": 64,
@@ -55,7 +102,7 @@
         },
         
         {
-        	"id" : "coal",
+        	"id" : 13,
         	"name": "Coal",
             "category": "ingredient",
             "maxStackSize": 64,
@@ -64,7 +111,7 @@
         },
 
         {
-        	"id" : "laser",
+        	"id" : 14,
             "name": "Laser Gun",
             "category": "tool",
             "maxStackSize": 1,

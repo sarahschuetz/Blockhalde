@@ -12,7 +12,7 @@ public class Item {
 		armor
 	}
 	
-	public String id = "";
+	public int id;
 	public String name = "";
 	public String category = "";
 	public String hasWear = "";
@@ -21,6 +21,7 @@ public class Item {
 	
 	private Category cat = null;
 	private int currentStackSize = 0;
+	private int inventoryPos;
 	
 	
 	public Item(){
@@ -39,13 +40,18 @@ public class Item {
 		return currentStackSize;
 	}
 
+	public int getInventoryPos() {
+		return inventoryPos;
+	}
+
+
+	public void setInventoryPos(int inventoryPos) {
+		this.inventoryPos = inventoryPos;
+	}
+
+
 	public Texture getImage() {
 		return new Texture(Gdx.files.internal(image));
-	}
-	
-	public int[] getInventoryPosition() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

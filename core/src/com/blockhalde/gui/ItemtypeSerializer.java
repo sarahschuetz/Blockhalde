@@ -18,14 +18,14 @@ public class ItemtypeSerializer {
 			
 			for (Item item : inventory) {
 				String it = json.prettyPrint(item);			
-				file.writeString(it, true);
+				file.writeString(it +",", true);
 			}
 			
 			file.writeString("\n]\n", true);
 			file.writeString("}", true);
 	}
 
-	public static List<Item> loadJsonItems(){   		 
+	public static List<Item> loadJsonItemsTypes(){   		 
 	        FileHandle handle = Gdx.files.internal("json/itemtypes.json");
 	        Json json = new Json();	        
 	        ItemWrapper dataTest = json.fromJson(ItemWrapper.class, handle);
