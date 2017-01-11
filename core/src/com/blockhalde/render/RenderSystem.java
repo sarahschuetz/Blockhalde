@@ -44,7 +44,7 @@ public class RenderSystem extends EntitySystem {
 		texture = new Texture(Gdx.files.internal("textures/blocks.png"), true);
 		texture.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
 
-		fogGradient = new Texture(Gdx.files.internal("textures/fun-gradient.png"), true);
+		fogGradient = new Texture(Gdx.files.internal("textures/alpha-gradient.png"), true);
 		fogGradient.setFilter(Texture.TextureFilter.MipMap, Texture.TextureFilter.Nearest);
 		
 		this.engine = engine;

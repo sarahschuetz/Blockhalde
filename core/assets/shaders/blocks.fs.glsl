@@ -27,8 +27,7 @@ void main() {
 
     float ao = v_color.r * aoFactor;
 
-    gl_FragColor.rgb = mix(vec3(0.0, 0.0, 0.0), texture2D(u_texture, v_texCoords).rgb, ao);  //vec4(v_texCoords.x, v_texCoords.y, 0.0, 1.0)
-	gl_FragColor.a = 1.0;
+    vec4 color = mix(vec4(0.0, 0.0, 0.0, 1.0), texture2D(u_texture, v_texCoords), ao);
 
-    gl_FragColor = mix(fogColor, gl_FragColor, fogFactor);
+    gl_FragColor = mix(fogColor, color, fogFactor);
 }
