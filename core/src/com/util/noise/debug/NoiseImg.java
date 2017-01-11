@@ -43,32 +43,40 @@ public class NoiseImg extends Actor {
 		
 		for(int x = 0; x < width; x++) {
 			for(int z = 0; z < height; z++) {
-				float perlinValue = (float) perlin.calcPerlinAt(x / smoothness, y, z / smoothness, octaves, persistence);
-				pixmapScreen.setColor(perlinValue, perlinValue, perlinValue, 1f);
+//				float perlinValue = (float) perlin.calcPerlinAt(x / smoothness, y, z / smoothness, octaves, persistence);
+				
+				double heightMap = perlin.calcPerlinAt(x / smoothness, z / smoothness, y, 2, 1); // generate Heightmap from 2d perlin noise 
+				double heightMap2 = perlin.calcPerlinAt(x / smoothness, z / smoothness, y, 3, 1); // generate Heightmap from 2d perlin noise 
+				double heightMap3 = perlin.calcPerlinAt(x / smoothness, z / smoothness, y, 1, 1); // generate Heightmap from 2d perlin noise 
+				
+				heightMap = (heightMap + heightMap2) * 0.5;
+				heightMap = (heightMap + heightMap3) * 0.5;
+				
+				pixmapScreen.setColor((float) heightMap, (float) heightMap, (float) heightMap, 1f);
 				pixmapScreen.drawPixel(x, z);
 			}
 		}
 		
-		Pixmap pixmapChunk = new Pixmap(16, 16, Format.RGBA8888);	
-		
-		for(int x = 0; x < Chunk.X_MAX; x++) {
-			for(int z2 = 0; z2 < Chunk.Z_MAX; z2++) {
-				
-				float perlinValue = (float) perlin.calcPerlinAt(
-						x  / (double) Chunk.X_MAX,
-						(y % Chunk.Y_MAX),
-						z2 / (double) Chunk.Z_MAX, octaves, persistence);
-				
-				pixmapChunk.setColor(perlinValue, perlinValue, perlinValue, 1f);
-				pixmapChunk.drawPixel(x, z2);
-			}
-		}
+//		Pixmap pixmapChunk = new Pixmap(16, 16, Format.RGBA8888);	
+//		
+//		for(int x = 0; x < Chunk.X_MAX; x++) {
+//			for(int z2 = 0; z2 < Chunk.Z_MAX; z2++) {
+//				
+//				float perlinValue = (float) perlin.calcPerlinAt(
+//						x  / (double) Chunk.X_MAX,
+//						(y % Chunk.Y_MAX),
+//						z2 / (double) Chunk.Z_MAX, octaves, persistence);
+//				
+//				pixmapChunk.setColor(perlinValue, perlinValue, perlinValue, 1f);
+//				pixmapChunk.drawPixel(x, z2);
+//			}
+//		}
 		
 		textureScreen = new Texture(pixmapScreen);
 		pixmapScreen.dispose();
 		
-		textureChunk = new Texture(pixmapChunk);
-		pixmapChunk.dispose();
+//		textureChunk = new Texture(pixmapChunk);
+//		pixmapChunk.dispose();
 	}
 	
 	public void incrementY() {
@@ -85,6 +93,6 @@ public class NoiseImg extends Actor {
 	public void draw(Batch batch, float parentAlpha) {
 		batch.disableBlending();
 	    batch.draw(textureScreen, 10, 10);
-	    batch.draw(textureChunk, 10, 10, 160, 160);
+//	    batch.draw(textureChunk, 10, 10, 160, 160);
 	}
 }
