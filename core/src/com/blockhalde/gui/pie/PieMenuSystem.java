@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.blockhalde.gui.RendererGUI;
+import com.blockhalde.gui.grid.GridSystem;
 
 /**
  * The {@link PieMenuSystem} serves a exquisite pie menu. Pops up when clicking right mouse button.
@@ -35,8 +36,10 @@ public class PieMenuSystem extends EntitySystem{
 	private Array<PieSlice> slices;
 	private TweenManager tweenManager;
 	private ArrowActor arrow;
-
-	public PieMenuSystem(){
+	
+	@Override
+	public void addedToEngine(Engine engine) {
+		
 		this.stage = RendererGUI.instance().getStage();
 		Tween.registerAccessor(Actor.class, new ActorAccessor());
 		center = new Vector2(Gdx.graphics.getWidth()*0.5f, Gdx.graphics.getHeight()*0.5f);
@@ -46,7 +49,7 @@ public class PieMenuSystem extends EntitySystem{
 		// --- SETUP TEST SLICES ---
 		Command cmdInventory = new Command(){
 			public void execute() {
-				RendererGUI.instance().toggleMenu();
+				engine.getSystem(GridSystem.class).toggleMenu();
 			}
 		};
 		

@@ -16,7 +16,7 @@ public class BlurActor extends Actor {
 	/**
 	 * Is set to true once blurredBackground contains a meaningful value.
 	 */
-	private boolean bgInitialized = false;
+	public boolean bgInitialized = false;
 	
 	public BlurActor() {
 		Pixmap orig = getScreenshot(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
@@ -31,28 +31,6 @@ public class BlurActor extends Actor {
 			batch.draw(blurredBackground, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true);
 		}
 	}
-	
-	@Override
-	public void setVisible(boolean visible) {
-		if (RendererGUI.instance().menusActive == 1 && visible) {
-    		Pixmap orig = getScreenshot(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
-			Pixmap blurred = BlurUtils.blur(orig, 4, 2, false);
-			blurredBackground = new Texture(blurred);
-			blurred.dispose();
-			
-			super.setVisible(visible);
-			
-			if(visible) {
-				bgInitialized = true;
-			}
-    	}
-		
-		if (RendererGUI.instance().menusActive == 0 && !visible) {
-			super.setVisible(visible);
-		}
-
-	}
-	
 
 	private static Pixmap getScreenshot(int x, int y, int w, int h, boolean yDown){
 		
@@ -73,6 +51,23 @@ public class BlurActor extends Actor {
 
         return pixmap;
     }
+	
+	@Override
+	public void setVisible(boolean visible) {
+		
+		if (visible) {
+			Pixmap orig = getScreenshot(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false);
+			Pixmap blurred = BlurUtils.blur(orig, 4, 2, true);
+			blurredBackground = new Texture(blurred);
+			blurred.dispose();
+			
+			bgInitialized = true;
+		} else {
+			bgInitialized = false;
+		}
+		
+		super.setVisible(visible);
+	}
 
 }
 

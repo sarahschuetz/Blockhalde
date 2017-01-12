@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.blockhalde.gui.RendererGUI;
+import com.blockhalde.gui.grid.GridSystem;
 import com.blockhalde.gui.pie.Command;
 import com.blockhalde.gui.pie.PieMenuSystem;
 import com.blockhalde.player.CameraComponent;
@@ -41,9 +42,9 @@ public class VirtualGameController extends VirtualAbstractController {
 	@Override
 	public void keyDown(int keycode) {
 		if (active) {
-			if (keycode == keybindings.getKey("INV_TOGGLE"))              RendererGUI.instance().toggleMenu();
-			else if (keycode == keybindings.getKey("INV_FORWARD"))        RendererGUI.instance().scrollItems(1);
-			else if (keycode == keybindings.getKey("INV_BACKWARD"))       RendererGUI.instance().scrollItems(-1);
+			if (keycode == keybindings.getKey("INV_TOGGLE"))              inputSystem.getEngine().getSystem(GridSystem.class).toggleMenu();
+			else if (keycode == keybindings.getKey("INV_FORWARD"))        inputSystem.getEngine().getSystem(GridSystem.class).scrollItems(1);
+			else if (keycode == keybindings.getKey("INV_BACKWARD"))       inputSystem.getEngine().getSystem(GridSystem.class).scrollItems(-1);
 			else if (keycode == keybindings.getKey("QUIT"))		          Gdx.app.exit();
 			else if (keycode == keybindings.getKey("TOGGLE_FLYING"))      toggleFlying();
 			else if (keycode == keybindings.getKey("NOISE_DEBUG"))        inputSystem.getEngine().getSystem(DebugPerlinNoiseSystem.class).toggleDebugView();
@@ -56,9 +57,7 @@ public class VirtualGameController extends VirtualAbstractController {
 
 	@Override
 	public void scrolled(int amount) {
-		if (active) {
-			RendererGUI.instance().scrollItems(amount);
-		}
+		inputSystem.getEngine().getSystem(GridSystem.class).scrollItems(amount);
 	}
 
 	private void toggleFlying() {
@@ -73,12 +72,13 @@ public class VirtualGameController extends VirtualAbstractController {
 	@Override
 	public void touchDown(int screenX, int screenY, int button) {
 		if(button == 1){
-			PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
-			if(pms != null){
-				RendererGUI.instance().setBlurActive();
-				pms.setActive(true);
-				VirtualController vpcc = inputSystem.getController(VirtualPlayerCameraController.class);
-				if (vpcc != null) vpcc.setActive(false);
+			if (!inputSystem.getEngine().getSystem(GridSystem.class).inventoryIsVisible) {
+				PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
+				if(pms != null){
+					pms.setActive(true);
+					VirtualController vpcc = inputSystem.getController(VirtualPlayerCameraController.class);
+					if (vpcc != null) vpcc.setActive(false);
+				}
 			}
 		}
 	}
@@ -86,12 +86,15 @@ public class VirtualGameController extends VirtualAbstractController {
 	@Override
 	public void touchUp(int screenX, int screenY, int button) {
 		if(button == 1){
-			PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
-			if(pms != null){
-				RendererGUI.instance().setBlurInactive();
-				pms.setActive(false);
-				VirtualController vpcc = inputSystem.getController(VirtualPlayerCameraController.class);
-				if (vpcc != null) vpcc.setActive(true);
+			if (inputSystem.getEngine().getSystem(GridSystem.class).inventoryIsVisible) {
+				inputSystem.getEngine().getSystem(GridSystem.class).toggleMenu();
+			} else {
+				PieMenuSystem pms = inputSystem.getEngine().getSystem(PieMenuSystem.class);
+				if(pms != null){
+					pms.setActive(false);
+					VirtualController vpcc = inputSystem.getController(VirtualPlayerCameraController.class);
+					if (vpcc != null) vpcc.setActive(true);
+				}
 			}
 		}
 	}

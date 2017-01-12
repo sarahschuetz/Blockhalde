@@ -10,7 +10,9 @@ import com.badlogic.msg.MessageDispatcher;
 import com.badlogic.msg.MessageManager;
 import com.badlogic.msg.Telegram;
 import com.badlogic.msg.Telegraph;
+import com.blockhalde.gui.GUIManagement;
 import com.blockhalde.gui.RendererGUI;
+import com.blockhalde.gui.grid.GridSystem;
 import com.blockhalde.gui.pie.PieMenuSystem;
 import com.blockhalde.input.InputSystem;
 import com.blockhalde.player.Player;
@@ -74,8 +76,11 @@ public class Blockhalde extends ApplicationAdapter {
 		
 		cameraSystem = new CameraSystem();
 		engine.addSystem(cameraSystem);
+		engine.addSystem(new GUIManagement());
 		engine.addSystem(new PieMenuSystem());
+		engine.addSystem(new GridSystem());
 		engine.addSystem(new InputSystem());
+		
 		engine.addSystem(new WorldManagementSystem());
 		engine.addSystem(new RenderSystem());
 		engine.addSystem(new DebugPerlinNoiseSystem());
