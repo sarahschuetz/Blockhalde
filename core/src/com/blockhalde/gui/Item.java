@@ -18,11 +18,11 @@ public class Item {
 	public String hasWear = "";
 	public String image = "";
 	public int maxStackSize = 0;
+	public int size = 1;
 	
 	private Category cat = null;
 	private int currentStackSize = 0;
 	private int inventoryPos;
-	
 	
 	public Item(){
 	}
@@ -51,7 +51,7 @@ public class Item {
 
 
 	public Texture getImage() {
-		return new Texture(Gdx.files.internal(image));
+		return new Texture(Gdx.files.internal("textures/" + image));
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package com.blockhalde.gui;
 
+import java.awt.Event;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
@@ -8,6 +10,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.terrain.block.BlockType;
 
 public class InventoryManager {
+	
+	ItemListener lst;
 	
 	private List<Item> items;
 	private List<Item> itemtypes;
@@ -41,6 +45,11 @@ public class InventoryManager {
 		if(item != null){
 			this.items.add(item);	
 		}
+		
+		if (lst != null) {
+			lst.itemAdded(this.items);
+		}
+		
 	}
 	
 
@@ -101,4 +110,9 @@ public class InventoryManager {
 		}
 		return this.items;
 	}
+	
+	public void setListener (ItemListener lst) {
+        this.lst = lst;
+    }
+
 }

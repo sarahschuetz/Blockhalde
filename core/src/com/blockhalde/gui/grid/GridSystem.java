@@ -1,6 +1,8 @@
 package com.blockhalde.gui.grid;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.badlogic.ashley.core.EntitySystem;
@@ -10,10 +12,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.blockhalde.gui.InventoryManager;
 import com.blockhalde.gui.Item;
+import com.blockhalde.gui.ItemListener;
 import com.blockhalde.gui.RendererGUI;
 
-public class GridSystem extends EntitySystem {
+public class GridSystem extends EntitySystem implements ItemListener {
 	
 	private final int GRID_COUNT = 12;
 	private final int BOTTOM_GRID_HEIGHT = 1;
@@ -43,7 +47,7 @@ public class GridSystem extends EntitySystem {
 	
 	public boolean inventoryIsVisible = false;
 	
-	protected HashMap<String, String> itemsForBottomGrid;
+	List<Item> items;
 	
 	public GridSystem() {
 		
@@ -56,9 +60,11 @@ public class GridSystem extends EntitySystem {
 			gridSize = width/GRID_COUNT;
 		}
 		
+		this.items = new ArrayList<Item>();
+		
 		this.stage = RendererGUI.instance().getStage();
 		
-		setHelperMaterials();
+		InventoryManager.getInstance().setListener(this);
 		
 		drawItemDescription(1, "Item description");
 		drawTitle(11, "INVENTORY");
@@ -100,18 +106,7 @@ public class GridSystem extends EntitySystem {
 			}
 		}
 		
-		int i = 0;
-		
-		for (Map.Entry<String, String> entry : itemsForBottomGrid.entrySet()) {
-		    Item item = new Item();
-		    item.name = entry.getKey();
-		    item.image = entry.getValue();
-		    setGridItem(item, i, 0);
-		    i++;
-		}
-		
 		setSelectedItemBottomGrid (0);
-		
 		bottomMenu = new GridActor(gridSize, bottomGrid);
 		stage.addActor(bottomMenu);
 		
@@ -149,19 +144,6 @@ public class GridSystem extends EntitySystem {
 		titleActor = new HeadingTextActor(text, gridSize, startOffset);
 		titleActor.setVisible(false);
 		stage.addActor(titleActor);
-	}
-	
-	private void setHelperMaterials() {
-		
-		itemsForBottomGrid = new HashMap<String, String>();
-		itemsForBottomGrid.put("Imaginary Stone", "textures/gui_textures/stone.png");
-		itemsForBottomGrid.put("Imaginary Wood", "textures/gui_textures/wood.png");
-		itemsForBottomGrid.put("Imaginary Cobblestone", "textures/gui_textures/cobblestone.png");
-		itemsForBottomGrid.put("Imaginary Glass", "textures/gui_textures/glass.png");
-		itemsForBottomGrid.put("Imaginary Diamond", "textures/gui_textures/diamond.png");
-		itemsForBottomGrid.put("Imaginary Coal", "textures/gui_textures/coal.png");
-		itemsForBottomGrid.put("Imaginary Bricks", "textures/gui_textures/bricks.png");
-		
 	}
 	
 	public void setGridItem(Item item, int x, int y) {
@@ -243,6 +225,42 @@ public class GridSystem extends EntitySystem {
 	
 	public boolean inventoryIsVisible() {
 		return inventoryIsVisible;
+	}
+
+	@Override
+	public void itemAdded(List<Item> items) {
+		
+		for (int j = 0; j < items.size(); j++) {
+			items.get(j).size = 1;
+		}
+			
+		for (int j = 0; j < items.size(); j++) {
+			boolean exists = false;
+			
+			int i;
+			
+			for (i = 0; i < this.items.size(); i++) {
+				if (items.get(j).name.equals(this.items.get(i).name)) {
+					exists = true;
+					break;
+				}
+			}
+			
+			if (exists) {
+				this.items.get(i).size += 1;
+			} else {
+				this.items.add(items.get(j));
+			}
+		    
+		}
+						
+		updateBottomGridItems();
+	}
+	
+	private void updateBottomGridItems() {
+		for (int j = 0; j < items.size() && j < GRID_COUNT; j++) {
+		    setGridItem(items.get(j), j, 0);
+		}
 	}
 	
 }

@@ -1,8 +1,11 @@
 package com.blockhalde.gui.grid;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
@@ -14,8 +17,17 @@ public class GridActor extends Actor {
 	private int gridSize;
 	private GridInstance[][] grids;
 	
+	protected String text = "";
+	protected GlyphLayout layout;
+	protected BitmapFont font;
+	
 	public GridActor(int gridSize, GridInstance[][] grids) {
 		shapeRenderer = new ShapeRenderer();
+		
+		font = new BitmapFont();
+        font.setColor(Color.WHITE);
+        
+        layout = new GlyphLayout();
 		
 		this.gridSize = gridSize;
 		this.grids = grids;
@@ -33,6 +45,9 @@ public class GridActor extends Actor {
 		batch.begin();
 		
 		drawGridActorItem(batch);
+		
+		drawGridActorNumbers(batch);
+		
 	}
 
 	private void drawGridActorItem(Batch batch) {
@@ -44,6 +59,17 @@ public class GridActor extends Actor {
 			}
 		}
 	} 
+	
+	private void drawGridActorNumbers(Batch batch) {
+		for (GridInstance[] gridRow : grids) {
+			for (GridInstance singleGrid : gridRow) {
+				if (singleGrid.item != null) {
+					layout.setText(font, singleGrid.item.size + "");
+					font.draw(batch, layout, singleGrid.position.x + gridSize/2 - layout.width/2, singleGrid.position.y + gridSize/2);
+				}	
+			}
+		}
+	}
 	
 	private void drawGridActorBackground() {
 		for (GridInstance[] gridRow : grids) {
