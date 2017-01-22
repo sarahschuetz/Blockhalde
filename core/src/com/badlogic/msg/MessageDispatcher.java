@@ -18,7 +18,6 @@ package com.badlogic.msg;
 
 /*import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.Timepiece;*/
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Logger;

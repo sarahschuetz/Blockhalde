@@ -21,7 +21,7 @@ public class DebugPerlinNoiseSystem extends EntitySystem {
 		Viewport viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera());
 		this.stage = new Stage(viewport);
 		
-		this.noise = new NoiseImg(engine.getSystem(WorldManagementSystem.class).getTerrainGenerator());
+		this.noise = new NoiseImg((PerlinTerrainGenerator) engine.getSystem(WorldManagementSystem.class).getTerrainGenerator());
 		this.stage.addActor(this.noise);
 	}
 

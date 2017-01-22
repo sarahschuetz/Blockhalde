@@ -4,7 +4,7 @@ import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 
 
-public class FlatTerrainGenerator extends BaseTerrainGenerator {
+public class FlatTerrainGenerator implements TerrainGenerator {
    
 	public FlatTerrainGenerator() {
 		super();

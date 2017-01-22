@@ -85,8 +85,4 @@ public class TerrainChunk implements Chunk {
     public ChunkPosition getChunkPosition() {
         return chunkPosition;
     }
-    
-    public ChunkPosition getRelativeChunkPosition() {
-        return new ChunkPosition(chunkPosition.getXPosition() / Chunk.X_MAX, chunkPosition.getZPosition() / Chunk.Z_MAX);
-    }
 }

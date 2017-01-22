@@ -53,7 +53,6 @@ public interface Chunk {
      * Get the position of the chunk.
      */
 	ChunkPosition getChunkPosition();
-	ChunkPosition getRelativeChunkPosition();
 	
 	/**
 	 * Gets the difference in time in nanoseconds between a fixed but arbitrary

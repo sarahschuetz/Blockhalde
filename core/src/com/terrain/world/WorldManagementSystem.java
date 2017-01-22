@@ -13,9 +13,8 @@ import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
 import com.terrain.chunk.ChunkUtil;
 import com.terrain.chunk.TerrainChunk;
-import com.terrain.generators.PerlinTerrainGenerator;
 import com.terrain.generators.PurePerlinTerrainGenerator;
-import com.terrain.generators.SimplePerlinTerrainGenerator;
+import com.terrain.generators.TerrainGenerator;
 import com.util.FlagUtils;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
 
     // TODO: Change so that Seed is not fix implemented here
 //    private PerlinTerrainGenerator terrainGenerator = new SimplePerlinTerrainGenerator("Herst Bertl");
-    private PerlinTerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
+    private TerrainGenerator terrainGenerator = new PurePerlinTerrainGenerator("Herst Bertl");
 
      /**
      * Creates a new blank chunk at the specified position in the world
@@ -45,9 +44,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
         final ChunkPosition chunkPosition = new ChunkPosition(xPosition, zPosition);
         final Chunk chunk = new TerrainChunk(chunkPosition);
 
-        // TODO: Make the terrain generator somehow changeable
         terrainGenerator.generate(chunk);
-
         worldChunks.put(chunkPosition, chunk);
         
         MessageManager.getInstance().dispatchMessage(0f, null, null, MessageIdConstants.CHUNK_CREATED_MSG_ID, new ChunkMessage(chunkPosition));
@@ -118,7 +115,7 @@ public class WorldManagementSystem extends EntitySystem implements WorldInterfac
         this.drawDistance = drawDistance;
     }
     
-    public PerlinTerrainGenerator getTerrainGenerator() {
+    public TerrainGenerator getTerrainGenerator() {
     	return terrainGenerator;
     }
 

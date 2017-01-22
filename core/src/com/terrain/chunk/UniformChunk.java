@@ -1,7 +1,6 @@
 package com.terrain.chunk;
 
 import com.terrain.block.BlockType;
-import com.util.FlagUtils;
 
 public class UniformChunk extends AbstractChunk {
 

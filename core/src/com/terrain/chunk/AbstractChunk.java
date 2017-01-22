@@ -69,12 +69,4 @@ public abstract class AbstractChunk implements Chunk {
 		final short block = getBlockAt(relativeX, relativeY, relativeZ);
 		return FlagUtils.getByteOf(block, 0);
 	}
-
-	@Override
-	public ChunkPosition getRelativeChunkPosition() {
-		ChunkPosition chunkPosition = getChunkPosition();
-		return new ChunkPosition(chunkPosition.getXPosition() / Chunk.X_MAX,
-				chunkPosition.getZPosition() / Chunk.Z_MAX);
-	}
-
 }

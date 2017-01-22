@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.terrain.chunk.Chunk;
 import com.terrain.generators.PerlinTerrainGenerator;
 import com.util.noise.PerlinNoise3D;
 

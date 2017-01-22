@@ -2,7 +2,7 @@ package com.terrain.generators;
 
 import com.util.noise.PerlinNoise3D;
 
-public abstract class BasePerlinTerrainGenerator extends BaseTerrainGenerator implements PerlinTerrainGenerator {
+public abstract class BasePerlinTerrainGenerator implements PerlinTerrainGenerator {
 	
 	protected PerlinNoise3D perlinNoise;
 
