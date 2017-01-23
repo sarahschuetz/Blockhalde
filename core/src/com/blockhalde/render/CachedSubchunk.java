@@ -6,14 +6,15 @@ import com.terrain.chunk.ChunkPosition;
 
 /**
  * <p>
- * Used to pass a request from the {@link ChunkMeshBuilder} to the {@link ChunkMeshDirector}
- * to generate or re-generate the mesh used to render a specific subchunk of the world.
+ * Encapsulates the position of a subchunk, a modification date, a mesh builder,
+ * and a lazily allocated mesh.
  * </p>
  * 
  * <p>
- * The {@link ChunkMeshDirector}, in turn, will populate the included mesh builder with the
- * data from the selected subchunk. Then, it will send the cached subchunk back to the
- * {@link ChunkMeshBuilder}
+ * This is the format used by the {@link RenderSystem} used to store cached
+ * subchunks for later drawing onto the screen. It is also the format used by
+ * {@link ChunkMeshDirector} to enqueue finished subchunks for inclusion into the
+ * cache of the render system.
  * </p>
  * 
  * @author phil
@@ -24,9 +25,8 @@ public class CachedSubchunk {
 	public long lastMeshUpdate = Long.MIN_VALUE;
 	public MeshBuilder builder;
 	private Mesh mesh;
-	
+
 	public CachedSubchunk(MeshBuilder builder, ChunkPosition chunkPos, int subchunkIdx, long lastMeshUpdate) {
-		super();
 		this.chunkPos = chunkPos;
 		this.subchunkIdx = subchunkIdx;
 		this.lastMeshUpdate = lastMeshUpdate;
@@ -34,14 +34,13 @@ public class CachedSubchunk {
 	}
 
 	public Mesh getMesh() {
-		if(mesh == null) {
+		if (mesh == null) {
 			mesh = builder.end();
 			builder = null;
 		}
-		
+
 		return mesh;
 	}
-
 
 	public boolean isUnused() {
 		return subchunkIdx == -1;
