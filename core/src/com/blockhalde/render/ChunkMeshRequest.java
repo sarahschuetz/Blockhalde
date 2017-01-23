@@ -3,18 +3,26 @@ package com.blockhalde.render;
 import com.terrain.chunk.Chunk;
 import com.terrain.chunk.ChunkPosition;
 
+/**
+ * Encapsulates the parameters for initialization of a {@link ChunkMeshBuilder},
+ * which will in turn use the data in the request to fabricate a mesh for the
+ * desired subchunk.
+ * 
+ * 
+ */
 public class ChunkMeshRequest {
 	/**
-	 * Holds the chunk that contains the subchunk that should be generated with this request.
+	 * Holds the chunk that contains the subchunk that should be generated with
+	 * this request.
 	 */
 	public Chunk centerChunk;
 	public Chunk posZChunk;
 	public Chunk negZChunk;
 	public Chunk posXChunk;
 	public Chunk negXChunk;
-	
+
 	public int subchunkIdx;
-	
+
 	public ChunkMeshRequest(Chunk centerChunk, Chunk posZChunk, Chunk negZChunk, Chunk posXChunk, Chunk negXChunk,
 			int subchunkIdx) {
 		super();
@@ -25,7 +33,7 @@ public class ChunkMeshRequest {
 		this.negXChunk = negXChunk;
 		this.subchunkIdx = subchunkIdx;
 	}
-	
+
 	public ChunkPosition getPosition() {
 		return centerChunk.getChunkPosition();
 	}
@@ -33,7 +41,7 @@ public class ChunkMeshRequest {
 	@Override
 	public int hashCode() {
 		ChunkPosition position = getPosition();
-		
+
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((position == null) ? 0 : position.hashCode());
@@ -49,11 +57,11 @@ public class ChunkMeshRequest {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		
+
 		ChunkMeshRequest other = (ChunkMeshRequest) obj;
 		ChunkPosition position = getPosition();
 		ChunkPosition otherPosition = other.getPosition();
-		
+
 		if (position == null) {
 			if (otherPosition != null)
 				return false;

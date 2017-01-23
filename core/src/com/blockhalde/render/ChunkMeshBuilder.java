@@ -16,22 +16,34 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 import com.terrain.block.BlockType;
 import com.terrain.chunk.Chunk;
 
+/**
+ * <p>
+ * A {@link ChunkMeshBuilder} is a poolable object that can be used to create a new
+ * libgdx {@link MeshBuilder} and populate it with the data of a selected subchunk using
+ * the data of the chunk containing the subchunk, as well as the data of the adjacent
+ * chunks. The chunk data is encapsulated in the {@link ChunkMeshRequest} that is passed
+ * to the <code>init(request)</code> method.
+ * </p>
+ * 
+ * <p>
+ * Since {@link ChunkMeshBuilder} implements the {@link Callable} interface, it can easily
+ * be integrated with concurrency frameworks, such as <em>ForkJoin</em>.
+ * </p>
+ */
 public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 
 	private static final byte AIR_ID = BlockType.AIR.getBlockId();
-	
+
 	public static final VertexAttributes BLOCK_MESH_ATTRS = new VertexAttributes(
-		new VertexAttribute(Usage.Position, 3, "a_position"),
-		new VertexAttribute(Usage.Normal, 3, "a_normal"),
-		new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
-		new VertexAttribute(Usage.ColorPacked, 4, "a_color")
-	);
-	
+			new VertexAttribute(Usage.Position, 3, "a_position"), new VertexAttribute(Usage.Normal, 3, "a_normal"),
+			new VertexAttribute(Usage.TextureCoordinates, 2, "a_texCoord0"),
+			new VertexAttribute(Usage.ColorPacked, 4, "a_color"));
+
 	private VertexInfo leftBottom = new VertexInfo();
 	private VertexInfo leftTop = new VertexInfo();
 	private VertexInfo rightBottom = new VertexInfo();
 	private VertexInfo rightTop = new VertexInfo();
-	
+
 	private Vector3 center = new Vector3();
 	private Vector3 bottomLeft = new Vector3();
 	private Vector3 bottomRight = new Vector3();
@@ -61,11 +73,24 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 			return req.centerChunk.getBlockTypeAt(relativeX, relativeY, relativeZ);
 		}
 	}
-	
+
+	/**
+	 * <p>
+	 * Used after retrieving a chunkmeshbuilder from the pool to configure it
+	 * for the generation of a specific subchunk. The initialization parameters
+	 * are encapsulated in {@link ChunkMeshRequest}.
+	 * </p>
+	 * 
+	 * <p>
+	 * After initialization
+	 * </p>
+	 * 
+	 * @param req
+	 */
 	public void init(ChunkMeshRequest req) {
 		this.req = req;
 	}
-	
+
 	@Override
 	public MeshBuilder call() throws Exception {
 		float blockSizeHalved = 0.5f;
@@ -98,22 +123,22 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 						uvTopRight.set(region.getU2(), region.getV());
 
 						// ao values for the block
-						int bottomLeftFront = getVertexAO(blockTypeAt(x - 1, y, z + 1),
-								blockTypeAt(x, y - 1, z + 1), blockTypeAt(x - 1, y - 1, z + 1));
-						int bottomRightFront = getVertexAO(blockTypeAt(x + 1, y, z + 1),
-								blockTypeAt(x, y - 1, z + 1), blockTypeAt(x + 1, y - 1, z + 1));
-						int topLeftFront = getVertexAO(blockTypeAt(x - 1, y, z + 1),
-								blockTypeAt(x, y + 1, z + 1), blockTypeAt(x - 1, y + 1, z + 1));
-						int topRightFront = getVertexAO(blockTypeAt(x + 1, y, z + 1),
-								blockTypeAt(x, y + 1, z + 1), blockTypeAt(x + 1, y + 1, z + 1));
-						int bottomLeftBack = getVertexAO(blockTypeAt(x - 1, y, z - 1),
-								blockTypeAt(x, y - 1, z - 1), blockTypeAt(x - 1, y - 1, z - 1));
-						int bottomRightBack = getVertexAO(blockTypeAt(x + 1, y, z - 1),
-								blockTypeAt(x, y - 1, z - 1), blockTypeAt(x + 1, y - 1, z - 1));
-						int topLeftBack = getVertexAO(blockTypeAt(x - 1, y, z - 1),
-								blockTypeAt(x, y + 1, z - 1), blockTypeAt(x - 1, y + 1, z - 1));
-						int topRightBack = getVertexAO(blockTypeAt(x + 1, y, z - 1),
-								blockTypeAt(x, y + 1, z - 1), blockTypeAt(x + 1, y + 1, z - 1));
+						int bottomLeftFront = getVertexAO(blockTypeAt(x - 1, y, z + 1), blockTypeAt(x, y - 1, z + 1),
+								blockTypeAt(x - 1, y - 1, z + 1));
+						int bottomRightFront = getVertexAO(blockTypeAt(x + 1, y, z + 1), blockTypeAt(x, y - 1, z + 1),
+								blockTypeAt(x + 1, y - 1, z + 1));
+						int topLeftFront = getVertexAO(blockTypeAt(x - 1, y, z + 1), blockTypeAt(x, y + 1, z + 1),
+								blockTypeAt(x - 1, y + 1, z + 1));
+						int topRightFront = getVertexAO(blockTypeAt(x + 1, y, z + 1), blockTypeAt(x, y + 1, z + 1),
+								blockTypeAt(x + 1, y + 1, z + 1));
+						int bottomLeftBack = getVertexAO(blockTypeAt(x - 1, y, z - 1), blockTypeAt(x, y - 1, z - 1),
+								blockTypeAt(x - 1, y - 1, z - 1));
+						int bottomRightBack = getVertexAO(blockTypeAt(x + 1, y, z - 1), blockTypeAt(x, y - 1, z - 1),
+								blockTypeAt(x + 1, y - 1, z - 1));
+						int topLeftBack = getVertexAO(blockTypeAt(x - 1, y, z - 1), blockTypeAt(x, y + 1, z - 1),
+								blockTypeAt(x - 1, y + 1, z - 1));
+						int topRightBack = getVertexAO(blockTypeAt(x + 1, y, z - 1), blockTypeAt(x, y + 1, z - 1),
+								blockTypeAt(x + 1, y + 1, z - 1));
 
 						if (blockTypeAt(x, y, z + 1) == AIR_ID) {
 							// Front plane
@@ -199,7 +224,7 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 				}
 			}
 		}
-		
+
 		if (builder.getNumVertices() == 0) {
 			return null;
 		} else {
