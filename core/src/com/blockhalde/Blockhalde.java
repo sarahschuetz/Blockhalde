@@ -46,7 +46,7 @@ public class Blockhalde extends ApplicationAdapter {
 				Gdx.app.postRunnable(new Runnable() {
 					@Override
 					public void run() {
-						engine.getSystem(RenderSystem.class).loadChunk(chunkMessage);
+						engine.getSystem(RenderSystem.class).loadChunk(chunkMessage.getChunkPosition());
 					}
 				});
 				
