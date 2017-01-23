@@ -4,6 +4,10 @@ import java.util.Comparator;
 
 import com.badlogic.gdx.math.Vector3;
 
+/**
+ * Sorts instances of {@link CachedSubchunk} from the lowest to the highest
+ * distance to a given reference position, that can be specified with a setter.
+ */
 public class SubchunkDistanceComparator implements Comparator<CachedSubchunk> {
 
 	private Vector3 referencePos = new Vector3();
