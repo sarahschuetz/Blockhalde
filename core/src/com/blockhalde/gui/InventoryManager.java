@@ -42,6 +42,8 @@ public class InventoryManager {
 			}
 		}
 		
+		System.out.println(block.getBlockId());
+		
 		if(item != null){
 			this.items.add(item);	
 		}

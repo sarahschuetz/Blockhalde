@@ -33,7 +33,7 @@
             "image": "gui_textures/stone.png"
         },
 		{    
-        	"id" : 5, 	
+        	"id" : 4, 	
             "name": "Grass Block",
             "category": "block",
             "maxStackSize": 64,
@@ -41,7 +41,7 @@
             "image": "gui_textures/grass.png"
         },
         {    
-        	"id" : 6, 	
+        	"id" : 5, 	
             "name": "TNT Block",
             "category": "block",
             "maxStackSize": 64,
@@ -49,7 +49,7 @@
             "image": "gui_textures/tnt.png"
         },
         {    
-        	"id" : 7, 	
+        	"id" : 6, 	
             "name": "Snow Block",
             "category": "block",
             "maxStackSize": 64,
@@ -57,7 +57,7 @@
             "image": "gui_textures/snow.png"
         },
         {
-       		"id" : 8,
+       		"id" : 7,
             "name": "Wood Block",
             "category": "block",
             "maxStackSize": 64,
@@ -66,7 +66,7 @@
         },
         
         {
-        	"id" : 9,
+        	"id" : 8,
         	"name": "CobbleStone Block",
             "category": "block",
             "maxStackSize": 64,
@@ -75,7 +75,7 @@
         },
         
         {
-        	"id" : 10,
+        	"id" : 9,
         	"name": "Glas Block",
             "category": "block",
             "maxStackSize": 64,
@@ -84,7 +84,7 @@
         },
         
         {
-        	"id" : 11,
+        	"id" : 10,
             "name": "Bricks Block",
             "category": "block",
             "maxStackSize": 64,
@@ -93,7 +93,7 @@
         },
         
         {
-        	"id" : 12,
+        	"id" : 11,
         	"name": "Diamond",
             "category": "ingredient",
             "maxStackSize": 64,
@@ -102,7 +102,7 @@
         },
         
         {
-        	"id" : 13,
+        	"id" : 12,
         	"name": "Coal",
             "category": "ingredient",
             "maxStackSize": 64,
@@ -111,7 +111,7 @@
         },
 
         {
-        	"id" : 14,
+        	"id" : 13,
             "name": "Laser Gun",
             "category": "tool",
             "maxStackSize": 1,
