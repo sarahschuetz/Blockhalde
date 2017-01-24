@@ -29,7 +29,7 @@ public class PerlinNoise3D extends Noise {
 		Random random = new Random(seed);
 		
 		// nextDouble() returns the next pseudorandom double value between 0.0 and 1.0
-		// * 256 -> numbers between 0 and 255
+		// * 256 -> numbers between 0 and 255.999..
 		offsetX = random.nextDouble() * 256;
 	    offsetY = random.nextDouble() * 256;
 	    offsetZ = random.nextDouble() * 256;
@@ -41,8 +41,9 @@ public class PerlinNoise3D extends Noise {
 	    	p[i] = random.nextInt(256);
 	    }
 
-	    // TODO: find out what this is for!
+	    // Shuffle array and fill all 512 numbers of array
         for(int i = 0; i < 256; i++) {
+        	
             int pos = random.nextInt(256 - i) + i;
             int old = p[i];
 
@@ -102,7 +103,7 @@ public class PerlinNoise3D extends Noise {
 		int floorZ = floor(z);
 		
 		// Find unit cube containing the point
-		// & -> clamp between 0 and 255
+		// & -> "clamp" between 0 and 255
 		int xi = floorX & 255; // Calculate the "unit cube" that the point asked will be located in
 		int yi = floorY & 255; // The left bound is ( |_x_|,|_y_|,|_z_| ) and the right bound is that
 		int zi = floorZ & 255; // plus 1. Next we calculate the location (from 0.0 to 1.0) in that cube.
@@ -124,14 +125,14 @@ public class PerlinNoise3D extends Noise {
 	    // The result of this hash function is a value between 0 and 255 (inclusive) because of our p[] array.
 	    int aaa, aba, aab, abb, baa, bba, bab, bbb;
 	    
-	    aaa = p[p[p[    xi ] +    yi ] +    zi ];
-	    aba = p[p[p[    xi ] + inc(yi)] +    zi ];
-	    aab = p[p[p[    xi ] +    yi ] + inc(zi)];
-	    abb = p[p[p[    xi ] + inc(yi)] + inc(zi)];
-	    baa = p[p[p[inc(xi)] +    yi ] +    zi ];
-	    bba = p[p[p[inc(xi)] + inc(yi)] +    zi ];
-	    bab = p[p[p[inc(xi)] +    yi ] + inc(zi)];
-	    bbb = p[p[p[inc(xi)] + inc(yi)] + inc(zi)];
+	    aaa = p[p[p[    xi ] +    yi ] +    zi ];    // 0 - 0 - 0
+	    aba = p[p[p[    xi ] + inc(yi)] +    zi ];   // 0 - 1 - 0
+	    aab = p[p[p[    xi ] +    yi ] + inc(zi)];   // 0 - 0 - 1
+	    abb = p[p[p[    xi ] + inc(yi)] + inc(zi)];  // 0 - 1 - 1
+	    baa = p[p[p[inc(xi)] +    yi ] +    zi ];    // 1 - 0 - 0
+	    bba = p[p[p[inc(xi)] + inc(yi)] +    zi ];   // 1 - 1 - 0
+	    bab = p[p[p[inc(xi)] +    yi ] + inc(zi)];   // 1 - 0 - 1
+	    bbb = p[p[p[inc(xi)] + inc(yi)] + inc(zi)];  // 1 - 1 - 1
 	    
 		
 		// The gradient function calculates the dot product between a pseudorandom
