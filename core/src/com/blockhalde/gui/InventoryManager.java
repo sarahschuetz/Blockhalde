@@ -1,8 +1,6 @@
 package com.blockhalde.gui;
 
-import java.awt.Event;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
@@ -13,11 +11,14 @@ public class InventoryManager {
 	
 	ItemListener lst;
 	
+	// lists for the actual items & all existing items
 	private List<Item> items;
 	private List<Item> itemtypes;
 	
+	// file where inventory is saved
 	private FileHandle inventory;
 	
+	// singelton instance
 	private static InventoryManager theInstance = null;
 	
 	private InventoryManager(){
@@ -26,6 +27,7 @@ public class InventoryManager {
 		this.itemtypes = ItemtypeSerializer.loadJsonItemsTypes();
 	}
 	
+	// get singelton instance
 	public static InventoryManager getInstance(){
 		 if(theInstance == null) {
 	         theInstance = new InventoryManager();
@@ -33,6 +35,7 @@ public class InventoryManager {
 	      return theInstance;
 	}
 	
+	// adds item by blocktype to inventory
 	public void addItem(BlockType block){
 		Item item = null;
 		
@@ -42,9 +45,8 @@ public class InventoryManager {
 			}
 		}
 		
-		System.out.println(block.getBlockId());
-		
-		if(item != null){
+		// if the item is null (not found in itemtypes), it must not get saved
+		if(item != null){ 
 			this.items.add(item);	
 		}
 		
@@ -65,6 +67,7 @@ public class InventoryManager {
 	}
 	
 	/* important for gui people, should be called when item is choosen in gui */
+	// consumes an item by id
 	public void consumeItem(int id){
 		Item consumed = this.items.get(id);
 		consumed.setStackSize(consumed.getStackSize()-1);
@@ -74,6 +77,7 @@ public class InventoryManager {
 		}
 	}
 	
+	// consumes an item by blocktype
 	public void consumeItem(BlockType item){
 		Item consumed = this.items.get(item.getBlockId());
 		consumed.setStackSize(consumed.getStackSize()-1);
@@ -97,9 +101,10 @@ public class InventoryManager {
 		return null;
 	}
 	
-	// file handling
+	// file handling - for loading and saving the inventory
+	
 	public void saveInventory(){
-		ItemtypeSerializer.saveJsonItems(this.items);
+		ItemtypeSerializer.saveJsonInventoryItems(this.items);
 	}
 	
 	public void loadInventory(){
@@ -113,6 +118,7 @@ public class InventoryManager {
 		return this.items;
 	}
 	
+	// listener for gui inventory 
 	public void setListener (ItemListener lst) {
         this.lst = lst;
     }

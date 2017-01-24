@@ -9,7 +9,8 @@ import com.badlogic.gdx.utils.Json;
 
 public class ItemtypeSerializer {
 	
-	public static void saveJsonItems(List<Item> inventory){
+	// method for saving the inventory 
+	public static void saveJsonInventoryItems(List<Item> inventory){
 			Json json = new Json();
 			FileHandle file = Gdx.files.local("json/inventory.json");
 			
@@ -25,6 +26,7 @@ public class ItemtypeSerializer {
 			file.writeString("}", true);
 	}
 
+	// method for loading all itemtypes -> all existing items in the game
 	public static List<Item> loadJsonItemsTypes(){   		 
 	        FileHandle handle = Gdx.files.internal("json/itemtypes.json");
 	        Json json = new Json();	        
@@ -39,6 +41,7 @@ public class ItemtypeSerializer {
 			return itemData; 
 	} 
 	
+	// method for loading the inventory from the inventory json file
 	public static List<Item> loadInventoryJsonItems(FileHandle inventory){
 		Json json = new Json();
 		return json.fromJson(ItemWrapper.class, inventory).inventory;
