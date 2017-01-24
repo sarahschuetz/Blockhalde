@@ -148,11 +148,9 @@ public class RenderSystem extends EntitySystem {
 	 * </p>
 	 * 
 	 * <p>
-	 * Note, that this will not actually enqueue generation of the given
-	 * position, but instead only the positions of those neighbouring chunks
-	 * that already have four loaded neighbouring chunks. This is an
-	 * optimization to avoid geometry errors when unloaded geometry is
-	 * considered in the generation of a chunk that has undefined neighbours.
+	 * Note: Enqueues not only the new chunk itself but also its neighbouring chunks
+	 * to be sure that there won't be any geometry issues. In maximum this method can
+	 * enqueue a total of five chunks per call.
 	 * </p>
 	 * 
 	 * @param pos

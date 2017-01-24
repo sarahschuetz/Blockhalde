@@ -232,7 +232,7 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 		}
 	}
 
-	public void addCubePlane(MeshBuilder builder, Vector3 center, Vector3 bottomLeftOffset, int bottomLeftAO,
+	private void addCubePlane(MeshBuilder builder, Vector3 center, Vector3 bottomLeftOffset, int bottomLeftAO,
 			Vector3 bottomRightOffset, int bottomRightAO, Vector3 topRightOffset, int topRightAO, Vector3 topLeftOffset,
 			int topLeftAO, Vector3 normal, Vector2 uvBottomLeft, Vector2 uvTopRight) {
 
@@ -252,7 +252,7 @@ public class ChunkMeshBuilder implements Poolable, Callable<MeshBuilder> {
 		builder.rect(leftBottom, rightBottom, rightTop, leftTop);
 	}
 
-	public int getVertexAO(short neighborSide1, short neighborSide2, short neighborCorner) {
+	private int getVertexAO(short neighborSide1, short neighborSide2, short neighborCorner) {
 		if (neighborSide1 != BlockType.AIR.getBlockId() && neighborSide2 != BlockType.AIR.getBlockId())
 			return 0;
 		int ao = 0;
