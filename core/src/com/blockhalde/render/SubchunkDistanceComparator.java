@@ -18,10 +18,6 @@ public class SubchunkDistanceComparator implements Comparator<CachedSubchunk> {
 	}
 	
 	private float getSubchunkDistanceSqr(CachedSubchunk subchunk) {
-		if(subchunk.isUnused()) {
-			return Float.MAX_VALUE;
-		}
-		
 		// Set subchunkpos to (0, 0, 0) in the chunk
 		subchunkPos.x = subchunk.chunkPos.getXPosition();
 		subchunkPos.y = subchunk.subchunkIdx * RenderSystem.SUBCHUNK_HEIGHT;

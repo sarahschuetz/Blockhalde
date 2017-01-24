@@ -41,8 +41,4 @@ public class CachedSubchunk {
 
 		return mesh;
 	}
-
-	public boolean isUnused() {
-		return subchunkIdx == -1;
-	}
 }

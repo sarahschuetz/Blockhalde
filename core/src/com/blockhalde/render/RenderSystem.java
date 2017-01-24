@@ -232,9 +232,7 @@ public class RenderSystem extends EntitySystem {
 		texture.bind(0);
 	
 		for (CachedSubchunk cached : cache) {
-			if (!cached.isUnused()) { // Omit draw call if mesh would be empty anyway
-				cached.getMesh().render(shader, GL20.GL_TRIANGLES);
-			}
+			cached.getMesh().render(shader, GL20.GL_TRIANGLES);
 		}
 	
 		shader.end();
@@ -296,8 +294,9 @@ public class RenderSystem extends EntitySystem {
 	 */
 	private CachedSubchunk findCachedSubchunk(int x, int subchunkIdx, int z) {
 		for (CachedSubchunk subchunk : cache) {
-			if (!subchunk.isUnused() && subchunk.subchunkIdx == subchunkIdx && subchunk.chunkPos.getXPosition() == x
-					&& subchunk.chunkPos.getZPosition() == z) {
+			if (subchunk.subchunkIdx == subchunkIdx &&
+				subchunk.chunkPos.getXPosition() == x &&
+				subchunk.chunkPos.getZPosition() == z) {
 				return subchunk;
 			}
 		}
