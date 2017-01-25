@@ -150,7 +150,7 @@ public class RenderSystem extends EntitySystem {
 	 * @param subchunkIdx
 	 * @param z
 	 */
-	public void enqueueSubchunk(int x, int subchunkIdx, int z) {
+	private void enqueueSubchunk(int x, int subchunkIdx, int z) {
 		Chunk center = world.getChunk(x, z);
 		Chunk posX = world.getChunk(x + 16, z);
 		Chunk negX = world.getChunk(x - 16, z);
@@ -207,7 +207,7 @@ public class RenderSystem extends EntitySystem {
 	 * 
 	 * @param chunk
 	 */
-	public void enqueueChunk(Chunk chunk) {
+	private void enqueueChunk(Chunk chunk) {
 		int x = chunk.getChunkPosition().getXPosition();
 		int z = chunk.getChunkPosition().getZPosition();
 
