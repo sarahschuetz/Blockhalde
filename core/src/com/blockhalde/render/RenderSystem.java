@@ -103,11 +103,36 @@ public class RenderSystem extends EntitySystem {
 	 *            Z Address of the block in world coordinates
 	 */
 	public void updateBlock(int blockX, int blockY, int blockZ) {
-		int chunkX = blockX / 16 * 16;
+		int x = blockX / 16 * 16;
 		int subchunkIdx = blockY / 16;
-		int chunkZ = blockZ / 16 * 16;
+		int z = blockZ / 16 * 16;
 
-		enqueueSubchunk(chunkX, subchunkIdx, chunkZ);
+		enqueueSubchunk(x, subchunkIdx, z);
+		
+		// Also enqueue neighbours in x and z direction
+		// in case their geometry may depend on the updated
+		// block or an older version of it
+		if(blockX % 16 == 15) {
+			enqueueSubchunk(x + 16, subchunkIdx, z);
+		}
+		if(blockX % 16 == 0) {
+			enqueueSubchunk(x - 16, subchunkIdx, z);
+		}
+		if(blockZ % 16 == 15) {
+			enqueueSubchunk(x, subchunkIdx, z + 16);
+		}
+		if(blockZ % 16 == 0) {
+			enqueueSubchunk(x, subchunkIdx, z - 16);
+		}
+		
+		// Also enqueue subchunk on top and on bottom
+		// if there may be geometry interdependence
+		if(blockY % 16 == 15) {
+			enqueueSubchunk(x, subchunkIdx + 1, z);
+		}
+		if(blockY % 16 == 0) {
+			enqueueSubchunk(x, subchunkIdx - 1, z);
+		}
 	}
 
 	/**
