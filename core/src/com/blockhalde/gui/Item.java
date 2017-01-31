@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Item {
 	
+	// enum for categories
 	public enum Category{
 		block,
 		ingredient,
@@ -12,6 +13,7 @@ public class Item {
 		armor
 	}
 	
+	// properties for loading and saving item
 	public int id;
 	public String name = "";
 	public String category = "";
@@ -20,14 +22,16 @@ public class Item {
 	public int maxStackSize = 0;
 	public int size = 1;
 	
+	// properties that get changed
 	private Category cat = null;
 	private int currentStackSize = 0;
 	private int inventoryPos;
 	
+	// constructor must be without parameters for json loading
 	public Item(){
 	}
 
-	
+	// turn category from json into enum value
 	public Category getCat() {
 		return Category.valueOf(Category.class, category);
 	}
@@ -49,7 +53,7 @@ public class Item {
 		this.inventoryPos = inventoryPos;
 	}
 
-
+	// load the texture 
 	public Texture getImage() {
 		return new Texture(Gdx.files.internal("textures/" + image));
 	}

@@ -87,18 +87,28 @@ public class InventoryManager {
 		}
 	}
 	
-	public BlockType deleteItem(Item item){
-			this.items.remove(item);
-			return null;	
+	// consumes an item by item value
+	public void consumeItem(Item item){
+			Item consumed = this.items.get(item.id);
+			consumed.setStackSize(consumed.getStackSize()-1);
+			
+			if(consumed.getStackSize() <= 0){
+				this.items.remove(consumed);
+			}
 	}
 	
-	public BlockType deleteItem(int id){
+	public void deleteItem(Item item){
+		if(this.items.contains(item)){	
+			this.items.remove(item);
+		}		
+	}
+	
+	public void deleteItem(int id){
 		for (Item item : this.items) {
 			if (item.id == id) {
 				deleteItem(item);
 			}
 		}
-		return null;
 	}
 	
 	// file handling - for loading and saving the inventory
