@@ -23,7 +23,8 @@ public class SubchunkDistanceComparator implements Comparator<CachedSubchunk> {
 		subchunkPos.y = subchunk.subchunkIdx * RenderSystem.SUBCHUNK_HEIGHT;
 		subchunkPos.z = subchunk.chunkPos.getZPosition();
 
-		// Set subchunk pos to center of subchunk
+		// Then set subchunk pos to center of subchunk by incrementing
+		// x,y,z by half a subchunk side length = 8.0f
 		subchunkPos.add(RenderSystem.SUBCHUNK_HEIGHT * 0.5f);
 		
 		return referencePos.dst2(subchunkPos);

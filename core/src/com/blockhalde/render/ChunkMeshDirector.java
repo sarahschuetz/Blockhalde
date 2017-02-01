@@ -38,9 +38,10 @@ public class ChunkMeshDirector implements Runnable {
 	 * should be concurrently executed in a builder.
 	 */
 	private BlockingQueue<ChunkMeshRequest> pendingRequests = new LinkedBlockingDeque<>();
+	
 	/**
 	 * Contains finished subchunks for reading by the object that created the
-	 * worker (render system).
+	 * director (render system).
 	 */
 	private BlockingQueue<CachedSubchunk> cacheInsertions;
 
@@ -140,6 +141,9 @@ public class ChunkMeshDirector implements Runnable {
 		}
 	}
 
+	/**
+	 * Schedules the director for exit at a safe point in the near future.
+	 */
 	public void shutdown() {
 		running = false;
 	}

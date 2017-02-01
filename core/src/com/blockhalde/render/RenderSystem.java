@@ -85,6 +85,11 @@ public class RenderSystem extends EntitySystem {
 	}
 
 	@Override
+	public void removedFromEngine(Engine engine) {
+		director.shutdown();
+	}
+
+	@Override
 	public void update(float deltaTime) {
 		drainNewCacheEntryQueue();
 		freeExcessCacheSpace();
@@ -92,8 +97,54 @@ public class RenderSystem extends EntitySystem {
 	}
 
 	/**
+	 * <p>
+	 * Invoked after a message that a new chunk has been loaded into the world
+	 * at the given position.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note: Enqueues not only the new chunk itself but also its neighbouring chunks
+	 * to be sure that there won't be any geometry issues. In maximum this method can
+	 * enqueue a total of five chunks per call.
+	 * </p>
+	 * 
+	 * @param pos
+	 */
+	public void loadChunk(ChunkPosition pos) {
+		int x = pos.getXPosition();
+		int z = pos.getZPosition();
+	
+		Chunk[] neighborhood = {
+			world.getChunk(x, z),
+			world.getChunk(x, z + 16),
+			world.getChunk(x, z - 16),
+			world.getChunk(x + 16, z),
+			world.getChunk(x - 16, z)
+		};
+	
+		for (Chunk neighbor : neighborhood) {
+			if (neighbor != null) {
+				enqueueChunk(neighbor);
+			}
+		}
+	}
+
+	/**
+	 * <p>
 	 * Invoked after a message from the world that a block at the given address
 	 * has changed, been deleted, or placed.
+	 * <p>
+	 * 
+	 * <p>
+	 * This will enqueue at least the subchunk where the block is contained for
+	 * mesh regeneration.
+	 * </p>
+	 * 
+	 * If the block is on the edge of a subchunk, neighbouring subchunks are also
+	 * regenerated. At a minimum, one subchunk is updated, at a maximum four
+	 * subchunks are updated, depending on how many faces of the subchunk are touched
+	 * by the addressed cube.
+	 * </p>
 	 * 
 	 * @param blockX
 	 *            X Address of the block in world coordinates
@@ -103,10 +154,11 @@ public class RenderSystem extends EntitySystem {
 	 *            Z Address of the block in world coordinates
 	 */
 	public void updateBlock(int blockX, int blockY, int blockZ) {
-		int x = blockX / 16 * 16;
-		int subchunkIdx = blockY / 16;
-		int z = blockZ / 16 * 16;
+		int x = blockX / 16 * 16; // Chunk X, rounded down to next number divisble by 16
+		int subchunkIdx = blockY / 16; // Subchunk index [0,15]
+		int z = blockZ / 16 * 16; // Chunk Z
 
+		// At a minimum, enqueue the subchunk that contains the block
 		enqueueSubchunk(x, subchunkIdx, z);
 		
 		// Also enqueue neighbours in x and z direction
@@ -168,34 +220,6 @@ public class RenderSystem extends EntitySystem {
 
 	/**
 	 * <p>
-	 * Invoked after a message that a new chunk has been loaded into the world
-	 * at the given position.
-	 * </p>
-	 * 
-	 * <p>
-	 * Note: Enqueues not only the new chunk itself but also its neighbouring chunks
-	 * to be sure that there won't be any geometry issues. In maximum this method can
-	 * enqueue a total of five chunks per call.
-	 * </p>
-	 * 
-	 * @param pos
-	 */
-	public void loadChunk(ChunkPosition pos) {
-		int x = pos.getXPosition();
-		int z = pos.getZPosition();
-
-		Chunk[] neighborhood = { world.getChunk(x, z), world.getChunk(x, z + 16), world.getChunk(x, z - 16),
-				world.getChunk(x + 16, z), world.getChunk(x - 16, z) };
-
-		for (Chunk neighbor : neighborhood) {
-			if (neighbor != null) {
-				enqueueChunk(neighbor);
-			}
-		}
-	}
-
-	/**
-	 * <p>
 	 * Enqueues the given chunk if all neighbouring chunks have already been
 	 * loaded.
 	 * </p>
@@ -226,11 +250,6 @@ public class RenderSystem extends EntitySystem {
 				director.enqueue(req);
 			}
 		}
-	}
-
-	@Override
-	public void removedFromEngine(Engine engine) {
-		director.shutdown();
 	}
 
 	private void render() {
